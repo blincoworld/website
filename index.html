@@ -52,7 +52,7 @@ header{
   display:flex;
   align-items:center;
   gap:28px;
-  font-size:.95rem;
+  font-size:1rem;
   font-weight:600;
 }
 .nav-link{
@@ -76,7 +76,7 @@ header{
   overflow:hidden;
 }
 .hero-copy{
-  padding:76px 56px 70px 0;
+  padding:30px 56px 70px 0;
   display:flex;
   flex-direction:column;
   justify-content:space-between;
@@ -86,14 +86,14 @@ header{
 .eyebrow{
   font-weight:700;
   color:var(--blue);
-  font-size:.95rem;
+  font-size:1rem;
   letter-spacing:.01em;
 }
 h1{
   margin:20px 0 28px;
   font-family:Inter,Arial,sans-serif;
   font-weight:800;
-  font-size:clamp(4.6rem,8.1vw,8.2rem);
+  font-size:clamp(4.2rem,6.6vw,6.8rem);
   line-height:.9;
   letter-spacing:-.055em;
   max-width:900px;
@@ -177,7 +177,7 @@ h1 .blue{color:var(--blue)}
   top:30px;
   z-index:3;
   color:#fff;
-  font-size:.95rem;
+  font-size:1rem;
   font-weight:700;
   max-width:170px;
   line-height:1.4;
@@ -193,7 +193,7 @@ h1 .blue{color:var(--blue)}
   padding:14px 16px;
   border-radius:8px;
   font-weight:700;
-  font-size:.92rem;
+  font-size:.98rem;
   box-shadow:0 10px 30px rgba(0,0,0,.08);
 }
 
@@ -206,7 +206,7 @@ h1 .blue{color:var(--blue)}
   padding:24px 22px;
   border-right:1px solid var(--line);
   font-weight:750;
-  font-size:1.02rem;
+  font-size:1.06rem;
 }
 .strip div:last-child{border-right:0}
 .strip span{color:var(--blue);margin-right:8px}
@@ -239,7 +239,7 @@ h1 .blue{color:var(--blue)}
 
 .story-copy{
   grid-column:2;
-  margin-top:50px;
+  margin-top:40px;
   display:grid;
   grid-template-columns:1fr 1fr;
   gap:52px;
@@ -248,8 +248,8 @@ h1 .blue{color:var(--blue)}
 .story-copy p{
   margin:0;
   color:var(--muted);
-  font-size:1.18rem;
-  line-height:1.72;
+  font-size:1.24rem;
+  line-height:1.68;
 }
 .story-copy strong{color:var(--ink)}
 
@@ -278,7 +278,7 @@ h1 .blue{color:var(--blue)}
 .flow-row .why{
   color:var(--muted);
   font-weight:600;
-  font-size:1.02rem;
+  font-size:1.06rem;
 }
 
 .statement{
@@ -345,7 +345,7 @@ footer{
   justify-content:space-between;
   gap:20px;
   color:var(--muted);
-  font-size:.9rem;
+  font-size:.96rem;
 }
 
 @media(max-width:920px){
@@ -415,7 +415,7 @@ footer{
 }
 .personal-bridge p span{color:var(--blue)}
 .flow-row .why{
-  font-size:1.02rem;
+  font-size:1.06rem;
   line-height:1.4;
 }
 .cta-box{
@@ -427,6 +427,134 @@ footer{
 @media(max-width:560px){
   .personal-bridge{padding:48px 0}
   .cta-box{padding:42px 24px}
+}
+</style>
+
+
+<style>
+.problem-proof{
+  padding:94px 0;
+  border-bottom:1px solid var(--ink);
+}
+.problem-grid{
+  display:grid;
+  grid-template-columns:26% 74%;
+}
+.problem-copy{
+  display:grid;
+  gap:0;
+  border-top:2px solid var(--ink);
+}
+.problem-item{
+  display:grid;
+  grid-template-columns:1.1fr .9fr;
+  gap:36px;
+  padding:30px 0;
+  border-bottom:1px solid var(--line);
+  align-items:start;
+}
+.problem-item strong{
+  font-size:1.46rem;
+  line-height:1.36;
+}
+.problem-item span{
+  color:var(--muted);
+  font-size:1.16rem;
+  line-height:1.5;
+}
+.why-free{
+  margin-top:28px;
+  max-width:720px;
+  color:#d0d7e2;
+  font-size:1rem;
+  line-height:1.65;
+  border-top:1px solid rgba(255,255,255,.18);
+  padding-top:22px;
+}
+.why-free strong{
+  color:#fff;
+}
+@media(max-width:920px){
+  .problem-grid{grid-template-columns:1fr}
+  .problem-grid .section-label{margin-bottom:34px}
+}
+@media(max-width:560px){
+  .problem-proof{padding:76px 0}
+  .problem-item{grid-template-columns:1fr;gap:10px;padding:24px 0}
+  .problem-item strong{font-size:1.18rem}
+}
+</style>
+
+
+<style>
+.diagnosis-kicker{
+  color:#8db5ff;
+  font-weight:800;
+  font-size:1rem;
+  margin-bottom:22px;
+}
+.diagnosis-details{
+  display:flex;
+  flex-wrap:wrap;
+  gap:0;
+  margin-top:30px;
+  border-top:1px solid rgba(255,255,255,.22);
+  border-bottom:1px solid rgba(255,255,255,.22);
+}
+.diagnosis-details span{
+  padding:15px 22px 15px 0;
+  margin-right:22px;
+  color:#fff;
+  font-weight:700;
+  font-size:.98rem;
+}
+.diagnosis-details span:not(:last-child)::after{
+  content:"/";
+  color:#6f7d90;
+  margin-left:22px;
+}
+.personal-bridge strong{
+  color:var(--ink);
+  font-weight:800;
+}
+@media(max-width:560px){
+  .diagnosis-details{
+    display:grid;
+  }
+  .diagnosis-details span{
+    padding:12px 0;
+    margin:0;
+    border-bottom:1px solid rgba(255,255,255,.12);
+  }
+  .diagnosis-details span:last-child{border-bottom:0}
+  .diagnosis-details span::after{display:none}
+}
+</style>
+
+
+<style>
+.bridge-conclusion{
+  display:block;
+  margin-top:1.15em;
+  font-size:.88em;
+  line-height:1.28;
+  font-weight:700;
+  color:var(--ink);
+}
+</style>
+
+
+<style>
+.problem-payoff{
+  padding:30px 0 4px;
+  font-size:1.25rem;
+  line-height:1.55;
+  color:var(--muted);
+  max-width:780px;
+}
+.problem-payoff strong{
+  color:var(--ink);
+  font-weight:800;
 }
 </style>
 
@@ -448,19 +576,17 @@ footer{
         <div>
           <div class="eyebrow">Systems for local trade businesses</div>
           <h1>
-            <span>Build the</span>
-            <span class="blue">system.</span>
-            <span>Win the work.</span>
+            <span>Good leads</span>
+            <span class="blue">are expensive.</span>
+            <span>Losing them costs even more.</span>
           </h1>
           <p>
-            I help trade businesses turn more enquiries into booked jobs by fixing what happens after the lead comes in:
-            response, booking, follow-up, quoting and the gaps in between.
+            I build simple systems for trade businesses that make sure enquiries get answered, quotes get followed up and good jobs don't disappear just because everyone's busy doing the actual work.
           </p>
         </div>
 
         <div class="hero-bottom">
-          <a class="primary" href="https://diagnosis.piersblinco.com/">Get Your Free Growth Diagnosis</a>
-          <a class="secondary" href="#story">The short story</a>
+          <a class="primary" href="https://diagnosis.piersblinco.com/">Find Out Where You're Losing Work</a>
         </div>
       </div>
 
@@ -471,10 +597,10 @@ footer{
     </section>
 
     <div class="strip">
-      <div><span>01</span> Enquiry capture</div>
-      <div><span>02</span> Inspection booking</div>
-      <div><span>03</span> Quote follow-up</div>
-      <div><span>04</span> Job conversion</div>
+      <div><span>01</span> Faster response</div>
+      <div><span>02</span> More inspections booked</div>
+      <div><span>03</span> Quotes actually followed up</div>
+      <div><span>04</span> Fewer good leads wasted</div>
     </div>
 
     <section class="section" id="story">
@@ -482,21 +608,17 @@ footer{
         <div class="section-label">01 — Background</div>
 
         <h2>
-          I started building websites.
-          <span class="soft">I ended up building the systems underneath businesses.</span>
+          I've been building things on the internet for more than 20 years.
+          <span class="soft">Eventually I realised the interesting bit wasn't really the website.</span>
         </h2>
 
         <div class="story-copy">
           <p>
-            I spent years in web development, ecommerce and consulting, working on large online businesses where the real
-            value was rarely just the website. It was the process behind it — what happened when someone clicked, enquired,
-            bought or needed a response.
+            I started as a web developer, spent years working in ecommerce and consulting, and eventually realised the interesting bit wasn't really the website. <strong>It was what happened after somebody showed up.</strong> Did somebody reply? Did they follow up? Did the customer know what to do next?
           </p>
 
           <p>
-            I’d also seen the small-business version growing up around my dad’s bicycle shop. A business can work incredibly
-            hard and still lose opportunities because follow-up relies on memory, customer information lives everywhere,
-            and there’s no clear system for what happens next. <strong>That’s the bit I care about fixing.</strong>
+            Big businesses build systems for all of that. Small businesses usually have the owner trying to remember who they quoted last Tuesday while they're halfway up a ladder. I’d already seen that world growing up around my dad’s bicycle shop. <strong>That’s where good opportunities disappear.</strong>
           </p>
         </div>
       </div>
@@ -504,7 +626,7 @@ footer{
 
     <section class="personal-bridge">
       <div class="bridge-label">A personal note</div>
-      <p>I've spent twenty-odd years around websites, ecommerce and business systems. These days I prefer building things that solve <span>boring, expensive problems.</span></p>
+      <p>These days I prefer building things that solve <span>boring, expensive problems</span> — the sort nobody thinks much about until they realise how much work is slipping through the cracks.<br><br><span class="bridge-conclusion">The expensive part isn't having a broken follow-up process. It's continuing to send good leads through it.</span></p>
     </section>
 
     <section class="section">
@@ -513,62 +635,90 @@ footer{
 
         <h2>
           The customer journey should keep moving
-          <span class="soft">even when the owner is on a roof.</span>
+          <span class="soft">even when the owner is up a ladder.</span>
         </h2>
 
         <div class="flow">
           <div class="flow-row">
             <div class="num">01</div>
-            <div class="title">A new enquiry comes in</div>
-            <div class="why">Capture it properly</div>
+            <div class="title">Someone fills in the website form</div>
+            <div class="why">How quickly did you respond?</div>
           </div>
           <div class="flow-row">
             <div class="num">02</div>
-            <div class="title">They get an immediate response</div>
-            <div class="why">Don't leave them waiting</div>
+            <div class="title">They look at the booking link</div>
+            <div class="why">What happens if they don't book?</div>
           </div>
           <div class="flow-row">
             <div class="num">03</div>
-            <div class="title">The inspection gets booked</div>
-            <div class="why">Move them forward</div>
+            <div class="title">The inspection is done</div>
+            <div class="why">Is the next step obvious?</div>
           </div>
           <div class="flow-row">
             <div class="num">04</div>
-            <div class="title">The quote is sent</div>
-            <div class="why">Know where it stands</div>
+            <div class="title">A quote is sent</div>
+            <div class="why">Who follows it up on day 2, 5, 10 and 21?</div>
           </div>
           <div class="flow-row">
             <div class="num">05</div>
-            <div class="title">Follow-up keeps happening</div>
-            <div class="why">No relying on memory</div>
+            <div class="title">They say, “I'll think about it”</div>
+            <div class="why">Who makes sure they're not forgotten?</div>
           </div>
           <div class="flow-row">
             <div class="num">06</div>
-            <div class="title">The job gets won and scheduled</div>
-            <div class="why">Close the loop</div>
+            <div class="title">The job is won</div>
+            <div class="why">What happens next?</div>
           </div>
         </div>
       </div>
     </section>
 
+
+    <section class="problem-proof">
+      <div class="problem-grid">
+        <div class="section-label">03 — Where the money leaks</div>
+        <div class="problem-copy">
+          <div class="problem-item">
+            <strong>Someone enquires while you're working.</strong>
+            <span>You'll reply later.</span>
+          </div>
+          <div class="problem-item">
+            <strong>Someone gets a quote.</strong>
+            <span>You'll chase them when you get a minute.</span>
+          </div>
+          <div class="problem-item">
+            <strong>Someone says they'll think about it.</strong>
+            <span>They're now somewhere in WhatsApp, your inbox, a notebook or your head.</span>
+          </div>
+          <div class="problem-payoff">None of that feels particularly serious at the time. <strong>Until you add up what those jobs were worth.</strong></div>
+        </div>
+      </div>
+    </section>
+
     <section class="statement">
-      <div class="label">03 — The point</div>
+      <div class="label">04 — The point</div>
       <blockquote>
-        Most businesses don't need more leads.
-        <span>They need to waste fewer good ones.</span>
+        You might not need more leads.
+        <span>You might just need to stop losing the ones you've already got.</span>
       </blockquote>
     </section>
 
     <section class="cta">
       <div class="cta-box">
         <div>
-          <h2>Find where the leaks are.</h2>
+          <div class="diagnosis-kicker">The Trade Growth Diagnosis</div>
+          <h2>Want me to take a look?</h2>
           <p>
-            The free Trade Growth Diagnosis looks at the common gaps between an enquiry arriving and a customer actually
-            saying yes — and shows you where your process may be letting good opportunities disappear.
+            I built a short Trade Growth Diagnosis that looks at six places where trade businesses commonly lose work. Answer a few questions and I'll show you which problem I'd look at first.
           </p>
+          <div class="diagnosis-details">
+            <span>Six common growth problems</span>
+            <span>Personalised diagnosis</span>
+            <span>Immediate result</span>
+          </div>
+          <div class="why-free">It's free, takes a few minutes, and there's no obligation to book a call afterwards. If there's something I can help with, we can talk. If there isn't, you've still got the diagnosis.</div>
         </div>
-        <a class="primary" href="https://diagnosis.piersblinco.com/">Run the Diagnosis</a>
+        <a class="primary" href="https://diagnosis.piersblinco.com/">Show Me Where I'm Losing Work</a>
       </div>
 
       <footer>
@@ -589,7 +739,10 @@ document.getElementById("year").textContent = new Date().getFullYear();
 .cta-box .primary{
   color:#fff;
   border-color:#fff;
-  min-width:340px;
+  min-width:360px;
+  font-size:1.08rem;
+  padding-top:18px;
+  padding-bottom:16px;
 }
 .cta-box .primary:hover{
   color:#8db5ff;
