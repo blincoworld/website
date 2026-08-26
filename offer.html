@@ -323,6 +323,52 @@
     }
     @media print { .trade-proof { display:none!important; } }
 
+  
+    .beta-availability {
+      border:1px solid var(--border);
+      border-radius:1rem;
+      padding:1.2rem 1.25rem;
+      background:#fff;
+      box-shadow:var(--shadow);
+      margin:1.4rem 0;
+      text-align:center;
+    }
+    .beta-availability-title {
+      font-size:.78rem;
+      font-weight:800;
+      letter-spacing:.06em;
+      text-transform:uppercase;
+      color:var(--mid);
+      margin-bottom:.75rem;
+    }
+    .beta-slots {
+      display:grid;
+      grid-template-columns:repeat(10,1fr);
+      gap:.4rem;
+      max-width:520px;
+      margin:0 auto .8rem;
+    }
+    .beta-slot {
+      aspect-ratio:1 / 1;
+      border-radius:.4rem;
+      border:1px solid var(--border);
+      background:#f5f7fa;
+      box-shadow:inset 0 0 0 1px rgba(255,255,255,.65);
+    }
+    .beta-slot.reserved {
+      background:var(--blue);
+      border-color:var(--blue);
+      box-shadow:0 6px 14px rgba(47,124,246,.18);
+    }
+    .beta-availability-copy {
+      margin:0;
+      font-weight:800;
+      font-size:1rem;
+    }
+    .beta-availability-copy span {
+      color:var(--blue);
+    }
+
   </style>
 </head>
 <body>
@@ -704,6 +750,13 @@
       <p class="mb-0">Each completed payment reserves one TradeOS beta installation. When the 10th space is taken, the beta closes.</p>
     </div>
 
+    
+    <div class="beta-availability" id="betaAvailability" aria-label="Founding beta availability">
+      <div class="beta-availability-title">Founding beta availability</div>
+      <div class="beta-slots" id="betaSlots" aria-hidden="true"></div>
+      <p class="beta-availability-copy" id="betaAvailabilityCopy"></p>
+    </div>
+
     <a class="cta-btn" href="https://buy.stripe.com/7sY4gz3zWeofcoCdwU67S03" target="_blank" rel="noopener">
       <i class="fa-solid fa-lock me-2"></i>SECURE MY TRADEOS INSTALLATION... £1,597
     </a>
@@ -1071,5 +1124,32 @@
   })();
 
 </script>
+
+<script>
+  // Update this one number as founding beta places are reserved.
+  const RESERVED_BETA_PLACES = 2;
+  const TOTAL_BETA_PLACES = 10;
+
+  (function renderBetaAvailability() {
+    const slots = document.getElementById('betaSlots');
+    const copy = document.getElementById('betaAvailabilityCopy');
+    if (!slots || !copy) return;
+
+    const reserved = Math.max(0, Math.min(TOTAL_BETA_PLACES, RESERVED_BETA_PLACES));
+    const remaining = TOTAL_BETA_PLACES - reserved;
+
+    slots.innerHTML = '';
+    for (let i = 0; i < TOTAL_BETA_PLACES; i++) {
+      const slot = document.createElement('div');
+      slot.className = 'beta-slot' + (i < reserved ? ' reserved' : '');
+      slots.appendChild(slot);
+    }
+
+    const reservedWord = reserved === 1 ? 'place' : 'places';
+    const remainingWord = remaining === 1 ? 'place' : 'places';
+    copy.innerHTML = `<span>${reserved} ${reservedWord} reserved.</span> ${remaining} ${remainingWord} remaining.`;
+  })();
+</script>
+
 </body>
 </html>
