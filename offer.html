@@ -31,7 +31,7 @@
     .shell { max-width:920px; margin:0 auto; padding:0 1rem; }
     .section { padding:3.75rem 0; }
     .section + .section { border-top:1px solid #eef1f5; }
-    .hero { padding:5rem 0 4rem; }
+    .hero { padding:2.25rem 0 4rem; }
     .hero-main {
       display:grid;
       grid-template-columns:minmax(0, 1.15fr) minmax(280px, .85fr);
@@ -210,7 +210,7 @@
     .final-section { padding-bottom:6.5rem; }
     @media (min-width:768px) {
       .section { padding:4.75rem 0; }
-      .hero { padding:6.25rem 0 5rem; }
+      .hero { padding:3rem 0 5rem; }
       .sticky-cta { display:none; }
       .final-section { padding-bottom:4.75rem; }
       .media-caption { text-align:left; }
@@ -369,9 +369,52 @@
       color:var(--blue);
     }
 
+  
+    .availability-topbar {
+      position:sticky;
+      top:0;
+      z-index:1045;
+      background:#ffdf3d;
+      color:#121826;
+      border-bottom:1px solid rgba(18,24,38,.12);
+      box-shadow:0 6px 18px rgba(18,24,38,.08);
+    }
+    .availability-topbar-inner {
+      max-width:920px;
+      margin:0 auto;
+      padding:.5rem 1rem;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:.55rem;
+      font-size:.88rem;
+      font-weight:800;
+      line-height:1.2;
+      text-align:center;
+    }
+    .availability-topbar-dot {
+      width:.48rem;
+      height:.48rem;
+      border-radius:50%;
+      background:var(--blue);
+      flex:0 0 auto;
+      box-shadow:0 0 0 4px rgba(47,124,246,.12);
+    }
+    @media (max-width:575.98px) {
+      .availability-topbar-inner {
+        padding:.48rem .75rem;
+        font-size:.82rem;
+      }
+    }
+
   </style>
 </head>
 <body>
+<div class="availability-topbar" aria-label="Founding beta availability">
+  <div class="availability-topbar-inner">
+    <span id="betaTopbarCopy">2 places reserved · 8 remaining</span>
+  </div>
+</div>
 
 <main class="shell">
 
@@ -1133,6 +1176,7 @@
   (function renderBetaAvailability() {
     const slots = document.getElementById('betaSlots');
     const copy = document.getElementById('betaAvailabilityCopy');
+    const topbarCopy = document.getElementById('betaTopbarCopy');
     if (!slots || !copy) return;
 
     const reserved = Math.max(0, Math.min(TOTAL_BETA_PLACES, RESERVED_BETA_PLACES));
@@ -1148,6 +1192,9 @@
     const reservedWord = reserved === 1 ? 'place' : 'places';
     const remainingWord = remaining === 1 ? 'place' : 'places';
     copy.innerHTML = `<span>${reserved} ${reservedWord} reserved.</span> ${remaining} ${remainingWord} remaining.`;
+    if (topbarCopy) {
+      topbarCopy.textContent = `${reserved} ${reservedWord} reserved · ${remaining} ${remainingWord} remaining`;
+    }
   })();
 </script>
 
