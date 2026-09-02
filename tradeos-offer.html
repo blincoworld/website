@@ -1294,7 +1294,56 @@ const jobValue = document.getElementById("jobValue");
           "Current enquiry and quote situation": values.enquiry_situation,
           "What happens after a quote": values.quote_followup,
           "Biggest difference": values.biggest_difference,
-          "Ideal timing": values.timing
+          "Ideal timing": values.timing,
+
+          "Calculator average job value":
+            Math.max(0, Number(jobValue?.value) || 0),
+
+          "Calculator lost jobs per week":
+            Math.max(0, Number(lostJobs?.value) || 0),
+
+          "Calculator recovery percentage":
+            Math.min(
+              100,
+              Math.max(
+                0,
+                Number(recoverable?.value) || 0
+              )
+            ),
+
+          "Estimated monthly revenue recovery":
+            Math.round(
+              (
+                Math.max(0, Number(jobValue?.value) || 0) *
+                Math.max(0, Number(lostJobs?.value) || 0) *
+                52 *
+                (
+                  Math.min(
+                    100,
+                    Math.max(
+                      0,
+                      Number(recoverable?.value) || 0
+                    )
+                  ) / 100
+                )
+              ) / 12
+            ),
+
+          "Estimated annual revenue recovery":
+            Math.round(
+              Math.max(0, Number(jobValue?.value) || 0) *
+              Math.max(0, Number(lostJobs?.value) || 0) *
+              52 *
+              (
+                Math.min(
+                  100,
+                  Math.max(
+                    0,
+                    Number(recoverable?.value) || 0
+                  )
+                ) / 100
+              )
+            )
         }
       };
 
