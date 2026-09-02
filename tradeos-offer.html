@@ -888,7 +888,64 @@
 <div aria-live="polite" class="interest-thanks" id="interestThanks" role="status">
 <i class="fa-solid fa-circle-check"></i>
 <h3>Thanks... we've got it.</h3>
-<p class="mb-0">We'll take a look at your answers and be in touch shortly.</p>
+<p class="mb-0" id="interestThanksMessage">We'll take a look at your answers and be in touch shortly.</p>
+
+<div class="ooh-callback" id="oohCallback" hidden>
+  <div class="ooh-callback-divider"></div>
+
+  <div class="kicker mb-1">You've caught us out of hours</div>
+  <h4>When would you prefer a quick call?</h4>
+
+  <p class="text-secondary mb-3">
+    No need to book an appointment. Just give us a rough day and time
+    that normally suits you and we'll aim for that.
+  </p>
+
+  <div class="row g-2">
+    <div class="col-md-6">
+      <label class="form-label" for="callbackDay">
+        Preferred day
+      </label>
+
+      <select
+        class="form-select"
+        id="callbackDay"
+      ></select>
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label" for="callbackTime">
+        Preferred time
+      </label>
+
+      <select
+        class="form-select"
+        id="callbackTime"
+      >
+        <option value="9–11am">9–11am</option>
+        <option value="11am–1pm">11am–1pm</option>
+        <option value="1–3pm">1–3pm</option>
+        <option value="3–5pm">3–5pm</option>
+        <option value="Any time 9–5">Any time 9–5</option>
+      </select>
+    </div>
+  </div>
+
+  <button
+    class="interest-submit mt-3"
+    id="saveCallbackPreference"
+    type="button"
+  >
+    SAVE CALLBACK PREFERENCE
+  </button>
+
+  <p
+    class="small-note text-center mt-2 mb-0"
+    id="callbackPreferenceStatus"
+  >
+    Optional... if you don't choose anything, we'll simply call on the next working day.
+  </p>
+</div>
 </div>
 </div>
 </div>
@@ -902,6 +959,40 @@
       </div>
 <button class="cta-btn border-0" data-bs-target="#interestModal" data-bs-toggle="modal" type="button">REGISTER YOUR INTEREST</button>
 </div>
+<style>
+.ooh-callback {
+  margin-top: 22px;
+  text-align: left;
+}
+
+.ooh-callback-divider {
+  height: 1px;
+  margin: 22px 0;
+  background: #e6ebf2;
+}
+
+.ooh-callback h4 {
+  margin: 0 0 6px;
+  font-size: 1.05rem;
+  font-weight: 800;
+}
+
+.ooh-callback .interest-submit {
+  width: 100%;
+}
+
+.ooh-callback.is-saved {
+  padding: 16px;
+  border: 1px solid #bbf7d0;
+  border-radius: 12px;
+  background: #f0fdf4;
+}
+
+.ooh-callback.is-saved .ooh-callback-divider {
+  display: none;
+}
+</style>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
 const jobValue = document.getElementById("jobValue");
@@ -1267,7 +1358,126 @@ const jobValue = document.getElementById("jobValue");
 
     const form = document.getElementById('interestForm');
     const thanks = document.getElementById('interestThanks');
+    const thanksMessage = document.getElementById('interestThanksMessage');
+    const oohCallback = document.getElementById('oohCallback');
+    const callbackDay = document.getElementById('callbackDay');
+    const callbackTime = document.getElementById('callbackTime');
+    const saveCallbackPreference = document.getElementById('saveCallbackPreference');
+    const callbackPreferenceStatus = document.getElementById('callbackPreferenceStatus');
+
     if (!form || !thanks) return;
+
+    let lastTradeOsPayload = null;
+
+    function getUkNowParts() {
+      const formatter = new Intl.DateTimeFormat(
+        'en-GB',
+        {
+          timeZone: 'Europe/London',
+          weekday: 'short',
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: false
+        }
+      );
+
+      const parts = Object.fromEntries(
+        formatter
+          .formatToParts(new Date())
+          .filter(part => part.type !== 'literal')
+          .map(part => [part.type, part.value])
+      );
+
+      return {
+        weekday: parts.weekday,
+        hour: Number(parts.hour),
+        minute: Number(parts.minute)
+      };
+    }
+
+    function isTradeOsCoreHours() {
+      const now = getUkNowParts();
+
+      const workingDay = [
+        'Mon',
+        'Tue',
+        'Wed',
+        'Thu',
+        'Fri'
+      ].includes(now.weekday);
+
+      return (
+        workingDay &&
+        now.hour >= 9 &&
+        now.hour < 17
+      );
+    }
+
+    function getNextWorkingDays(count = 5) {
+      const results = [];
+      const cursor = new Date();
+
+      /*
+       * Work with midday dates so DST changes don't push
+       * the calendar date backwards/forwards.
+       */
+      cursor.setHours(12, 0, 0, 0);
+
+      while (results.length < count) {
+        cursor.setDate(cursor.getDate() + 1);
+
+        const weekday = new Intl.DateTimeFormat(
+          'en-GB',
+          {
+            timeZone: 'Europe/London',
+            weekday: 'short'
+          }
+        ).format(cursor);
+
+        if (weekday === 'Sat' || weekday === 'Sun') {
+          continue;
+        }
+
+        results.push({
+          value: cursor.toISOString().slice(0, 10),
+          label: new Intl.DateTimeFormat(
+            'en-GB',
+            {
+              timeZone: 'Europe/London',
+              weekday: 'long',
+              day: 'numeric',
+              month: 'long'
+            }
+          ).format(cursor)
+        });
+      }
+
+      return results;
+    }
+
+    function populateCallbackDays() {
+      if (!callbackDay) return;
+
+      callbackDay.innerHTML = getNextWorkingDays()
+        .map(
+          day =>
+            `<option value="${day.value}">${day.label}</option>`
+        )
+        .join('');
+    }
+
+    function showOutOfHoursCallback() {
+      if (!oohCallback) return;
+
+      populateCallbackDays();
+
+      oohCallback.hidden = false;
+
+      if (thanksMessage) {
+        thanksMessage.textContent =
+          "We've got your details. You've caught us outside our normal Monday to Friday, 9–5 call hours, so we won't disturb you now.";
+      }
+    }
 
     form.addEventListener('submit', async function (event) {
       event.preventDefault();
@@ -1367,8 +1577,16 @@ const jobValue = document.getElementById("jobValue");
           );
         }
 
+        lastTradeOsPayload = JSON.parse(
+          JSON.stringify(payload)
+        );
+
         form.style.display = 'none';
         thanks.style.display = 'block';
+
+        if (!isTradeOsCoreHours()) {
+          showOutOfHoursCallback();
+        }
       } catch (error) {
         console.error('TradeOS registration failed:', error);
 
@@ -1383,11 +1601,119 @@ const jobValue = document.getElementById("jobValue");
       }
     });
 
+    if (saveCallbackPreference) {
+      saveCallbackPreference.addEventListener(
+        'click',
+        async function () {
+          if (
+            !lastTradeOsPayload ||
+            !callbackDay ||
+            !callbackTime
+          ) {
+            return;
+          }
+
+          const originalText =
+            saveCallbackPreference.textContent;
+
+          saveCallbackPreference.disabled = true;
+          saveCallbackPreference.textContent = 'SAVING...';
+
+          const updatedPayload = JSON.parse(
+            JSON.stringify(lastTradeOsPayload)
+          );
+
+          updatedPayload.questionnaireAnswers = {
+            ...(updatedPayload.questionnaireAnswers || {}),
+            "Preferred callback day": callbackDay.value,
+            "Preferred callback time": callbackTime.value
+          };
+
+          try {
+            const response = await fetch(
+              'https://business-os.pbwebonlinesales.workers.dev/api/leads/create',
+              {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(updatedPayload)
+              }
+            );
+
+            const result = await response
+              .json()
+              .catch(() => ({}));
+
+            if (!response.ok || !result.success) {
+              throw new Error(
+                result.error ||
+                'Could not save callback preference.'
+              );
+            }
+
+            lastTradeOsPayload = updatedPayload;
+
+            oohCallback?.classList.add('is-saved');
+
+            saveCallbackPreference.textContent =
+              '✓ CALLBACK PREFERENCE SAVED';
+
+            if (callbackPreferenceStatus) {
+              const selectedDay =
+                callbackDay.options[
+                  callbackDay.selectedIndex
+                ]?.textContent || callbackDay.value;
+
+              callbackPreferenceStatus.textContent =
+                `Got it... we'll aim to call ${selectedDay}, ${callbackTime.value}.`;
+            }
+          } catch (error) {
+            console.error(
+              'Callback preference save failed:',
+              error
+            );
+
+            alert(
+              'Sorry, we could not save your callback preference. Your original registration is safe.'
+            );
+
+            saveCallbackPreference.disabled = false;
+            saveCallbackPreference.textContent =
+              originalText;
+          }
+        }
+      );
+    }
+
     if (modalEl) {
       modalEl.addEventListener('hidden.bs.modal', function () {
         form.reset();
         form.style.display = '';
         thanks.style.display = 'none';
+
+        lastTradeOsPayload = null;
+
+        if (oohCallback) {
+          oohCallback.hidden = true;
+          oohCallback.classList.remove('is-saved');
+        }
+
+        if (saveCallbackPreference) {
+          saveCallbackPreference.disabled = false;
+          saveCallbackPreference.textContent =
+            'SAVE CALLBACK PREFERENCE';
+        }
+
+        if (callbackPreferenceStatus) {
+          callbackPreferenceStatus.textContent =
+            "Optional... if you don't choose anything, we'll simply call on the next working day.";
+        }
+
+        if (thanksMessage) {
+          thanksMessage.textContent =
+            "We'll take a look at your answers and be in touch shortly.";
+        }
       });
     }
   })();
