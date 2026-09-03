@@ -1,0 +1,536 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+  >
+  <title>Secure your TradeOS founding place</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: #f5f7fb;
+      color: #10213d;
+      font-family:
+        Inter,
+        ui-sans-serif,
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+    }
+
+    .page {
+      width: min(100% - 32px, 1040px);
+      margin: 0 auto;
+      padding: 60px 0 90px;
+    }
+
+    .brand {
+      margin-bottom: 44px;
+      color: #1769e0;
+      font-size: 14px;
+      font-weight: 800;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .hero {
+      max-width: 760px;
+      margin-bottom: 34px;
+    }
+
+    .eyebrow {
+      color: #1769e0;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 8px 0 12px;
+      font-size: clamp(34px, 5vw, 56px);
+      line-height: 1.04;
+      letter-spacing: -.04em;
+    }
+
+    .hero p {
+      margin: 0;
+      color: #5e6b7f;
+      font-size: 18px;
+      line-height: 1.65;
+    }
+
+    .customer {
+      margin: 26px 0 34px;
+      padding: 16px 18px;
+      border: 1px solid #dce3ed;
+      border-radius: 12px;
+      background: #fff;
+      color: #5e6b7f;
+    }
+
+    .customer strong {
+      color: #10213d;
+    }
+
+    .plans {
+      display: grid;
+      grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+      gap: 22px;
+    }
+
+    .plan {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      padding: 28px;
+      border: 1px solid #dce3ed;
+      border-radius: 18px;
+      background: #fff;
+      box-shadow:
+        0 12px 35px rgba(20, 39, 74, .06);
+    }
+
+    .plan.recommended {
+      border: 2px solid #1769e0;
+    }
+
+    .recommended-label {
+      position: absolute;
+      top: -13px;
+      right: 20px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: #1769e0;
+      color: #fff;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+
+    .plan h2 {
+      margin: 0;
+      font-size: 22px;
+    }
+
+    .price {
+      margin: 18px 0 6px;
+      font-size: 44px;
+      font-weight: 850;
+      letter-spacing: -.04em;
+    }
+
+    .price-note {
+      min-height: 48px;
+      color: #5e6b7f;
+      line-height: 1.5;
+    }
+
+    .details {
+      margin: 24px 0 28px;
+      padding: 18px 0;
+      border-top: 1px solid #e6ebf2;
+      border-bottom: 1px solid #e6ebf2;
+    }
+
+    .detail {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      padding: 7px 0;
+      font-size: 14px;
+    }
+
+    .detail span {
+      color: #6b778b;
+    }
+
+    .detail strong {
+      text-align: right;
+    }
+
+    .fee-note {
+      margin: 0 0 20px;
+      padding: 12px 14px;
+      border-radius: 10px;
+      background: #fff8e8;
+      color: #705314;
+      font-size: 12px;
+      line-height: 1.55;
+    }
+
+    button {
+      width: 100%;
+      min-height: 52px;
+      margin-top: auto;
+      border: 0;
+      border-radius: 10px;
+      background: #1769e0;
+      color: #fff;
+      font: inherit;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    button.secondary {
+      background: #10213d;
+    }
+
+    button:disabled {
+      opacity: .55;
+      cursor: wait;
+    }
+
+    .security {
+      margin-top: 28px;
+      color: #778397;
+      font-size: 12px;
+      line-height: 1.6;
+      text-align: center;
+    }
+
+    .error {
+      display: none;
+      margin-bottom: 24px;
+      padding: 14px 16px;
+      border: 1px solid #fecaca;
+      border-radius: 10px;
+      background: #fef2f2;
+      color: #991b1b;
+    }
+
+    @media (max-width: 760px) {
+      .page {
+        padding-top: 34px;
+      }
+
+      .plans {
+        grid-template-columns: 1fr;
+      }
+
+      .plan {
+        padding: 22px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="page">
+    <div class="brand">TradeOS</div>
+
+    <section class="hero">
+      <div class="eyebrow">
+        Founding member offer
+      </div>
+
+      <h1>
+        Choose how you'd like to get started.
+      </h1>
+
+      <p>
+        Your founding place includes the full TradeOS build,
+        six months of access and the founding-member terms
+        we've discussed.
+      </p>
+    </section>
+
+    <div
+      class="error"
+      id="errorBox"
+    ></div>
+
+    <div
+      class="customer"
+      id="customerBox"
+    >
+      Loading your payment options...
+    </div>
+
+    <section
+      class="plans"
+      id="plans"
+      hidden
+    >
+      <article class="plan recommended">
+        <div class="recommended-label">
+          Best value
+        </div>
+
+        <h2>Pay in full</h2>
+
+        <div class="price">
+          £1,597
+        </div>
+
+        <div class="price-note">
+          One payment today. No additional payment-plan fee.
+        </div>
+
+        <div class="details">
+          <div class="detail">
+            <span>TradeOS founding offer</span>
+            <strong>£1,597</strong>
+          </div>
+
+          <div class="detail">
+            <span>Payment-plan fee</span>
+            <strong>£0</strong>
+          </div>
+
+          <div class="detail">
+            <span>Total payable</span>
+            <strong>£1,597</strong>
+          </div>
+        </div>
+
+        <button
+          type="button"
+          data-payment-option="full"
+        >
+          PAY £1,597
+        </button>
+      </article>
+
+      <article class="plan">
+        <h2>Split over 2 months</h2>
+
+        <div class="price">
+          £958.20
+        </div>
+
+        <div class="price-note">
+          £958.20 today, then £958.20
+          one month later.
+        </div>
+
+        <div class="details">
+          <div class="detail">
+            <span>TradeOS founding offer</span>
+            <strong>£1,597</strong>
+          </div>
+
+          <div class="detail">
+            <span>Split-payment fee</span>
+            <strong>£319.40 (20%)</strong>
+          </div>
+
+          <div class="detail">
+            <span>Total payable</span>
+            <strong>£1,916.40</strong>
+          </div>
+
+          <div class="detail">
+            <span>Payments</span>
+            <strong>2 × £958.20</strong>
+          </div>
+        </div>
+
+        <div class="fee-note">
+          The split-payment option includes a 20%
+          payment-plan fee for paying across two
+          monthly instalments.
+        </div>
+
+        <button
+          class="secondary"
+          type="button"
+          data-payment-option="split"
+        >
+          PAY £958.20 TODAY
+        </button>
+      </article>
+    </section>
+
+    <div class="security">
+      Payments are processed securely by Stripe.
+      Your card details are never stored by TradeOS.
+    </div>
+  </main>
+
+  <script>
+    (() => {
+      const API =
+        'https://business-os.pbwebonlinesales.workers.dev';
+
+      const params =
+        new URLSearchParams(
+          window.location.search
+        );
+
+      const leadId =
+        params.get('lead') || '';
+
+      const customerBox =
+        document.getElementById(
+          'customerBox'
+        );
+
+      const plans =
+        document.getElementById(
+          'plans'
+        );
+
+      const errorBox =
+        document.getElementById(
+          'errorBox'
+        );
+
+      function showError(message) {
+        errorBox.textContent = message;
+        errorBox.style.display = 'block';
+      }
+
+      function escapeHtml(value) {
+        const div =
+          document.createElement('div');
+
+        div.textContent =
+          String(value || '');
+
+        return div.innerHTML;
+      }
+
+      async function loadContext() {
+        if (!leadId) {
+          customerBox.textContent =
+            'This payment link is incomplete.';
+
+          showError(
+            'Please use the payment link you were sent.'
+          );
+
+          return;
+        }
+
+        try {
+          const response = await fetch(
+            `${API}/api/tradeos/payment-context?leadId=${encodeURIComponent(
+              leadId
+            )}`
+          );
+
+          const data =
+            await response.json();
+
+          if (
+            !response.ok ||
+            !data.success
+          ) {
+            throw new Error(
+              data.error ||
+              'Could not load payment details.'
+            );
+          }
+
+          customerBox.innerHTML =
+            `<strong>${
+              escapeHtml(
+                data.lead.name ||
+                'TradeOS customer'
+              )
+            }</strong><br>${
+              escapeHtml(
+                data.lead.email || ''
+              )
+            }`;
+
+          plans.hidden = false;
+        } catch (error) {
+          console.error(error);
+
+          customerBox.textContent =
+            'We could not load this payment link.';
+
+          showError(error.message);
+        }
+      }
+
+      async function startCheckout(
+        option,
+        button
+      ) {
+        const original =
+          button.textContent;
+
+        button.disabled = true;
+        button.textContent =
+          'OPENING SECURE CHECKOUT...';
+
+        try {
+          const response = await fetch(
+            `${API}/api/tradeos/checkout`,
+            {
+              method: 'POST',
+
+              headers: {
+                'Content-Type':
+                  'application/json'
+              },
+
+              body: JSON.stringify({
+                paymentOption: option,
+                leadId
+              })
+            }
+          );
+
+          const data =
+            await response.json();
+
+          if (
+            !response.ok ||
+            !data.success ||
+            !data.checkoutUrl
+          ) {
+            throw new Error(
+              data.error ||
+              'Could not start checkout.'
+            );
+          }
+
+          window.location.href =
+            data.checkoutUrl;
+        } catch (error) {
+          console.error(error);
+
+          button.disabled = false;
+          button.textContent =
+            original;
+
+          showError(error.message);
+        }
+      }
+
+      document
+        .querySelectorAll(
+          '[data-payment-option]'
+        )
+        .forEach((button) => {
+          button.addEventListener(
+            'click',
+            () => {
+              startCheckout(
+                button.dataset.paymentOption,
+                button
+              );
+            }
+          );
+        });
+
+      loadContext();
+    })();
+  </script>
+</body>
+</html>
