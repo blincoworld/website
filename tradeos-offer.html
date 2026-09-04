@@ -930,6 +930,33 @@
 }
 </style>
 
+
+<style>
+/* TradeOS offer page - refinement pass 3 */
+
+.future-revenue-result{
+  text-align:center;
+  margin:1.5rem 0 1.75rem;
+}
+
+.future-revenue-result .future-value-number{
+  display:block;
+  font-size:clamp(4rem,9vw,7rem);
+  line-height:.9;
+  font-weight:900;
+  letter-spacing:-.055em;
+  margin:0;
+}
+
+.future-value-label{
+  margin-top:.65rem;
+  font-size:clamp(1.15rem,2.4vw,1.6rem);
+  line-height:1.1;
+  font-weight:800;
+  color:var(--blue);
+}
+</style>
+
 </head>
 <body>
 <div aria-label="Founding beta availability" class="availability-topbar">
@@ -1015,7 +1042,10 @@
     <div class="kicker">Now make that number real</div>
     <h2>What would holding on to more of that revenue actually change?</h2>
     <p>You told us what an average job is worth. Based on your own numbers, even a modest improvement in follow-up could mean around:</p>
-    <div class="future-value-number" id="futureAnnual">£39,000 extra revenue / year</div>
+    <div class="future-revenue-result">
+  <div class="future-value-number" id="futureAnnual">£39,000</div>
+  <div class="future-value-label">extra revenue / year</div>
+</div>
     <p class="lead-copy mb-0">So forget software for a moment. What would having more of that money staying in your business mean for you?</p>
 
     <div class="future-value-grid">
@@ -1415,7 +1445,7 @@ const jobValue = document.getElementById("jobValue");
     annualEl.textContent = money(annual) + "/year";
     monthlyEl.textContent = "about " + money(monthly) + "/month";
     const futureAnnualEl = document.getElementById("futureAnnual");
-    if (futureAnnualEl) futureAnnualEl.textContent = money(annual) + " extra revenue / year";
+    if (futureAnnualEl) futureAnnualEl.textContent = money(annual);
   }
 
   [jobValue,lostJobs,recoverable].filter(Boolean).forEach(el => el.addEventListener("input", updateCalc));
