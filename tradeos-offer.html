@@ -785,6 +785,151 @@
 }
 </style>
 
+
+<style>
+/* ========================================================
+   TradeOS offer page - refinement pass 2
+   ======================================================== */
+
+/* Sticky CTA removed */
+.tradeos-sticky-cta{
+  display:none !important;
+}
+
+/* Tighten the opening hero */
+.hero.chapter{
+  padding-top:clamp(1.4rem,3vw,2.2rem) !important;
+}
+
+.hero-headline{
+  margin-bottom:clamp(.8rem,1.8vw,1.25rem) !important;
+}
+
+.hero-headline .kicker{
+  margin-bottom:.55rem;
+}
+
+.hero-main{
+  align-items:start !important;
+}
+
+.hero-copy{
+  align-self:start;
+}
+
+.hero-visual{
+  align-self:start !important;
+  margin-top:-.65rem;
+}
+
+.hero-leak-image{
+  margin-top:0 !important;
+}
+
+/* No longer needed now floating CTA has gone */
+@media(max-width:700px){
+  body{
+    padding-bottom:0 !important;
+  }
+
+  .hero-visual{
+    margin-top:0;
+  }
+}
+
+/* Founding growth / access section */
+.founding-growth{
+  margin-top:2rem;
+  border:1px solid var(--border);
+  border-radius:1.2rem;
+  overflow:hidden;
+  background:#fff;
+  box-shadow:var(--shadow);
+}
+
+.founding-growth-head{
+  padding:clamp(1.5rem,4vw,2.4rem);
+  background:var(--dark);
+  color:#fff;
+}
+
+.founding-growth-head .kicker{
+  color:#9fc2ff;
+}
+
+.founding-growth-head h2{
+  color:#fff;
+  margin-bottom:1rem;
+}
+
+.founding-growth-head p{
+  color:#d7dfeb;
+  margin-bottom:0;
+  max-width:850px;
+}
+
+.founding-growth-body{
+  padding:clamp(1.4rem,4vw,2.4rem);
+}
+
+.growth-topic-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:12px;
+  margin:1.5rem 0;
+}
+
+.growth-topic{
+  padding:1rem 1.1rem;
+  border:1px solid var(--border);
+  border-radius:.9rem;
+  background:#f8fbff;
+}
+
+.growth-topic strong{
+  display:block;
+  color:#111827;
+  margin-bottom:.25rem;
+}
+
+.growth-topic span{
+  display:block;
+  color:#596579;
+  line-height:1.5;
+}
+
+.training-direction{
+  margin-top:1.5rem;
+  padding:1.25rem 1.35rem;
+  border-left:4px solid var(--blue);
+  border-radius:.75rem;
+  background:var(--pale);
+}
+
+.consulting-note{
+  margin-top:1.5rem;
+  padding-top:1.5rem;
+  border-top:1px solid var(--border);
+}
+
+.founding-growth-close{
+  margin-top:1.6rem;
+  padding:1.25rem;
+  border-radius:.9rem;
+  background:#fff7d6;
+  text-align:center;
+  font-size:clamp(1.05rem,2.5vw,1.3rem);
+  font-weight:800;
+  color:#172033;
+}
+
+@media(max-width:700px){
+  .growth-topic-grid{
+    grid-template-columns:1fr;
+  }
+}
+</style>
+
 </head>
 <body>
 <div aria-label="Founding beta availability" class="availability-topbar">
@@ -813,12 +958,12 @@
 <div class="kicker">Where the money leaks</div>
 <p class="big-statement">THE MONEY IS MADE IN THE <span class="highlight">FOLLOW-UP.</span></p>
 <p class="lead-copy mt-4">Most good opportunities aren't deliberately ignored. You're busy. You mean to chase the quote later. You don't want to feel pushy. Or silence gets interpreted as, “they've gone with someone cheaper.”</p>
-<p class="lead-copy fw-bold">But no reply doesn't necessarily mean no.</p>
+<p class="lead-copy fw-bold">But not getting a reply doesn't necessarily mean a no.</p>
 </div>
 <div class="pain-grid">
 <div class="pain-card"><strong>You get busy.</strong><span class="text-secondary">The follow-up you meant to send Thursday becomes Monday... then gets forgotten.</span></div>
 <div class="pain-card"><strong>You don't want to chase.</strong><span class="text-secondary">Following up personally can feel awkward, especially once you've already sent the price.</span></div>
-<div class="pain-card"><strong>You assume price lost it.</strong><span class="text-secondary">Often the customer simply goes with the business that stayed visible, looked organised and made the next step easy.</span></div>
+<div class="pain-card"><strong>You assume price lost it.</strong><span class="text-secondary">But they may not have chosen the cheaper quote at all. They may simply have gone with the business that stayed in touch, looked organised and made the next step easy.</span></div>
 </div>
 </section>
 
@@ -870,7 +1015,7 @@
     <div class="kicker">Now make that number real</div>
     <h2>What would holding on to more of that revenue actually change?</h2>
     <p>You told us what an average job is worth. Based on your own numbers, even a modest improvement in follow-up could mean around:</p>
-    <div class="future-value-number" id="futureAnnual">£39,000 / year/year</div>
+    <div class="future-value-number" id="futureAnnual">£39,000 extra revenue / year</div>
     <p class="lead-copy mb-0">So forget software for a moment. What would having more of that money staying in your business mean for you?</p>
 
     <div class="future-value-grid">
@@ -956,6 +1101,57 @@
 <div class="stack-item"><strong>Email automation + follow-up</strong><span class="text-secondary">Keep the sales conversation moving while you're working.</span></div>
 <div class="stack-item"><strong>Invoice journey</strong><span class="text-secondary">Move won work into the next commercial step.</span></div>
 </div>
+<div class="founding-growth">
+<div class="founding-growth-head">
+<div class="kicker">More than software</div>
+<h2>We're not just building the system. We want to help you build a better business.</h2>
+<p>Every two weeks, the founding group will get together with me for a live business-growth session. Part of that is about TradeOS... what's working, what's awkward and what we should improve next. But the rest is about whatever could help your business win more work, keep more of it and make more from the customers you already have.</p>
+</div>
+
+<div class="founding-growth-body">
+<h3>Bring whatever you're trying to solve.</h3>
+
+<div class="growth-topic-grid">
+<div class="growth-topic">
+<strong>Need more enquiries?</strong>
+<span>We can look at Facebook, local groups, social media, flyers, paid ads and other ways of generating leads.</span>
+</div>
+
+<div class="growth-topic">
+<strong>Quotes aren't converting?</strong>
+<span>We can look at the sales conversation, how you present the quote and what happens afterwards.</span>
+</div>
+
+<div class="growth-topic">
+<strong>Want to make more from each customer?</strong>
+<span>We can look at additional services, recurring income and other opportunities already sitting inside the business.</span>
+</div>
+
+<div class="growth-topic">
+<strong>Not sure how to present the business?</strong>
+<span>Bring your website, Facebook page, advert, flyer or idea and we'll work through it together.</span>
+</div>
+</div>
+
+<p class="fw-bold mb-0">Sales. Marketing. Lead generation. Follow-up. Pricing. Positioning. Systems. Customer journeys. If it can help you build a stronger local trade business, it's fair game.</p>
+
+<div class="training-direction">
+<strong>And the founding group will help shape what comes next.</strong>
+<p class="mb-0 mt-2">The questions and problems that keep coming up in these sessions will help us build a growing TradeOS training area with practical guides and resources based on what real trade businesses actually want help with... rather than us guessing what you should learn.</p>
+</div>
+
+<div class="consulting-note">
+<div class="kicker">Experience you can actually use</div>
+<h3>I've been working with and consulting businesses since 2010.</h3>
+<p class="mb-0">That includes major household-name companies, working on ecommerce, systems and customer journeys at a very different price point. The founding 10 get direct access to that experience as part of TradeOS.</p>
+</div>
+
+<div class="founding-growth-close">
+We're building TradeOS with 10 businesses... not selling software to 10 businesses.
+</div>
+</div>
+</div>
+
 <div class="offer-anchor">
 <div class="kicker">When TradeOS officially launches in 2027</div>
 <div class="launch-price">£9,997</div>
@@ -1006,13 +1202,6 @@ Founding places are limited to the first 10 suitable businesses.
 </footer>
 
 </main>
-
-<div class="tradeos-sticky-cta">
-<button class="cta-btn js-register-interest" data-bs-toggle="modal" data-bs-target="#interestModal" type="button">
-<i class="fa-solid fa-arrow-right me-2"></i>REGISTER YOUR INTEREST
-</button>
-</div>
-
 <div aria-atomic="true" aria-live="polite" class="trade-proof" id="tradeProof" role="status">
 <div aria-hidden="true" class="trade-proof-map">
 <svg viewbox="0 0 156 124" xmlns="http://www.w3.org/2000/svg">
@@ -1226,7 +1415,7 @@ const jobValue = document.getElementById("jobValue");
     annualEl.textContent = money(annual) + "/year";
     monthlyEl.textContent = "about " + money(monthly) + "/month";
     const futureAnnualEl = document.getElementById("futureAnnual");
-    if (futureAnnualEl) futureAnnualEl.textContent = money(annual) + " more revenue/year";
+    if (futureAnnualEl) futureAnnualEl.textContent = money(annual) + " extra revenue / year";
   }
 
   [jobValue,lostJobs,recoverable].filter(Boolean).forEach(el => el.addEventListener("input", updateCalc));
