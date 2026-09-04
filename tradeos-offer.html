@@ -609,6 +609,182 @@
   .journey-wrap{ margin-top:18px !important; }
 </style>
 
+
+<style>
+/* ========================================================
+   TradeOS offer-page layout refinement
+   ======================================================== */
+
+.hero-headline{
+  width:100%;
+  margin-bottom:2rem;
+}
+
+.hero-headline h1{
+  max-width:none;
+  width:100%;
+  font-size:clamp(2.8rem,7vw,5.7rem);
+  line-height:.94;
+  letter-spacing:-.055em;
+  margin:0;
+}
+
+.pain-grid{
+  align-items:stretch;
+}
+
+.pain-card{
+  display:flex;
+  flex-direction:column;
+  justify-content:flex-start;
+  height:100%;
+  text-align:left;
+}
+
+.pain-card strong{
+  color:#111827 !important;
+}
+
+.pain-card span,
+.pain-card .text-secondary{
+  color:#596579 !important;
+  line-height:1.55;
+}
+
+/* Journey becomes a visual 4 x 2 flow */
+.journey-wrap{
+  display:grid !important;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:14px;
+  padding:14px;
+  overflow:visible !important;
+  background:#f8fbff !important;
+}
+
+.journey-step{
+  position:relative;
+  display:block !important;
+  border:1px solid var(--border) !important;
+  border-radius:14px;
+  overflow:visible;
+  background:#fff;
+  min-height:145px;
+}
+
+.journey-step:last-child{
+  border-bottom:1px solid var(--border) !important;
+}
+
+.journey-num{
+  width:42px;
+  height:42px;
+  border-radius:50%;
+  margin:16px 16px 0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:800;
+}
+
+.journey-copy{
+  padding:12px 16px 18px !important;
+}
+
+.journey-step:not(:nth-child(4)):not(:nth-child(8))::after{
+  content:"→";
+  position:absolute;
+  right:-17px;
+  top:50%;
+  transform:translateY(-50%);
+  z-index:5;
+  width:20px;
+  text-align:center;
+  color:var(--blue);
+  font-size:1.4rem;
+  font-weight:900;
+}
+
+/* Intermediate CTA */
+.offer-inline-cta{
+  text-align:center;
+  padding:26px 18px;
+  margin:28px 0 4px;
+  border:1px solid #d9e4f2;
+  border-radius:18px;
+  background:#f8fbff;
+}
+
+.offer-inline-cta p{
+  margin:0 0 14px;
+  font-weight:700;
+}
+
+/* Sticky CTA */
+.tradeos-sticky-cta{
+  position:fixed;
+  right:22px;
+  bottom:22px;
+  z-index:1030;
+  box-shadow:0 12px 35px rgba(20,40,70,.22);
+}
+
+.tradeos-sticky-cta .cta-btn{
+  width:auto;
+  margin:0;
+  padding:.9rem 1.25rem;
+  font-size:.88rem;
+}
+
+/* Footer */
+.tradeos-footer{
+  border-top:1px solid var(--border);
+  margin-top:36px;
+  padding:28px 20px 38px;
+  text-align:center;
+  color:#667085;
+  font-size:.8rem;
+  line-height:1.6;
+}
+
+.tradeos-footer strong{
+  color:#344054;
+}
+
+@media(max-width:900px){
+  .journey-wrap{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+
+  .journey-step:not(:nth-child(4)):not(:nth-child(8))::after{
+    display:none;
+  }
+}
+
+@media(max-width:700px){
+  .hero-headline h1{
+    font-size:clamp(2.5rem,13vw,4rem);
+  }
+
+  .journey-wrap{
+    grid-template-columns:1fr;
+  }
+
+  .tradeos-sticky-cta{
+    left:12px;
+    right:12px;
+    bottom:12px;
+  }
+
+  .tradeos-sticky-cta .cta-btn{
+    width:100%;
+  }
+
+  body{
+    padding-bottom:74px;
+  }
+}
+</style>
+
 </head>
 <body>
 <div aria-label="Founding beta availability" class="availability-topbar">
@@ -618,12 +794,13 @@
 </div>
 <main class="shell">
 <section class="hero chapter">
+<div class="hero-headline">
+<div class="kicker">TradeOS</div>
+<h1>GOOD LEADS ARE EXPENSIVE. <span class="highlight">LOSING THEM COSTS EVEN MORE.</span></h1>
+</div>
 <div class="hero-main">
 <div class="hero-copy">
-<div class="kicker">TradeOS</div>
-<h1>GOOD LEADS<br/>ARE EXPENSIVE.</h1>
-<h1 class="highlight mt-2">LOSING THEM COSTS EVEN MORE.</h1>
-<p class="lead-copy mt-4">TradeOS keeps the customer journey moving... from the first enquiry to the quote, follow-up, booked job and invoice.</p>
+<p class="lead-copy mt-0">TradeOS keeps the customer journey moving... from the first enquiry to the quote, follow-up, booked job and invoice.</p>
 <p class="fw-bold mt-3 mb-0">Because the money isn't made when somebody asks for a quote. It's made in what happens next.</p>
 </div>
 <div class="hero-visual">
@@ -674,7 +851,7 @@
       <div class="mb-2">
         <label class="form-label" for="recoverable">Conservative share better follow-up could help recover</label>
         <div class="input-group">
-          <input class="form-control" id="recoverable" type="number" min="0" max="100" step="5" value="25">
+          <input class="form-control" id="recoverable" type="number" min="0" max="100" step="5" value="50">
           <span class="input-group-text">%</span>
         </div>
       </div>
@@ -693,7 +870,7 @@
     <div class="kicker">Now make that number real</div>
     <h2>What would holding on to more of that revenue actually change?</h2>
     <p>You told us what an average job is worth. Based on your own numbers, even a modest improvement in follow-up could mean around:</p>
-    <div class="future-value-number" id="futureAnnual">£39,000 more revenue/year</div>
+    <div class="future-value-number" id="futureAnnual">£39,000 / year/year</div>
     <p class="lead-copy mb-0">So forget software for a moment. What would having more of that money staying in your business mean for you?</p>
 
     <div class="future-value-grid">
@@ -727,9 +904,17 @@
 </div>
 </div>
 <div class="soft-box mt-4">
-<h3 class="mb-2">Future pace it for a second.</h3>
-<p class="mb-0">You finish the job you're on, open one screen and know who enquired, who's booked, which quotes are live and who needs the next touch. No digging through messages. No trying to remember who said they'd “let you know.”</p>
+<h3 class="mb-2">Think about this for a second...</h3>
+<p class="mb-0">What would your working day look like if you could finish the job you're on, open one screen and immediately know who enquired, who's booked, which quotes are live and who needs the next touch? No digging through messages. No trying to remember who said they'd “let you know.”</p>
 </div>
+
+<div class="offer-inline-cta">
+<p>If you're already thinking, “this would make life easier”... put your hand up.</p>
+<button class="cta-btn js-register-interest" data-bs-toggle="modal" data-bs-target="#interestModal" type="button">
+<i class="fa-solid fa-arrow-right me-2"></i>REGISTER YOUR INTEREST
+</button>
+</div>
+
 </section>
 <section class="chapter">
 <div class="chapter-intro">
@@ -772,7 +957,7 @@
 <div class="stack-item"><strong>Invoice journey</strong><span class="text-secondary">Move won work into the next commercial step.</span></div>
 </div>
 <div class="offer-anchor">
-<div class="kicker">When TradeOS officially launches</div>
+<div class="kicker">When TradeOS officially launches in 2027</div>
 <div class="launch-price">£9,997</div>
 <div class="small-note">build &amp; implementation</div>
 <div class="divider"></div>
@@ -780,9 +965,17 @@
 <div class="small-note">system, support &amp; ongoing development</div>
 <div class="price-reassurance">
 <strong>BUT THAT'S NOT WHAT YOU'LL PAY.</strong>
-<span>We're looking for 10 founding businesses, and those first 10 will get terms that won't be available at launch.</span>
+<span>The first 10 founding businesses get terms that disappear when TradeOS launches.</span>
 </div>
 </div>
+
+<div class="offer-inline-cta">
+<p>You don't need to decide anything now. Register your interest and we'll see whether it's a fit.</p>
+<button class="cta-btn js-register-interest" data-bs-toggle="modal" data-bs-target="#interestModal" type="button">
+<i class="fa-solid fa-arrow-right me-2"></i>REGISTER YOUR INTEREST
+</button>
+</div>
+
 </section>
 <section class="chapter final-section" id="secure">
 <div class="chapter-intro">
@@ -805,7 +998,21 @@
 <button class="cta-btn chapter-cta js-register-interest" data-bs-toggle="modal" data-bs-target="#interestModal" type="button"><i class="fa-solid fa-arrow-right me-2"></i>REGISTER YOUR INTEREST</button>
 <p class="small-note text-center mt-3 mb-0">No obligation. We'll take a quick look at where your business is now, answer any questions and see whether one of the 10 founding places is a fit.</p>
 </section>
+
+<footer class="tradeos-footer">
+<strong>TradeOS</strong><br>
+Built for trade businesses that want fewer opportunities slipping through the cracks.<br>
+Founding places are limited to the first 10 suitable businesses.
+</footer>
+
 </main>
+
+<div class="tradeos-sticky-cta">
+<button class="cta-btn js-register-interest" data-bs-toggle="modal" data-bs-target="#interestModal" type="button">
+<i class="fa-solid fa-arrow-right me-2"></i>REGISTER YOUR INTEREST
+</button>
+</div>
+
 <div aria-atomic="true" aria-live="polite" class="trade-proof" id="tradeProof" role="status">
 <div aria-hidden="true" class="trade-proof-map">
 <svg viewbox="0 0 156 124" xmlns="http://www.w3.org/2000/svg">
