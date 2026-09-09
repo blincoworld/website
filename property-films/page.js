@@ -4,6 +4,10 @@
   const form = document.querySelector('#interest-form');
   const error = document.querySelector('#form-error');
   const fields = ['name', 'business_name', 'email', 'phone', 'website', 'property_count', 'photography'];
+  const submitButton = form.querySelector('button[type=submit]');
+  const submitLabel = submitButton.innerHTML;
+  const exampleHeading = document.getElementById('photography-claim');
+  const defaultExampleHeading = exampleHeading.textContent;
   let submissionId = crypto.randomUUID(), started = false, busy = false;
   function event(name, detail = {}) {
     // No personal information is included. Existing analytics can subscribe to this event.
@@ -69,7 +73,7 @@
     } catch (err) {
       error.textContent = err.name === 'TimeoutError' || err.name === 'TypeError' ? 'We couldn’t confirm your submission. Please check your connection and try again — your details are still here.' : err.message;
       form.querySelector('[aria-invalid=true]')?.focus();
-    } finally { busy = false; button.disabled = false; button.innerHTML = 'SHOW ME WHAT\'S POSSIBLE <span aria-hidden="true">↗</span>'; }
+    } finally { busy = false; button.disabled = false; button.innerHTML = submitLabel; }
   });
   const video = document.getElementById('showcase');
   const placeholder = document.getElementById('film-placeholder');
@@ -80,7 +84,7 @@
   video.addEventListener('error', () => {
     video.hidden = true; placeholder.hidden = false;
     document.querySelector('.placeholder-note').textContent = 'EXAMPLE FILM TEMPORARILY UNAVAILABLE';
-    document.getElementById('photography-claim').textContent = 'A NEW FILM. FROM THE PHOTOGRAPHY YOU ALREADY HAVE.';
+    exampleHeading.textContent = defaultExampleHeading;
   });
   // Probe before assigning a source so missing media never shows broken playback controls.
   // Static hosts return their HTML fallback for missing files; check MIME type as well as status.

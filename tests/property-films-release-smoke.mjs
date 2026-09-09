@@ -26,10 +26,14 @@ try{
  await send('Runtime.enable');await send('Page.enable');
  // The existing shell has no favicon; don't issue unrelated favicon fallback requests.
  await send('Page.addScriptToEvaluateOnNewDocument',{source:"document.addEventListener('DOMContentLoaded',()=>{const e=document.createElement('link');e.rel='icon';e.href='data:,';document.head.appendChild(e);});"});
- for(const width of [1440,375,412,768]){
-  await send('Emulation.setDeviceMetricsOverride',{width,height:900,deviceScaleFactor:1,mobile:width<600});
+ for(const width of [1366,1440,1920,375,412,768]){
+  await send('Emulation.setDeviceMetricsOverride',{width,height:width===1366?768:width===1920?1080:900,deviceScaleFactor:1,mobile:width<600});
   await send('Page.navigate',{url:base+'/property-films/'});await wait("document.querySelector('#showcase') && !document.querySelector('#showcase').hidden");await sleep(300);
   assert(await js('document.documentElement.scrollWidth<=innerWidth'),'Overflow at '+width);
+  if(width>=1200){assert(await js("document.querySelector('.cinema').getBoundingClientRect().top<innerHeight-80"),'Video visible in first desktop viewport at '+width);assert(await js("parseFloat(getComputedStyle(document.querySelector('h1')).fontSize)>=60"),'Large proposition');}
+  assert(await js("new Promise(resolve=>{const image=new Image();image.onload=()=>resolve(image.naturalWidth>=1280);image.onerror=()=>resolve(false);image.src=document.querySelector('#showcase').poster;})"),'Real film cover loads');
+  const firstFold=await send('Page.captureScreenshot',{format:'png'});await fs.writeFile(`/tmp/property-direct-first-${width}.png`,Buffer.from(firstFold.data,'base64'));
+  assert(await js("parseFloat(getComputedStyle(document.querySelector('.hero .button')).fontSize)>=16"),'Readable CTA');
   assert(await js("document.querySelector('#showcase').controls && document.querySelector('#showcase').playsInline && !document.querySelector('#showcase').autoplay"));
   assert(await js("[...document.querySelectorAll('#interest-form input:not(#company_fax),#interest-form select,#interest-form button')].every(e=>e.getBoundingClientRect().height>=44)"));
   await js("document.querySelector('#showcase').muted=true;document.querySelector('#showcase').scrollIntoView({block:'center'});document.querySelector('#showcase').play()");
@@ -37,10 +41,10 @@ try{
   assert(await js("document.querySelector('#showcase').videoWidth===1920 && document.querySelector('#showcase').duration>50 && !document.querySelector('#showcase').error"));
   const shot=await send('Page.captureScreenshot',{format:'png'});await fs.writeFile(`/tmp/property-release-video-${width}.png`,Buffer.from(shot.data,'base64'));
   await js("document.querySelector('#showcase').currentTime=48");await wait("document.querySelector('#showcase').ended");
-  assert(await js("document.querySelector('#guarantee-title').textContent.includes('Love Your Film') && !document.querySelector('.film-guarantee').hidden"));
+  assert(await js("document.querySelector('.film-guarantee').textContent.includes('LOVE YOUR FILM GUARANTEE') && !document.querySelector('.film-guarantee').hidden"));
   assert(await js("document.querySelector('#customer-proof').hidden"));
-  assert(await js("document.querySelector('.steps').textContent.includes('agreed and paid for')"));
-  assert(!await js("/£|\\b700\\b|buy now|order now|unlimited revisions|stripe|checkout/i.test(document.body.innerText)"));
+  assert(await js("document.querySelector('.production-boundary').textContent.includes('agreed and paid for')"));
+  assert(!await js("/£|\\b700\\b|buy now|order now|unlimited revisions|stripe|checkout|more bookings|increase your revenue|higher rankings/i.test(document.body.innerText)"));
   await click('[data-cta=example-interest]');await wait("Math.abs(scrollY-Math.min(scrollY+document.querySelector('#interest').getBoundingClientRect().top-24,document.documentElement.scrollHeight-innerHeight))<8");
   // Bring the hero link into view as a visitor would before activating it.
   await js("document.querySelector('[data-cta=watch-example]').scrollIntoView({block:'center',behavior:'instant'})");await sleep(100);
@@ -48,8 +52,10 @@ try{
   await js("document.querySelector('.film-guarantee').scrollIntoView({block:'center',behavior:'instant'})");
   assert(await js("document.querySelector('.film-guarantee').getBoundingClientRect().top<innerHeight && document.querySelector('.film-guarantee').getBoundingClientRect().bottom>0"));
   const offerShot=await send('Page.captureScreenshot',{format:'png',captureBeyondViewport:true});await fs.writeFile(`/tmp/property-offer-${width}.png`,Buffer.from(offerShot.data,'base64'));
+  await click('[data-cta=guarantee-interest]');await wait("Math.abs(scrollY-Math.min(scrollY+document.querySelector('#interest').getBoundingClientRect().top-20,document.documentElement.scrollHeight-innerHeight))<8");
   console.log('PASS '+width+'px: film playback, layout, CTAs, guarantee, paid-project wording and no pricing/checkout');
  }
+ await js("window.exampleHeadingBeforeError=document.querySelector('#photography-claim').textContent;document.querySelector('#showcase').dispatchEvent(new Event('error'))");assert(await js("!document.querySelector('#film-placeholder').hidden && document.querySelector('#photography-claim').textContent===window.exampleHeadingBeforeError"));
  await click('#interest-form button');assert.equal(await js("document.querySelectorAll('[aria-invalid=true]').length"),7);
  const business='[DEPLOYMENT TEST] Property Films '+new Date().toISOString();
  for(const [name,value]of Object.entries({name:'Deployment smoke test',business_name:business,email:'property-films-smoke@example.com',phone:'+44 7700 900123',website:'https://piersblinco.com/property-films',property_count:'1',photography:'Yes'}))await fill('#'+name,value);
@@ -58,6 +64,10 @@ try{
  const privacy=await fetch(base+'/property-films/privacy.html');assert(privacy.ok);assert(/privacy/i.test(await privacy.text()));
  console.log('PASS form validation and privacy page');
  if(submit){
+  await js("window.savedFetch=window.fetch;window.fetch=()=>Promise.reject(new TypeError('Offline'));");
+  await click('#interest-form button');await wait("document.querySelector('#form-error').textContent.includes('connection')");
+  assert(await js("document.querySelector('#interest-form button').textContent.includes('SHOW ME WHAT YOU COULD DO WITH MINE')"),'CTA restored after failure');
+  await js('window.fetch=window.savedFetch');
   await click('#interest-form button');await wait("!document.querySelector('#success').hidden");assert(await js("document.querySelector('#interest-form').hidden && document.activeElement.id==='success'"));
   const raw=localSubmit?'local-test-only':(await fs.readFile('/home/piers-blinco/business-os/.dev.vars.messenger-production-token','utf8')).trim();const token=(raw.includes('=')?raw.slice(raw.indexOf('=')+1):raw).trim().replace(/^['"]|['"]$/g,'');
   const auth={Authorization:'Bearer '+token};
