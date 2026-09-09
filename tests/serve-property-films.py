@@ -2,14 +2,37 @@
 from http.server import ThreadingHTTPServer, SimpleHTTPRequestHandler
 from pathlib import Path
 import os
+import re
 os.chdir(Path(__file__).resolve().parents[1])
 class Handler(SimpleHTTPRequestHandler):
     def video_fixture(self, head=False):
+        if self.path != '/property-films/property-showcase.mp4': return False
         fixture = Path('/tmp/property-films-browser-fixture.mp4')
-        if self.path != '/property-films/property-showcase.mp4' or not fixture.exists(): return False
-        content = fixture.read_bytes()
-        self.send_response(200); self.send_header('Content-Type','video/mp4'); self.send_header('Content-Length',str(len(content))); self.end_headers()
-        if not head: self.wfile.write(content)
+        film = fixture if fixture.exists() else Path('property-films/property-showcase.mp4')
+        if not film.exists(): return False
+        size = film.stat().st_size
+        requested = self.headers.get('Range', '') if not head else ''
+        match = re.fullmatch(r'bytes=(\d+)-(\d*)', requested)
+        start = int(match[1]) if match else 0
+        end = min(int(match[2]), size - 1) if match and match[2] else size - 1
+        if start >= size or end < start:
+            self.send_error(416); return True
+        self.send_response(206 if match else 200)
+        self.send_header('Content-Type', 'video/mp4')
+        self.send_header('Content-Length', str(end - start + 1))
+        self.send_header('Accept-Ranges', 'bytes')
+        if match: self.send_header('Content-Range', f'bytes {start}-{end}/{size}')
+        self.end_headers()
+        if not head:
+            try:
+                with film.open('rb') as stream:
+                    stream.seek(start)
+                    remaining = end - start + 1
+                    while remaining:
+                        chunk = stream.read(min(65536, remaining))
+                        self.wfile.write(chunk)
+                        remaining -= len(chunk)
+            except (BrokenPipeError, ConnectionResetError): pass
         return True
     def do_HEAD(self):
         if not self.video_fixture(head=True): super().do_HEAD()

@@ -72,3 +72,10 @@ The public endpoint remains `/api/property-business/property-films/submit` on th
 Business OS passed all 139 automated tests before release. `tests/property-films-release-smoke.mjs` checks the real finished video and public form; its default is read-only. A labelled production enquiry requires the explicit `--submit` flag. The existing production token is read privately for authenticated verification and never embedded in website assets. Detailed deployment identifiers and final verification are recorded in the Business OS release notes.
 
 The website still deploys from `main` through its existing GitHub Pages configuration. The root site, CNAME and TradeOS pages are unchanged. Premier Cottages FULL IMPORT has not been run.
+
+
+## Offer refinement — 9 September 2026
+
+The existing editorial design is retained. Hero/example/benefit/process/enquiry copy now focuses on a cinematic property film and explains that production starts only once the project is agreed and paid for. Added a substantial production-ingredients section, the Love Your Film Guarantee, a secondary explanation of generative AI, and an empty hidden `#customer-proof` section reserved for verified future customer material. No public pricing, checkout or promise of a free bespoke preview is included.
+
+The form handler, API configuration, video file and photography-provenance switch are unchanged. To verify the refined page against local D1, start the existing local Worker on 8793 and `python3 tests/serve-property-films.py` on 8792, then run `node tests/property-films-release-smoke.mjs --local-submit`. The preview server supports MP4 byte ranges. The browser suite checks real video playback/seeking, 1440/375/412/768px layouts, CTA scrolling (including the page-bottom limit), real local enquiry storage, guarantee visibility, working links, hidden future proof and absence of pricing/checkout. Production checks use `PROPERTY_FILMS_TEST_URL=https://piersblinco.com node tests/property-films-release-smoke.mjs` and submit nothing unless explicitly requested with `--submit`.
