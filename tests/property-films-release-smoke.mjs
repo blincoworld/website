@@ -30,7 +30,10 @@ try{
   await send('Emulation.setDeviceMetricsOverride',{width,height:width===1366?768:width===1920?1080:900,deviceScaleFactor:1,mobile:width<600});
   await send('Page.navigate',{url:base+'/property-films/'});await wait("document.querySelector('#showcase') && !document.querySelector('#showcase').hidden");await sleep(300);
   assert(await js('document.documentElement.scrollWidth<=innerWidth'),'Overflow at '+width);
-  if(width>=1200){assert(await js("document.querySelector('.video-shell').getBoundingClientRect().width>0 && document.querySelector('.video-shell').getBoundingClientRect().height>0"),'Video section rendered at '+width);assert(await js("parseFloat(getComputedStyle(document.querySelector('h1')).fontSize)>=60"),'Large proposition');}
+  if(width>=1200){
+   assert(await js("(()=>{const e=document.querySelector('.video-shell');return !!e && e.getBoundingClientRect().width>0 && e.getBoundingClientRect().height>0})()"),'Video section rendered at '+width);
+   assert(await js("(()=>{const e=document.querySelector('h1');return !!e && parseFloat(getComputedStyle(e).fontSize)>=60})()"),'Large proposition');
+  }
   assert(await js("new Promise(resolve=>{const image=new Image();image.onload=()=>resolve(image.naturalWidth>=1280);image.onerror=()=>resolve(false);image.src=document.querySelector('#showcase').poster;})"),'Real film cover loads');
   const firstFold=await send('Page.captureScreenshot',{format:'png'});await fs.writeFile(`/tmp/property-direct-first-${width}.png`,Buffer.from(firstFold.data,'base64'));
   assert(await js("parseFloat(getComputedStyle(document.querySelector('.hero .button')).fontSize)>=16"),'Readable CTA');
