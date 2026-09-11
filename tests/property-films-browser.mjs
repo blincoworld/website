@@ -29,15 +29,14 @@ try {
   await send('Page.navigate',{url:'http://127.0.0.1:8792/property-films'});
   await wait("document.querySelector('#interest-form') && window.PROPERTY_FILMS_CONFIG");await pause(300);
   assert(await js('document.documentElement.scrollWidth <= innerWidth'),`${label}: no overflow`);
-  assert(await js("!document.querySelector('#film-placeholder').hidden && document.querySelector('#showcase').hidden"),`${label}: missing film placeholder`);
-  assert(await js("Math.abs(document.querySelector('.cinema').getBoundingClientRect().width/document.querySelector('.cinema').getBoundingClientRect().height-16/9)<.02"),`${label}: video ratio`);
+  await wait("document.querySelector('#showcase') && !document.querySelector('#showcase').hidden");
+   assert(await js("document.querySelector('#film-placeholder').hidden && !document.querySelector('#showcase').hidden"),`${label}: film not loaded`);
+  assert(await js("Math.abs(document.querySelector('.video-shell').getBoundingClientRect().width/document.querySelector('.video-shell').getBoundingClientRect().height-16/9)<.02"),`${label}: video ratio`);
   assert(await js("[...document.querySelectorAll('#interest-form input:not(#company_fax),select,button')].every(e=>e.getBoundingClientRect().height>=44)"),`${label}: touch targets`);
   const shot=await send('Page.captureScreenshot',{captureBeyondViewport:true,format:'png'});await fs.writeFile(`/tmp/property-films-${label}.png`,Buffer.from(shot.data,'base64'));
   console.log(`PASS ${label}: layout, touch targets, placeholder; screenshot /tmp/property-films-${label}.png`);
  }
  await js("window.testEvents=[];window.addEventListener('property-films:analytics',e=>testEvents.push(e.detail.event))");
- await click('[data-cta="watch-example"]');
- assert(await js("testEvents.includes('property_films_cta_clicked')"));
  await click('#interest-form button');
  assert.equal(await js("document.querySelectorAll('[aria-invalid=true]').length"),7);
  assert.equal(await js('document.activeElement.id'),'name');
@@ -52,24 +51,24 @@ try {
  assert(await js("document.querySelector('#interest-form').hidden && document.activeElement.id==='success'"));
  assert(await js("testEvents.includes('property_films_form_started') && testEvents.includes('property_films_form_submitted_successfully')"));
  console.log('PASS form validation, network failure recovery, real API submission, success focus, analytics');
- const leads=await(await fetch('http://127.0.0.1:8793/api/property-business/leads',{headers:{Authorization:'Bearer local-test-only'}})).json();
+ const leads=await(await fetch('http://127.0.0.1:8793/api/property-business/leads',{headers:{Authorization:'Bearer local-property-business-token'}})).json();
  const lead=leads.leads.find(l=>l.business_name===business);assert(lead);assert.equal(lead.status,'NEW');assert.equal(lead.website,'https://example.com/lodge');
  await send('Page.navigate',{url:'http://127.0.0.1:8793/#property-business-leads'});
  await wait("document.querySelector('[data-module=\"property-business-leads\"]')");await click('[data-module="property-business-leads"]');await wait("document.querySelector('#property-business-leads')");
- await fill('[name=token]','local-test-only');await click('[data-connect] button');await wait("document.querySelector('[data-id]')");
+ await fill('[name=token]','local-property-business-token');await click('[data-connect] button');await wait("document.querySelector('[data-id]')");
  await click(`[data-id="${lead.id}"]`);await wait("document.querySelector('[data-edit]')");
  await fill('[name=notes]','Test notes <script>literal only</script>');await fill('[name=status]','INTERESTED');await click('[data-edit] button');await wait("document.querySelector('[data-message]').textContent==='Changes saved.'");
- const saved=await(await fetch(`http://127.0.0.1:8793/api/property-business/leads/${lead.id}`,{headers:{Authorization:'Bearer local-test-only'}})).json();assert.equal(saved.lead.status,'INTERESTED');assert.equal(saved.lead.notes,'Test notes <script>literal only</script>');
+ const saved=await(await fetch(`http://127.0.0.1:8793/api/property-business/leads/${lead.id}`,{headers:{Authorization:'Bearer local-property-business-token'}})).json();assert.equal(saved.lead.status,'INTERESTED');assert.equal(saved.lead.notes,'Test notes <script>literal only</script>');
  await click('[data-back]');await click(`[data-id="${lead.id}"]`);assert.equal(await js("document.querySelector('[name=notes]').value"),saved.lead.notes);
  console.log('PASS Business OS navigation, real D1 lead, detail, persisted notes/status and escaping');
  assert.deepEqual(await js("[...document.querySelectorAll('[data-module^=property-business-]')].map(e=>e.textContent.trim().replace(/^[⌂◎◫▷]\\s*/,''))"),['Overview','Prospects','Leads','Property Films']);
- assert(await js("!document.querySelector('[data-module=property-films]') && document.querySelector('[data-module=analytics]').compareDocumentPosition(document.querySelector('#property-business-nav-label')) & Node.DOCUMENT_POSITION_FOLLOWING"));
+   assert(await js("document.querySelector('.nav-section-property')?.open && !!document.querySelector('.nav-section-tradeos') && !!(document.querySelector('.nav-section-property').compareDocumentPosition(document.querySelector('.nav-section-tradeos')) & Node.DOCUMENT_POSITION_FOLLOWING)"));
  await click('[data-module="property-business-overview"]');await wait("document.querySelector('.pb-counts')");
  assert(await js("Number(document.querySelector('.pb-counts strong').textContent)>0"));
  await click('[data-module="property-business-prospects"]');await wait("document.querySelector('[data-property-business-page=prospects]')");
  assert(await js("document.querySelector('[data-property-business-page]').textContent.includes('Premier Cottages')"));
  await click('[data-module="property-business-films"]');await wait("document.querySelector('[data-formspree]')");
- assert(await js("!document.querySelector('[data-property-business-page]').textContent.includes('local-test-only')"));
+ assert(await js("!document.querySelector('[data-property-business-page]').textContent.includes('local-property-business-token')"));
  await click('[data-module="property-business-leads"]');await wait("document.querySelector('[data-id]')");
  console.log('PASS separated Property Business navigation, overview counts, prospects source panel, offer configuration and shared connection');
  for(const width of [375,1440]){

@@ -1,102 +1,1203 @@
-<!doctype html>
-<html lang="en-GB">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Cinematic Property Films | Piers Blinco</title>
-  <meta name="description" content="Turn your existing property photography into a cinematic promotional film — without organising another video shoot.">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cinematic Films for Holiday Lets</title>
+  <meta name="description" content="Turn the professional photos you already have into a cinematic property film — no film crew, no new photoshoot, no need to revisit the property.">
   <link rel="canonical" href="https://piersblinco.com/property-films">
-  <meta property="og:title" content="Cinematic Property Films | Piers Blinco">
-  <meta property="og:description" content="Your property. Your photography. A cinematic promotional film. No additional video shoot.">
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="https://piersblinco.com/property-films">
-  <meta name="theme-color" content="#232922">
-  <link rel="stylesheet" href="/property-films/style.css">
+
+  <style>
+    :root {
+      --bg: #f5f0e8;
+      --ink: #111111;
+      --muted: #6f6a63;
+      --panel: #ffffff;
+      --dark: #0d0f12;
+      --line: rgba(17,17,17,.14);
+      --accent: #d66f2d;
+      --shadow: 0 24px 70px rgba(15, 15, 15, .12);
+      --radius: 26px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a { color: inherit; }
+
+    .wrap {
+      width: min(1180px, calc(100% - 40px));
+      margin: 0 auto;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 22px 0;
+      gap: 20px;
+    }
+
+    .brand {
+      font-weight: 900;
+      letter-spacing: -.04em;
+      font-size: 20px;
+    }
+
+    .top-cta {
+      font-size: 14px;
+      font-weight: 800;
+      text-decoration: none;
+      border-bottom: 2px solid var(--ink);
+      padding-bottom: 2px;
+    }
+
+    .hero { padding: 46px 0 34px; }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      margin-bottom: 22px;
+    }
+
+    .eyebrow::before {
+      content: "";
+      width: 34px;
+      height: 3px;
+      background: var(--accent);
+      border-radius: 99px;
+    }
+
+    h1, h2, h3, p { margin-top: 0; }
+
+    h1 {
+      max-width: 1100px;
+      font-size: clamp(56px, 8vw, 112px);
+      line-height: .92;
+      letter-spacing: -.065em;
+      margin-bottom: 28px;
+      font-weight: 950;
+    }
+
+    .hero-sub {
+      max-width: 880px;
+      font-size: clamp(22px, 2.2vw, 32px);
+      line-height: 1.22;
+      font-weight: 700;
+      letter-spacing: -.025em;
+      margin-bottom: 20px;
+    }
+
+    .hero-copy {
+      max-width: 780px;
+      font-size: 19px;
+      line-height: 1.55;
+      color: var(--muted);
+      margin-bottom: 0;
+    }
+
+    .hero-actions {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      flex-wrap: wrap;
+      margin-top: 32px;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 58px;
+      padding: 0 26px;
+      border-radius: 999px;
+      background: var(--ink);
+      color: #fff;
+      text-decoration: none;
+      font-size: 16px;
+      font-weight: 900;
+      letter-spacing: .02em;
+      text-transform: uppercase;
+      transition: transform .2s ease, box-shadow .2s ease;
+      box-shadow: 0 10px 24px rgba(0,0,0,.14);
+      border: 0;
+      cursor: pointer;
+    }
+
+    .button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 14px 28px rgba(0,0,0,.18);
+    }
+
+    .button.light {
+      background: #fff;
+      color: var(--ink);
+      box-shadow: none;
+      border: 1px solid rgba(255,255,255,.2);
+    }
+
+    .micro {
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .video-section { padding: 22px 0 90px; }
+
+    .video-shell {
+      position: relative;
+      overflow: hidden;
+      background: var(--dark);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      aspect-ratio: 16 / 9;
+      display: grid;
+      place-items: center;
+      isolation: isolate;
+    }
+
+    .video-shell::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 70% 25%, rgba(214,111,45,.28), transparent 30%),
+        linear-gradient(135deg, #1b1e22, #070809 75%);
+      z-index: -2;
+    }
+
+    .video-shell::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
+      background-size: 32px 32px;
+      z-index: -1;
+    }
+
+    .video-placeholder {
+      text-align: center;
+      color: #fff;
+      padding: 30px;
+    }
+
+    .play {
+      width: 84px;
+      height: 84px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      margin: 0 auto 20px;
+      background: #fff;
+      color: #111;
+      font-size: 30px;
+      box-shadow: 0 12px 40px rgba(0,0,0,.3);
+    }
+
+    .video-placeholder strong {
+      display: block;
+      font-size: clamp(26px, 3vw, 42px);
+      letter-spacing: -.04em;
+      margin-bottom: 8px;
+    }
+
+    .video-placeholder span {
+      color: rgba(255,255,255,.68);
+      font-size: 15px;
+    }
+
+    .post-video {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 24px;
+      align-items: end;
+      padding-top: 28px;
+    }
+
+    .post-video h2 {
+      font-size: clamp(38px, 5vw, 72px);
+      line-height: .98;
+      letter-spacing: -.055em;
+      margin-bottom: 0;
+      max-width: 850px;
+    }
+
+    section.block {
+      padding: 95px 0;
+      border-top: 1px solid var(--line);
+    }
+
+    .split {
+      display: grid;
+      grid-template-columns: 1.05fr .95fr;
+      gap: 70px;
+      align-items: start;
+    }
+
+    .section-title {
+      font-size: clamp(44px, 5vw, 76px);
+      line-height: .98;
+      letter-spacing: -.055em;
+      margin-bottom: 26px;
+      font-weight: 950;
+    }
+
+    .lead {
+      font-size: 22px;
+      line-height: 1.45;
+      color: var(--muted);
+      max-width: 720px;
+    }
+
+    .stack {
+      display: grid;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .stack-line {
+      padding: 18px 0;
+      border-bottom: 1px solid var(--line);
+      font-size: clamp(26px, 3vw, 40px);
+      font-weight: 950;
+      letter-spacing: -.04em;
+    }
+
+    .stack-line:last-child { border-bottom: 0; }
+
+    .punchline {
+      margin-top: 34px;
+      padding: 30px;
+      background: var(--ink);
+      color: #fff;
+      border-radius: 22px;
+      font-size: clamp(30px, 4vw, 52px);
+      line-height: 1;
+      font-weight: 950;
+      letter-spacing: -.05em;
+    }
+
+    .steps {
+      display: grid;
+      gap: 18px;
+      margin-top: 42px;
+    }
+
+    .step {
+      display: grid;
+      grid-template-columns: 78px 1fr;
+      gap: 24px;
+      background: rgba(255,255,255,.58);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 28px;
+    }
+
+    .step-number {
+      font-size: 14px;
+      font-weight: 950;
+      letter-spacing: .12em;
+      color: var(--accent);
+    }
+
+    .step h3 {
+      font-size: 26px;
+      margin-bottom: 8px;
+      letter-spacing: -.035em;
+    }
+
+    .step p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 17px;
+      line-height: 1.55;
+      max-width: 760px;
+    }
+
+    .statement {
+      background: var(--panel);
+      border-radius: var(--radius);
+      padding: clamp(34px, 5vw, 70px);
+      box-shadow: var(--shadow);
+    }
+
+    .statement h2 {
+      font-size: clamp(42px, 5vw, 72px);
+      line-height: .98;
+      letter-spacing: -.055em;
+      margin-bottom: 24px;
+    }
+
+    .statement p {
+      max-width: 780px;
+      font-size: 21px;
+      line-height: 1.55;
+      color: var(--muted);
+    }
+
+    .statement-list {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0,1fr));
+      gap: 10px 30px;
+      margin-top: 30px;
+      padding: 0;
+      list-style: none;
+    }
+
+    .statement-list li {
+      border-top: 1px solid var(--line);
+      padding: 16px 0;
+      font-size: 18px;
+      font-weight: 800;
+    }
+
+    .tech { background: #ece5da; }
+
+    .tech-callout {
+      margin-top: 32px;
+      font-size: clamp(28px, 3.5vw, 48px);
+      font-weight: 950;
+      letter-spacing: -.045em;
+    }
+
+    /* PACKAGE STACK */
+    .packages {
+      background: #111;
+      color: #fff;
+    }
+
+    .packages .section-title {
+      max-width: 880px;
+    }
+
+    .packages .lead {
+      color: rgba(255,255,255,.68);
+      margin-bottom: 0;
+    }
+
+    .package-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+      margin-top: 46px;
+      align-items: stretch;
+    }
+
+    .package-card {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      min-height: 100%;
+      padding: 30px;
+      border-radius: 24px;
+      background: #1a1d21;
+      border: 1px solid rgba(255,255,255,.12);
+    }
+
+    .package-card.featured {
+      background: #fff;
+      color: var(--ink);
+      transform: translateY(-12px);
+      box-shadow: 0 22px 55px rgba(0,0,0,.35);
+    }
+
+    .badge {
+      position: absolute;
+      top: 18px;
+      right: 18px;
+      padding: 8px 11px;
+      border-radius: 999px;
+      background: var(--accent);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 950;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .package-kicker {
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.52);
+      margin-bottom: 10px;
+    }
+
+    .featured .package-kicker {
+      color: var(--muted);
+    }
+
+    .package-name {
+      font-size: clamp(34px, 3vw, 48px);
+      line-height: 1;
+      letter-spacing: -.05em;
+      margin-bottom: 12px;
+      font-weight: 950;
+    }
+
+    .package-summary {
+      min-height: 78px;
+      color: rgba(255,255,255,.68);
+      font-size: 16px;
+      line-height: 1.5;
+      margin-bottom: 24px;
+    }
+
+    .featured .package-summary {
+      color: var(--muted);
+    }
+
+    .package-price {
+      margin: 0 0 22px;
+      padding: 16px 0;
+      border-top: 1px solid rgba(255,255,255,.12);
+      border-bottom: 1px solid rgba(255,255,255,.12);
+      font-weight: 900;
+      font-size: 14px;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.72);
+    }
+
+    .featured .package-price {
+      border-color: var(--line);
+      color: var(--muted);
+    }
+
+    .feature-list {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 28px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .feature-list li {
+      position: relative;
+      padding-left: 25px;
+      font-size: 15px;
+      line-height: 1.45;
+      color: rgba(255,255,255,.84);
+    }
+
+    .featured .feature-list li {
+      color: #282828;
+    }
+
+    .feature-list li::before {
+      content: "✓";
+      position: absolute;
+      left: 0;
+      top: 0;
+      font-weight: 950;
+      color: var(--accent);
+    }
+
+    .package-card .button {
+      margin-top: auto;
+      width: 100%;
+      background: #fff;
+      color: #111;
+      box-shadow: none;
+    }
+
+    .package-card.featured .button {
+      background: var(--ink);
+      color: #fff;
+    }
+
+    .package-note {
+      text-align: center;
+      margin-top: 26px;
+      color: rgba(255,255,255,.58);
+      font-size: 14px;
+    }
+
+    .guarantee {
+      background: var(--dark);
+      color: #fff;
+    }
+
+    .guarantee .eyebrow { color: #fff; }
+    .guarantee .section-title { max-width: 900px; }
+    .guarantee .lead { color: rgba(255,255,255,.7); }
+
+    .guarantee-answer {
+      display: inline-block;
+      margin: 18px 0 30px;
+      font-size: clamp(44px, 7vw, 92px);
+      line-height: .9;
+      font-weight: 950;
+      letter-spacing: -.06em;
+      color: #fff;
+    }
+
+    .final {
+      padding: 110px 0 130px;
+      text-align: center;
+    }
+
+    .final h2 {
+      font-size: clamp(52px, 8vw, 108px);
+      line-height: .9;
+      letter-spacing: -.065em;
+      margin: 0 auto 28px;
+      max-width: 1100px;
+    }
+
+    .final p {
+      max-width: 720px;
+      margin: 0 auto 30px;
+      color: var(--muted);
+      font-size: 20px;
+      line-height: 1.55;
+    }
+
+    .form-shell {
+      max-width: 760px;
+      margin: 48px auto 0;
+      padding: 28px;
+      text-align: left;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      box-shadow: 0 18px 50px rgba(0,0,0,.08);
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: 900;
+      margin-bottom: 7px;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+    }
+
+    input,
+    textarea,
+    select {
+      width: 100%;
+      border: 1px solid #d7d2cb;
+      background: #faf8f5;
+      padding: 15px 16px;
+      border-radius: 12px;
+      font: inherit;
+      color: var(--ink);
+    }
+
+    textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+
+    .field-full { grid-column: 1 / -1; }
+
+    .form-shell .button { margin-top: 18px; }
+
+    .form-note {
+      margin-top: 12px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    footer {
+      border-top: 1px solid var(--line);
+      padding: 26px 0 40px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    @media (max-width: 980px) {
+      .package-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .package-card.featured {
+        transform: none;
+      }
+    }
+
+    @media (max-width: 840px) {
+      .split,
+      .post-video {
+        grid-template-columns: 1fr;
+      }
+
+      .post-video { align-items: start; }
+
+      .statement-list {
+        grid-template-columns: 1fr;
+      }
+
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .field-full { grid-column: auto; }
+    }
+
+    @media (max-width: 600px) {
+      .wrap { width: min(100% - 28px, 1180px); }
+
+      .topbar { padding: 16px 0; }
+
+      .top-cta { display: none; }
+
+      .hero { padding-top: 28px; }
+
+      h1 { font-size: clamp(48px, 15vw, 72px); }
+
+      .hero-sub { font-size: 21px; }
+
+      .hero-copy { font-size: 17px; }
+
+      .button { width: 100%; }
+
+      .video-section { padding-bottom: 64px; }
+
+      section.block { padding: 68px 0; }
+
+      .step {
+        grid-template-columns: 1fr;
+        gap: 8px;
+        padding: 22px;
+      }
+
+      .statement { padding: 30px 22px; }
+
+      .final { padding: 78px 0 90px; }
+    }
+
+    .field-error {
+      display: block;
+      min-height: 18px;
+      margin-top: 5px;
+      font-size: 12px;
+      color: #a33a2b;
+      font-weight: 700;
+    }
+
+    [aria-invalid="true"] {
+      border-color: #a33a2b !important;
+      outline: 2px solid rgba(163,58,43,.12);
+    }
+
+    .form-error {
+      min-height: 22px;
+      margin: 14px 0 0;
+      color: #a33a2b;
+      font-weight: 800;
+    }
+
+    .success {
+      text-align: center;
+      padding: 28px;
+    }
+
+    .success h3 {
+      font-size: clamp(28px, 4vw, 44px);
+      margin-bottom: 10px;
+    }
+
+    .success p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 17px;
+    }
+
+    [hidden] { display: none !important; }
+
+  </style>
+</head>
+
+<body>
+
+  <header class="wrap topbar">
+    <div class="brand">HOLIDAY LET FILMS</div>
+    <a class="top-cta" href="#enquiry">Show me what's possible</a>
+  </header>
+
+  <main>
+
+    <section class="hero">
+      <div class="wrap">
+        <div class="eyebrow">A new way to show off your holiday let</div>
+
+        <h1>
+          YOUR PHOTOS LOOK GREAT.<br>
+          BUT THEY'RE STILL JUST PHOTOS.
+        </h1>
+
+        <p class="hero-sub">
+          Turn the professional photography you already have into a cinematic film that brings your holiday let to life.
+        </p>
+
+        <p class="hero-copy">
+          No film crew. No new photoshoot. Nobody needs to visit the property.
+          We take what you've already got and create the whole thing — movement,
+          story, script, voiceover, music and the finished edit.
+        </p>
+
+        <div class="hero-actions">
+          <a class="button" href="#example">See what we mean ↓</a>
+          <span class="micro">Made from the photos you already have.</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="video-section" id="example">
+      <div class="wrap">
+
+        <div class="video-shell" id="cinema">
+          <div class="video-placeholder" id="film-placeholder">
+            <div>
+              <div class="play">▶</div>
+              <strong>SEE WHAT YOUR PHOTOS COULD BECOME.</strong>
+              <span class="placeholder-note">EXAMPLE FILM LOADING…</span>
+            </div>
+          </div>
+          <video
+            id="showcase"
+            poster="/property-films/property-showcase.jpg"
+            controls
+            playsinline
+            preload="none"
+            hidden
+            aria-label="Example cinematic property film"
+            style="width:100%;height:100%;object-fit:cover;background:#0d0f12;">
+          </video>
+        </div>
+
+        <div class="post-video">
+          <h2 id="photography-claim">
+            YOUR PHOTOS.<br>
+            A FILM LIKE THIS.
+          </h2>
+
+          <a class="button" href="#packages">
+            See the options
+          </a>
+        </div>
+
+      </div>
+    </section>
+
+    <section class="block">
+      <div class="wrap split">
+
+        <div>
+          <div class="eyebrow">The simple bit</div>
+          <h2 class="section-title">
+            YOU ALREADY HAVE MOST OF WHAT WE NEED.
+          </h2>
+
+          <p class="lead">
+            You've already done the expensive part. You've got the property,
+            the listing and the professional photography.
+          </p>
+
+          <div class="punchline">
+            WE TURN IT INTO THE FILM.
+          </div>
+        </div>
+
+        <div class="stack">
+          <div class="stack-line">NO FILM CREW.</div>
+          <div class="stack-line">NO NEW SHOOT.</div>
+          <div class="stack-line">NO TRAVEL.</div>
+          <div class="stack-line">NO LEARNING AI.</div>
+          <div class="stack-line">NO EDITING IT YOURSELF.</div>
+        </div>
+
+      </div>
+    </section>
+
+    <section class="block">
+      <div class="wrap">
+
+        <div class="eyebrow">How it works</div>
+        <h2 class="section-title">HERE'S WHAT WE ACTUALLY DO.</h2>
+
+        <div class="steps">
+
+          <div class="step">
+            <div class="step-number">01</div>
+            <div>
+              <h3>YOU SHOW US THE PROPERTY.</h3>
+              <p>Send us your website or listing and the professional photography you already have.</p>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-number">02</div>
+            <div>
+              <h3>WE FIND THE STORY.</h3>
+              <p>We identify what makes the property desirable and shape the film around the property and the guest experience.</p>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-number">03</div>
+            <div>
+              <h3>WE BRING THE PHOTOGRAPHY TO LIFE.</h3>
+              <p>We create cinematic movement and scenes from the existing photography using modern filmmaking technology.</p>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-number">04</div>
+            <div>
+              <h3>WE FINISH THE WHOLE THING.</h3>
+              <p>Script. Voiceover. Music. Editing. Production. We put the finished film together for you.</p>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-number">05</div>
+            <div>
+              <h3>YOU GET THE FINISHED FILM.</h3>
+              <p>Once you've agreed to go ahead, we create the complete promotional film ready to use across your marketing.</p>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <section class="block">
+      <div class="wrap">
+
+        <div class="statement">
+          <div class="eyebrow">More than a slideshow</div>
+
+          <h2>
+            THIS ISN'T JUST YOUR PHOTOS WITH SOME MOVEMENT ADDED.
+          </h2>
+
+          <p>
+            The technology makes the transformation possible. But the finished
+            film still needs a story, pace, voice and point of view. We build
+            those around your property so the end result feels like a proper
+            piece of marketing, not an automated template.
+          </p>
+
+          <ul class="statement-list">
+            <li>Property-specific creative direction</li>
+            <li>Written narrative and script</li>
+            <li>Cinematic movement</li>
+            <li>Professional voiceover</li>
+            <li>Music and soundtrack</li>
+            <li>Full editing and production</li>
+          </ul>
+        </div>
+
+      </div>
+    </section>
+
+    <section class="block tech">
+      <div class="wrap split">
+
+        <div>
+          <div class="eyebrow">How is this possible?</div>
+          <h2 class="section-title">
+            WITHOUT FILMING THE PROPERTY?
+          </h2>
+        </div>
+
+        <div>
+          <p class="lead">
+            Modern generative filmmaking technology allows high-quality still
+            photography to be transformed into cinematic moving footage.
+          </p>
+
+          <p class="lead">
+            We combine that technology with human creative direction,
+            storytelling, scriptwriting, voiceover, music and editing.
+          </p>
+
+          <div class="tech-callout">
+            AI IS THE TOOL.<br>
+            THE FILM IS THE PRODUCT.
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <section class="block packages" id="packages">
+      <div class="wrap">
+        <div class="eyebrow">Choose your film</div>
+
+        <h2 class="section-title">
+          THREE WAYS TO BRING YOUR PROPERTY TO LIFE.
+        </h2>
+
+        <p class="lead">
+          Start simple, go for the complete package, or create a full flagship set of marketing assets.
+          We’ll talk you through which option makes sense for your property.
+        </p>
+
+        <div class="package-grid">
+
+          <article class="package-card">
+            <div class="package-kicker">Simple cinematic upgrade</div>
+            <h3 class="package-name">ESSENTIAL</h3>
+            <p class="package-summary">
+              For owners who want one polished cinematic film built from the photography they already have.
+            </p>
+
+            <div class="package-price">Price discussed with you directly</div>
+
+            <ul class="feature-list">
+              <li>30–45 second cinematic property film</li>
+              <li>Existing photography transformed into moving footage</li>
+              <li>Property-specific creative direction</li>
+              <li>Written script and narrative</li>
+              <li>Professional voiceover</li>
+              <li>Music and soundtrack</li>
+              <li>Full editing and production</li>
+              <li>Horizontal master version</li>
+              <li>1 revision round</li>
+              <li>Love Your Film Guarantee</li>
+            </ul>
+
+            <a class="button package-cta" href="#enquiry" data-package="Essential">
+              Talk to us about Essential
+            </a>
+          </article>
+
+          <article class="package-card featured">
+            <div class="badge">Most Popular</div>
+            <div class="package-kicker">The complete package</div>
+            <h3 class="package-name">SIGNATURE</h3>
+            <p class="package-summary">
+              The main film plus the extra formats and cutdowns you can actually use across your marketing.
+            </p>
+
+            <div class="package-price">Price discussed with you directly</div>
+
+            <ul class="feature-list">
+              <li>60–90 second cinematic property film</li>
+              <li>Expanded scene selection</li>
+              <li>Full property story and creative direction</li>
+              <li>Written script and narrative</li>
+              <li>Professional voiceover</li>
+              <li>Music and soundtrack</li>
+              <li>Full editing and production</li>
+              <li>Horizontal master version</li>
+              <li>Vertical social version</li>
+              <li>2 short social cutdowns</li>
+              <li>2 revision rounds</li>
+              <li>Love Your Film Guarantee</li>
+            </ul>
+
+            <a class="button package-cta" href="#enquiry" data-package="Signature">
+              Talk to us about Signature
+            </a>
+          </article>
+
+          <article class="package-card">
+            <div class="package-kicker">Flagship marketing set</div>
+            <h3 class="package-name">FLAGSHIP</h3>
+            <p class="package-summary">
+              For premium properties and operators who want a broader, more complete set of finished film assets.
+            </p>
+
+            <div class="package-price">Price discussed with you directly</div>
+
+            <ul class="feature-list">
+              <li>90 second+ flagship cinematic film</li>
+              <li>Full premium scene selection</li>
+              <li>Enhanced creative treatment</li>
+              <li>Written script and narrative</li>
+              <li>Professional voiceover</li>
+              <li>Music and soundtrack</li>
+              <li>Full editing and production</li>
+              <li>Horizontal master version</li>
+              <li>Vertical social version</li>
+              <li>4 short social cutdowns</li>
+              <li>Alternate teaser or edit</li>
+              <li>3 revision rounds</li>
+              <li>Priority production</li>
+              <li>Love Your Film Guarantee</li>
+            </ul>
+
+            <a class="button package-cta" href="#enquiry" data-package="Flagship">
+              Talk to us about Flagship
+            </a>
+          </article>
+
+        </div>
+
+        <div class="package-note">
+          Not sure which one fits? Choose “Not sure yet” below and we’ll recommend the right option.
+        </div>
+      </div>
+    </section>
+
+    <section class="block guarantee">
+      <div class="wrap">
+
+        <div class="eyebrow">Love Your Film Guarantee</div>
+
+        <h2 class="section-title">
+          AND WHAT IF YOU DON'T LIKE IT?
+        </h2>
+
+        <div class="guarantee-answer">
+          THEN WE'RE NOT FINISHED.
+        </div>
+
+        <p class="lead">
+          If revisions are needed, we'll work through sensible changes with you
+          until we've got a finished film you're genuinely happy to put in front
+          of potential guests.
+        </p>
+
+        <p class="lead">
+          And if we genuinely can't get it right, we'll refund you.
+        </p>
+
+      </div>
+    </section>
+
+    <section class="final" id="enquiry">
+      <div class="wrap">
+
+        <div class="eyebrow">Your turn</div>
+
+        <h2>
+          YOUR PROPERTY IS ALREADY PHOTOGENIC.<br>
+          LET'S MAKE IT MOVE.
+        </h2>
+
+        <p>
+          Send us your property details and we'll take a look at what you already
+          have and talk you through what we could create for it.
+        </p>
+
+        <div class="form-shell" id="form-area">
+          <form id="interest-form" novalidate>
+            <p class="form-note">All fields are required.</p>
+
+            <div class="form-grid">
+              <div>
+                <label for="name">Your name</label>
+                <input id="name" name="name" type="text" autocomplete="name" maxlength="150" required aria-describedby="name-error" placeholder="Jane Smith">
+                <span class="field-error" id="name-error"></span>
+              </div>
+
+              <div>
+                <label for="business_name">Business / property name</label>
+                <input id="business_name" name="business_name" type="text" autocomplete="organization" maxlength="200" required aria-describedby="business_name-error" placeholder="Oak Tree Cottages">
+                <span class="field-error" id="business_name-error"></span>
+              </div>
+
+              <div>
+                <label for="email">Email</label>
+                <input id="email" name="email" type="email" autocomplete="email" maxlength="254" required aria-describedby="email-error" placeholder="jane@example.com">
+                <span class="field-error" id="email-error"></span>
+              </div>
+
+              <div>
+                <label for="phone">Phone</label>
+                <input id="phone" name="phone" type="tel" autocomplete="tel" maxlength="40" required aria-describedby="phone-error" placeholder="07123 456789">
+                <span class="field-error" id="phone-error"></span>
+              </div>
+
+              <div class="field-full">
+                <label for="website">Property website or listing</label>
+                <input id="website" name="website" type="url" inputmode="url" autocomplete="url" maxlength="2000" required aria-describedby="website-error" placeholder="https://...">
+                <span class="field-error" id="website-error"></span>
+              </div>
+
+              <div>
+                <label for="property_count">Number of properties</label>
+                <select id="property_count" name="property_count" required aria-describedby="property_count-error">
+                  <option value="">Please select</option>
+                  <option>1</option>
+                  <option>2–5</option>
+                  <option>6–10</option>
+                  <option>11–25</option>
+                  <option>25+</option>
+                </select>
+                <span class="field-error" id="property_count-error"></span>
+              </div>
+
+              <div>
+                <label for="photography">Professional photography?</label>
+                <select id="photography" name="photography" required aria-describedby="photography-error">
+                  <option value="">Please select</option>
+                  <option>Yes</option>
+                  <option>Some</option>
+                  <option>No</option>
+                </select>
+                <span class="field-error" id="photography-error"></span>
+              </div>
+            </div>
+
+            <div class="honeypot" aria-hidden="true" style="position:absolute;left:-9999px;">
+              <label for="company_fax">Leave this empty</label>
+              <input id="company_fax" name="company_fax" tabindex="-1" autocomplete="off">
+            </div>
+
+            <p id="form-error" class="form-error" role="alert"></p>
+
+            <button class="button" type="submit">
+              Show me what's possible
+            </button>
+
+            <div class="form-note">
+              No obligation to proceed. Your details will be used to review your property and respond to your enquiry.
+              <a href="/property-films/privacy.html">Privacy information</a>
+            </div>
+          </form>
+
+          <div class="success" id="success" hidden tabindex="-1" role="status">
+            <h3>THANKS. WE'VE GOT IT.</h3>
+            <p>We'll take a look at your property and come back to you shortly.</p>
+          </div>
+
+          <noscript><p>Please enable JavaScript to send this form.</p></noscript>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    <div class="wrap">
+      Holiday Let Films — cinematic property films
+    </div>
+  </footer>
+
   <script src="/property-films/config.js" defer></script>
   <script src="/property-films/page.js" defer></script>
-</head>
-<body>
-  <a class="skip-link" href="#main">Skip to content</a>
-  <header class="wrap masthead"><a class="wordmark" href="/" aria-label="Piers Blinco home">PIERS BLINCO</a><span>PROPERTY FILMS</span></header>
-  <main id="main">
-    <section class="hero wrap" aria-labelledby="headline">
-      <div class="hero-layout">
-        <h1 id="headline">TURN THE PHOTOS YOU ALREADY HAVE INTO A <span>CINEMATIC PROPERTY FILM.</span></h1>
-        <div class="hero-support">
-          <p class="hero-sub">No film crew.<br> No new photoshoot.<br> No need for anyone to visit your property.</p>
-          <p>We turn your professional photography into a complete promotional film — with cinematic movement, a professionally written story, voiceover, music and editing.</p>
-          <a class="button" href="#example" data-cta="watch-example">WATCH WHAT WE CAN DO <span aria-hidden="true">↓</span></a>
-        </div>
-      </div>
-      <p class="direction">HERE’S WHAT WE MEAN <span aria-hidden="true">↓</span></p>
-    </section>
-    <section class="film-section" id="example" aria-labelledby="photography-claim">
-      <div class="wrap video-wrap">
-        <!-- Use a neutral example heading until the supplied film's photography provenance is verified. -->
-        <h2 id="photography-claim">YOUR PHOTOS. A FILM LIKE THIS.</h2>
-        <div class="cinema" id="cinema">
-          <!-- Replace property-films/property-showcase.mp4 to change the example. -->
-          <div class="film-placeholder" id="film-placeholder"><p>SEE WHAT YOUR PHOTOS COULD BECOME.</p><span class="placeholder-note">EXAMPLE FILM COMING SOON</span></div>
-          <video id="showcase" poster="/property-films/property-showcase.jpg" controls playsinline preload="none" hidden aria-label="Example cinematic property film"></video>
-        </div>
-        <div class="film-close"><h3>WANT US TO DO THIS FOR YOUR PROPERTY?</h3><a class="button" href="#interest" data-cta="example-interest">SHOW ME WHAT YOU COULD DO WITH MINE <span aria-hidden="true">↓</span></a></div>
-      </div>
-    </section>
-    <section class="core wrap" aria-labelledby="benefits-title">
-      <div><h2 id="benefits-title">YOU ALREADY HAVE MOST OF WHAT WE NEED.</h2><p>You’ve got the property.<br>You’ve already paid for the photography.<br>You’ve got the listing.</p><p class="statement">WE TURN IT INTO THE FILM.</p></div>
-      <div class="benefit-block"><ul><li>NO FILM CREW.</li><li>NO NEW SHOOT.</li><li>NO TRAVEL.</li><li>NO LEARNING AI.</li><li>NO EDITING IT YOURSELF.</li></ul><p>SEND US YOUR PROPERTY.<br>WE DO THE REST.</p></div>
-    </section>
-    <section class="process" aria-labelledby="process-title"><div class="wrap">
-      <h2 id="process-title">HERE’S WHAT WE ACTUALLY DO.</h2>
-      <p class="production-boundary">First, send us your details. We’ll discuss the project with you. <strong>Production starts only once the project is agreed and paid for.</strong></p>
-      <ol class="steps">
-        <li><span aria-hidden="true">01</span><div><h3>YOU SHOW US THE PROPERTY</h3><p>Send us your website or listing. Once we agree to go ahead, share the professional photography you already have.</p></div></li>
-        <li><span aria-hidden="true">02</span><div><h3>WE FIND THE STORY</h3><p>We identify what makes the property desirable and build the film around the property and guest experience.</p></div></li>
-        <li><span aria-hidden="true">03</span><div><h3>WE BRING THE PHOTOGRAPHY TO LIFE</h3><p>We use modern filmmaking technology to create cinematic movement from your existing photography.</p></div></li>
-        <li><span aria-hidden="true">04</span><div><h3>WE FINISH THE WHOLE THING</h3><p>Script. Voiceover. Music. Editing. Production.<br>All brought together in one complete film.</p></div></li>
-        <li><span aria-hidden="true">05</span><div><h3>YOU GET THE FINISHED FILM</h3><p>Ready for your website, social media, advertising and direct marketing.</p></div></li>
-      </ol>
-    </div></section>
-    <section class="film-value wrap" aria-labelledby="value-title">
-      <div><h2 id="value-title">THIS ISN’T A SLIDESHOW WITH SOME MOVEMENT ADDED.</h2><p>The technology makes the transformation possible.<br><strong>But the finished film still needs a story.</strong></p></div>
-      <div><ul class="craft-list"><li>We select the imagery.</li><li>We decide how to present the property.</li><li>We write the narration.</li><li>We create the movement.</li><li>We add the voice.</li><li>We choose the music.</li><li>We edit the finished film.</li></ul><p class="statement">PROPERTY MARKETING BUILT AROUND <span>YOUR PROPERTY.</span></p></div>
-    </section>
-    <section class="film-technology" aria-labelledby="technology-title"><div class="wrap">
-      <h2 id="technology-title">HOW CAN WE DO THIS WITHOUT FILMING THE PROPERTY?</h2>
-      <div><p>Modern generative filmmaking technology transforms high-quality still photography into cinematic moving footage. We combine it with human creative direction, storytelling, scriptwriting, voiceover, music and editing.</p><p>AI is the enabling technology.</p><p class="statement">THE FILM IS THE PRODUCT.</p></div>
-    </div></section>
-    <section class="film-guarantee" aria-labelledby="guarantee-title"><div class="wrap">
-      <h2 id="guarantee-title">AND WHAT IF YOU DON’T LIKE IT?</h2>
-      <p class="guarantee-answer">THEN WE’RE<br>NOT FINISHED.</p>
-      <div class="guarantee-detail"><h3>LOVE YOUR FILM GUARANTEE</h3><div><p>If revisions are needed, we’ll work through sensible changes with you until we’ve got a finished film you’re happy to put in front of potential guests.</p><p><strong>And if we genuinely can’t get it right, we’ll refund you in full.</strong></p></div></div>
-      <a class="button" href="#interest" data-cta="guarantee-interest">LET’S LOOK AT YOUR PROPERTY <span aria-hidden="true">↓</span></a>
-    </div></section>
-    <!-- Add only verified customer films, testimonials or case studies here when available. -->
-    <section class="customer-proof wrap" id="customer-proof" aria-label="Customer films and stories" hidden></section>
-    <section class="interest wrap" id="interest" aria-labelledby="interest-title">
-      <div class="interest-intro"><h2 id="interest-title">YOUR PROPERTY IS ALREADY PHOTOGENIC.<span>LET’S MAKE IT MOVE.</span></h2><p class="close-question">Want to see what we could create for your property?</p><p>Send us the property and we’ll take a look at what you already have and talk you through what we could create.</p><p class="no-obligation">No obligation to proceed.</p></div>
-      <div id="form-area">
-        <form id="interest-form" novalidate>
-          <p class="form-note">All fields are required.</p>
-          <div class="form-grid">
-            <div class="field"><label for="name">Name</label><input id="name" name="name" autocomplete="name" maxlength="150" required aria-describedby="name-error"><span class="field-error" id="name-error"></span></div>
-            <div class="field"><label for="business_name">Business / property name</label><input id="business_name" name="business_name" autocomplete="organization" maxlength="200" required aria-describedby="business_name-error"><span class="field-error" id="business_name-error"></span></div>
-            <div class="field"><label for="email">Email</label><input id="email" name="email" type="email" autocomplete="email" maxlength="254" required aria-describedby="email-error"><span class="field-error" id="email-error"></span></div>
-            <div class="field"><label for="phone">Phone</label><input id="phone" name="phone" type="tel" autocomplete="tel" maxlength="40" required aria-describedby="phone-error"><span class="field-error" id="phone-error"></span></div>
-            <div class="field full"><label for="website">Website or property listing URL</label><input id="website" name="website" type="url" inputmode="url" autocomplete="url" placeholder="https://" maxlength="2000" required aria-describedby="website-error"><span class="field-error" id="website-error"></span></div>
-            <div class="field"><label for="property_count">Number of properties</label><select id="property_count" name="property_count" required aria-describedby="property_count-error"><option value="">Please select</option><option>1</option><option>2–5</option><option>6–10</option><option>11–25</option><option>25+</option></select><span class="field-error" id="property_count-error"></span></div>
-            <div class="field"><label for="photography">Do you already have professional photography?</label><select id="photography" name="photography" required aria-describedby="photography-error"><option value="">Please select</option><option>Yes</option><option>Some</option><option>No</option></select><span class="field-error" id="photography-error"></span></div>
-          </div>
-          <div class="honeypot" aria-hidden="true"><label for="company_fax">Leave this empty</label><input id="company_fax" name="company_fax" tabindex="-1" autocomplete="off"></div>
-          <p id="form-error" class="form-error" role="alert"></p>
-          <button class="button" type="submit">SHOW ME WHAT YOU COULD DO WITH MINE <span aria-hidden="true">↗</span></button>
-          <p class="privacy-note">Your details will be used to review your property and respond to your enquiry. <a href="/property-films/privacy.html">Privacy information</a></p>
-        </form>
-        <div class="success" id="success" hidden tabindex="-1" role="status"><h3>THANKS. WE’VE GOT IT.</h3><p>We'll take a look at your property and come back to you shortly.</p></div>
-        <noscript><p>Please enable JavaScript to send this form.</p></noscript>
-      </div>
-    </section>
-  </main>
-  <footer class="wrap"><span class="wordmark">PIERS BLINCO</span><span>CINEMATIC PROPERTY FILMS</span><a href="/property-films/privacy.html">Privacy</a></footer>
+
 </body>
 </html>
