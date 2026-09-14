@@ -21,6 +21,9 @@ try{
  await send('Runtime.enable');await send('Page.enable');
  // The existing shell has no favicon; don't issue unrelated favicon fallback requests.
  await send('Page.addScriptToEvaluateOnNewDocument',{source:"document.addEventListener('DOMContentLoaded',()=>{const e=document.createElement('link');e.rel='icon';e.href='data:,';document.head.appendChild(e);});"});
+ // Exercise the retained disabled-preview path locally, even after public activation.
+ ws.addEventListener('message',async event=>{const d=JSON.parse(event.data);if(d.method==='Fetch.requestPaused')await send('Fetch.fulfillRequest',{requestId:d.params.requestId,responseCode:200,responseHeaders:[{name:'Content-Type',value:'application/javascript'}],body:Buffer.from("export const checkoutConfig={enabled:false,apiUrl:'/unused-checkout'};").toString('base64')});});
+ await send('Fetch.enable',{patterns:[{urlPattern:'*checkout-config.mjs*'}]});
  for(const width of [320,375,412,768,1024,1440]){
  await send('Emulation.setDeviceMetricsOverride',{width,height:1000,deviceScaleFactor:1,mobile:width<600});
  await send('Page.navigate',{url:base+'/property-films/packages'});

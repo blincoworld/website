@@ -1,5 +1,5 @@
 import { selectPackage, money } from './catalog.mjs';
-import { checkoutConfig } from './checkout-config.mjs';
+import { checkoutConfig } from './checkout-config.mjs?v=live-20260914';
 const preview = document.querySelector('#checkout-preview');
 let busy = false;
 const retryKeys = new Map();
