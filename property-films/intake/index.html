@@ -1,2 +1,36 @@
-<!DOCTYPE html>
-<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="robots" content="noindex"><meta name="referrer" content="no-referrer"><title>Property Films — Property intake</title><link rel="stylesheet" href="/property-films/shared.css"></head><body><header class="wrap topbar"><div class="brand">HOLIDAY LET FILMS</div><a class="top-cta" href="/property-films/">Explore property films</a></header><main class="hero wrap"><div class="eyebrow">Property intake</div><h1>YOUR PROPERTY DETAILS</h1><p class="hero-copy">Our property intake form is coming soon. Please contact us to arrange the details for your film.</p><div class="hero-actions"><a class="button" href="/property-films/#enquiry">CONTACT US</a></div></main></body></html>
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow"><meta name="referrer" content="no-referrer">
+<title>Let's create your film | Property Films</title>
+<link rel="stylesheet" href="/property-films/shared.css"><link rel="stylesheet" href="./intake.css">
+</head>
+<body class="intake-page">
+<header class="wrap topbar"><a class="brand" href="/property-films/">HOLIDAY LET FILMS</a><a class="top-cta" href="/property-films/">Explore property films</a></header>
+<main class="wrap intake-wrap">
+<section class="hero"><div class="eyebrow">Your film starts here</div><h1>LET'S CREATE<br>YOUR FILM</h1><p class="intro">We only need a few details to get started.</p><p class="muted">We can work directly from your existing website or property listing, or you can send us your original high-resolution photography for the best possible source material.</p></section>
+<p id="loading" role="status">Opening your verified order…</p>
+<div id="access-error" class="notice" role="alert" hidden><p id="access-message"></p><p>Reopen the START PROPERTY INTAKE link on your payment confirmation to try again.</p><a href="/property-films/">Contact us about your film</a></div>
+<section id="order-summary" class="order-summary" aria-label="Your verified order" hidden></section>
+<p id="test-note" class="muted small" hidden>TEST order — no real payment was taken and no production work will be started.</p>
+<form id="intake-form" hidden>
+<section class="intake-card"><div class="section-number">01 / ABOUT YOU</div><h2>A FEW QUICK DETAILS</h2><p class="muted">We've filled in what we can from your payment. You can correct it here.</p><div class="field-grid">
+<label>Your name<input name="name" autocomplete="name" maxlength="150" required></label>
+<label>Email<input name="email" type="email" autocomplete="email" maxlength="254" required></label>
+<label>Phone <span>(optional)</span><input name="phone" type="tel" autocomplete="tel" maxlength="40"></label>
+<label>Business / Operator Name<input name="businessName" autocomplete="organization" maxlength="200" required></label>
+</div></section>
+<div id="property-sections"></div>
+<section class="intake-card"><div class="section-number">PHOTOGRAPHY</div><h2>HOW SHOULD WE<br>GET YOUR PHOTOS?</h2><p class="muted">Either option is fine. You can finish your intake without uploading anything.</p>
+<div class="photo-options">
+<label class="photo-choice"><input type="radio" name="photoSource" value="listing" checked><span><strong>USE MY WEBSITE / LISTING PHOTOS</strong><small>No need to send us anything. We'll source the best available images from the links you've provided.</small><em>The easiest way to get started</em></span></label>
+<label class="photo-choice"><input type="radio" name="photoSource" value="originals_separately"><span><strong>I'LL SEND THE ORIGINAL HIGH-RES PHOTOS</strong><small>Recommended if you have them. Original files give us the highest-quality source material.</small><em>I'll send my original photos separately</em></span></label>
+</div><p class="muted small">If you choose originals, we'll contact you to arrange a secure photo handoff. You don't need to send them now.</p></section>
+<section id="seasonal-section" class="intake-card" hidden><div class="section-number">SEASONAL CONTENT</div><h2>WHAT'S ON YOUR CALENDAR?</h2><label>Are there any particular campaigns or times of year you'd especially like us to focus on? <span>(optional)</span><textarea name="seasonalNotes" rows="4" maxlength="1000" aria-describedby="seasonal-help"></textarea></label><p id="seasonal-help" class="muted small">Christmas &amp; winter escapes · Romantic / Valentine's breaks · Spring &amp; Easter · Summer stays · Dog-friendly breaks · Family breaks · Hot-tub getaways · Last-minute availability</p><p class="muted small">You don't have to decide everything now. A few ideas are plenty.</p></section>
+<section class="intake-card"><div class="section-number">ONE LAST THING</div><label>Anything else we should know? <span>(optional)</span><textarea name="generalNotes" rows="4" maxlength="1000"></textarea></label></section>
+<div class="submit-area"><p id="submit-error" class="notice" role="alert" tabindex="-1" hidden></p><button class="button" type="submit">SEND TO PRODUCTION</button><p class="muted small">No account or password needed. <a href="/property-films/privacy.html">How we handle your details</a></p></div>
+</form>
+<section id="success" class="intake-card success-card" tabindex="-1" hidden><div class="eyebrow">Intake received</div><h2>YOU'RE ALL SET</h2><p>We've got everything we need to start your Property Films project.</p><p>We'll review your property, photography and listing and begin planning your film.</p><p>If we need anything else, we'll contact you directly.</p><div id="photo-next" class="notice"></div><a href="/property-films/">Back to Property Films</a></section>
+<noscript><p>Please enable JavaScript to securely open and submit your property intake.</p></noscript>
+</main><script type="module" src="./intake.js"></script></body></html>

@@ -30,10 +30,10 @@ try{
    let text, type='application/javascript';
    if (request.url.includes('checkout-config.mjs')) text="export const checkoutConfig={enabled:true,apiUrl:'/checkout-mock'};";
    else if (request.url.includes('checkout.stripe.com')) { type='text/html'; text='<title>Mock Stripe Checkout</title><p>Hosted Checkout destination</p>'; }
-   else { type='application/json'; text=JSON.stringify({paid:statusPaid,testMode:true}); }
+   else { type='application/json'; text=JSON.stringify(request.url.includes('/access') ? {token:'a'.repeat(64),order:{package:'essential',propertyCount:1,seasonal:false,amountPaid:49500,testMode:true,intakeStatus:'NEEDED'},customer:{name:'Test customer',email:'test@example.com',phone:''}} : {paid:statusPaid,testMode:true}); }
    await send('Fetch.fulfillRequest',{requestId,responseCode:200,responseHeaders:[{name:'Content-Type',value:type}],body:Buffer.from(text).toString('base64')});
  });
- await send('Fetch.enable',{patterns:[{urlPattern:'*checkout-config.mjs*'},{urlPattern:'https://checkout.stripe.com/*'},{urlPattern:'*checkout-mock-status*'}]});
+ await send('Fetch.enable',{patterns:[{urlPattern:'*checkout-config.mjs*'},{urlPattern:'https://checkout.stripe.com/*'},{urlPattern:'*checkout-mock-status*'},{urlPattern:'*checkout-mock/access*'}]});
  for(const width of [375,1440]) {
    await send('Emulation.setDeviceMetricsOverride',{width,height:900,deviceScaleFactor:1,mobile:width<600});
    await send('Page.navigate',{url:base+'/property-films/packages/'});
@@ -68,11 +68,12 @@ try{
      assert(await js("!document.querySelector('#test-note').hidden"));
      assert(await js('document.documentElement.scrollWidth<=innerWidth'));
      await click('#confirmed a');await wait("location.pathname.includes('/intake')");
-     assert(await js("document.body.textContent.includes('coming soon')"));
+     await wait("document.querySelectorAll('.property-section').length===1");
+     assert(await js("!document.querySelector('#intake-form').hidden"));
    }
  }
  await send('Page.navigate',{url:base+'/property-films/thank-you/'});
  await wait("document.querySelector('#payment-message')?.textContent.includes('valid payment reference')");
  assert(await js("document.querySelector('#confirmed').hidden"));
- assert.deepEqual(errors,[]);console.log('PASS paid/unpaid/missing-reference confirmation and intake placeholder; no browser exceptions');
+ assert.deepEqual(errors,[]);console.log('PASS paid/unpaid/missing-reference confirmation and verified intake handoff; no browser exceptions');
 }finally{ws?.close();const stopped=new Promise(resolve=>chrome.once('exit',resolve));chrome.kill();await stopped;await fs.rm(profile,{recursive:true,force:true,maxRetries:5,retryDelay:100});}

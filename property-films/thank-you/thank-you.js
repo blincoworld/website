@@ -10,6 +10,9 @@ try {
   if (!result.paid) throw new Error('Your payment has not been confirmed yet. Please refresh this page shortly or contact us for help.');
   label.textContent = 'PAYMENT RECEIVED';
   message.textContent = 'Thank you — your Property Films order is confirmed.';
+  // The high-entropy Session reference is a capability, never a trusted purchase description.
+  // Keep it out of intake HTTP URLs/referrers; intake exchanges it for a short-lived token.
+  document.querySelector('#intake-link').href = `/property-films/intake#session_id=${encodeURIComponent(id)}`;
   document.querySelector('#confirmed').hidden = false;
   document.querySelector('#test-note').hidden = !result.testMode;
 } catch (error) {
