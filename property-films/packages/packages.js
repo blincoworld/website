@@ -3,7 +3,7 @@ import { checkoutConfig } from './checkout-config.mjs';
 const preview = document.querySelector('#checkout-preview');
 let busy = false;
 const retryKeys = new Map();
-if (checkoutConfig.enabled) document.querySelector('.package-note').textContent = 'Test checkout — no real payment will be taken.';
+if (checkoutConfig.enabled) document.querySelector('.package-note').textContent = 'Secure checkout — payment is processed by Stripe.';
 for (const card of document.querySelectorAll('[data-package]')) {
   const checkbox = card.querySelector('input');
   const button = card.querySelector('[data-choose]');

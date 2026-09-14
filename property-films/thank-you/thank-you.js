@@ -3,7 +3,7 @@ const label = document.querySelector('#payment-label');
 const message = document.querySelector('#payment-message');
 const id = new URLSearchParams(location.search).get('session_id');
 try {
-  if (!/^cs_test_[A-Za-z0-9]+$/.test(id || '')) throw new Error('We couldn’t find a valid payment reference. Please check the link from Checkout.');
+  if (!/^cs_(test|live)_[A-Za-z0-9]{8,200}$/.test(id || '')) throw new Error('We couldn’t find a valid payment reference. Please check the link from Checkout.');
   const response = await fetch(`${checkoutConfig.apiUrl}-status?session_id=${encodeURIComponent(id)}`, { credentials: 'omit', signal: AbortSignal.timeout(20000) });
   if (!response.ok) throw new Error('We couldn’t check your payment just now. Please refresh this page or contact us before trying another payment.');
   const result = await response.json();

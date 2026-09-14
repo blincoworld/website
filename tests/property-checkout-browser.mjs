@@ -22,7 +22,7 @@ try{
  // The existing shell has no favicon; don't issue unrelated favicon fallback requests.
  await send('Page.addScriptToEvaluateOnNewDocument',{source:"document.addEventListener('DOMContentLoaded',()=>{const e=document.createElement('link');e.rel='icon';e.href='data:,';document.head.appendChild(e);});"});
 
- let statusPaid = true;
+ let statusPaid = true, statusTest = true;
  ws.addEventListener('message', async event => {
    const data = JSON.parse(event.data);
    if (data.method !== 'Fetch.requestPaused') return;
@@ -30,7 +30,7 @@ try{
    let text, type='application/javascript';
    if (request.url.includes('checkout-config.mjs')) text="export const checkoutConfig={enabled:true,apiUrl:'/checkout-mock'};";
    else if (request.url.includes('checkout.stripe.com')) { type='text/html'; text='<title>Mock Stripe Checkout</title><p>Hosted Checkout destination</p>'; }
-   else { type='application/json'; text=JSON.stringify(request.url.includes('/access') ? {token:'a'.repeat(64),order:{package:'essential',propertyCount:1,seasonal:false,amountPaid:49500,testMode:true,intakeStatus:'NEEDED'},customer:{name:'Test customer',email:'test@example.com',phone:''}} : {paid:statusPaid,testMode:true}); }
+   else { type='application/json'; text=JSON.stringify(request.url.includes('/access') ? {token:'a'.repeat(64),order:{package:'essential',propertyCount:1,seasonal:false,amountPaid:49500,testMode:statusTest,intakeStatus:'NEEDED'},customer:{name:'Test customer',email:'test@example.com',phone:''}} : {paid:statusPaid,testMode:statusTest}); }
    await send('Fetch.fulfillRequest',{requestId,responseCode:200,responseHeaders:[{name:'Content-Type',value:type}],body:Buffer.from(text).toString('base64')});
  });
  await send('Fetch.enable',{patterns:[{urlPattern:'*checkout-config.mjs*'},{urlPattern:'https://checkout.stripe.com/*'},{urlPattern:'*checkout-mock-status*'},{urlPattern:'*checkout-mock/access*'}]});
@@ -54,18 +54,19 @@ try{
    await js("window.fetch=()=>new Promise(resolve=>window.finishCheckout=resolve)");
    await click('[data-choose]');
    assert(await js("[...document.querySelectorAll('[data-choose]')].every(b=>b.disabled)"));
-   await js("finishCheckout(new Response(JSON.stringify({checkoutUrl:'https://checkout.stripe.com/c/pay/cs_test_fixture'})))");
+   await js("finishCheckout(new Response(JSON.stringify({checkoutUrl:'https://checkout.stripe.com/c/pay/cs_test_fixture123'})))");
    await wait("location.hostname==='checkout.stripe.com'");
    console.log(`PASS ${width}px: ten state payloads, retry, errors, busy state, hosted redirect`);
  }
- for(const paid of [false,true]) {
+ for(const mode of ['test','live']) for(const paid of [false,true]) {
+   statusTest=mode==='test';
    statusPaid=paid;
-   await send('Page.navigate',{url:base+'/property-films/thank-you/?session_id=cs_test_fixture'});
+   await send('Page.navigate',{url:base+`/property-films/thank-you/?session_id=cs_${mode}_fixture123`});
    await wait("document.querySelector('#payment-label') && document.querySelector('#payment-label').textContent!=='Checking payment'");
    assert.equal(await js("!document.querySelector('#confirmed').hidden"),paid);
    if(paid){
      assert.equal(await js("document.querySelector('#payment-label').textContent"),'PAYMENT RECEIVED');
-     assert(await js("!document.querySelector('#test-note').hidden"));
+     assert.equal(await js("!document.querySelector('#test-note').hidden"),statusTest);
      assert(await js('document.documentElement.scrollWidth<=innerWidth'));
      await click('#confirmed a');await wait("location.pathname.includes('/intake')");
      await wait("document.querySelectorAll('.property-section').length===1");
