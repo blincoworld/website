@@ -16,7 +16,7 @@
 .intake-card { padding:32px; margin:24px 0; border:1px solid #37393e; border-radius:var(--radius); background:#17191d; }
 .section-number { font-size:12px; letter-spacing:.1em; font-weight:800; color:#ed955a; margin-bottom:16px; }
 .field-grid { display:grid; grid-template-columns:1fr 1fr; gap:22px; }
-.intake-page label { display:block; margin:0 0 20px; color:#f5f0e8; font-size:15px; font-weight:700; line-height:1.5; }
+.intake-page label { text-transform:none; letter-spacing:normal; display:block; margin:0 0 20px; color:#f5f0e8; font-size:15px; font-weight:700; line-height:1.5; }
 .intake-page label span:not(.photo-choice span) { font-weight:400; color:#bbc0c6; }
 .intake-page input:not([type=radio]), .intake-page textarea { display:block; width:100%; min-width:0; border:1px solid #62656b; border-radius:12px; background:#101215; color:#fff; padding:14px; font:inherit; font-size:16px; font-weight:400; margin-top:9px; }
 .intake-page textarea { resize:vertical; min-height:100px; }
