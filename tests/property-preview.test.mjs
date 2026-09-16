@@ -1,0 +1,12 @@
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+const html=readFileSync(new URL('../property-films/preview/index.html',import.meta.url),'utf8');
+const js=readFileSync(new URL('../property-films/preview/preview.js',import.meta.url),'utf8');
+assert.match(html,/name="robots" content="noindex, nofollow"/);
+assert.match(html,/A preview for/);
+assert.match(html,/View packages &amp; get started/);
+assert.match(html,/https:\/\/piersblinco.com\/property-films\/packages/);
+assert.match(html,/<video[^>]+autoplay muted loop playsinline controls/);
+assert.match(js,/textContent=data.business_name/);
+assert.match(js,/\[a-f0-9\]\{48\}/);
+console.log('Property preview page checks passed.');
