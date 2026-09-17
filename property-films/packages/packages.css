@@ -662,3 +662,32 @@
     min-height: 0 !important;
   }
 }
+
+/* Individual borders for Essential + Signature */
+.package-page .start-package-grid {
+  gap: 16px;
+  border: 0;
+}
+
+.package-page .start-package-card,
+.package-page .start-package-card + .start-package-card {
+  border: 1px solid rgba(255,255,255,.22);
+}
+
+.package-page .start-package-card.featured {
+  border: 1px solid var(--accent);
+}
+
+@media (max-width: 800px) {
+  .package-page .start-package-grid {
+    gap: 16px;
+  }
+
+  .package-page .start-package-card + .start-package-card {
+    border: 1px solid rgba(255,255,255,.22);
+  }
+
+  .package-page .start-package-card.featured {
+    border: 1px solid var(--accent);
+  }
+}
