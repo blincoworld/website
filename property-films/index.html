@@ -21,6 +21,7 @@
 
     <section class="hero">
       <div class="wrap">
+
         <div class="eyebrow">A new way to show off your holiday let</div>
 
         <h1>
@@ -28,67 +29,110 @@
           BUT THEY'RE STILL JUST PHOTOS.
         </h1>
 
-        <p class="hero-sub">
-          Turn the professional photography you already have into a cinematic film that brings your holiday let to life.
-        </p>
+        <div class="hero-grid">
 
-        <p class="hero-copy">
-          No film crew. No new photoshoot. Nobody needs to visit the property.
-          We take what you've already got and create the whole thing — movement,
-          story, script, voiceover, music and the finished edit.
-        </p>
+          <div class="hero-content">
+            <p class="hero-sub">
+              Turn the professional photography you already have into a cinematic film that brings your holiday let to life.
+            </p>
 
-        <div class="hero-actions">
-          <a class="button" href="#example">See what we mean ↓</a>
-          <span class="micro">Made from the photos you already have.</span>
-        </div>
-      </div>
-    </section>
+            <p class="hero-copy">
+              <strong>No film crew. No new photoshoot. No property visit.</strong>
+              We create the movement, story, voiceover, music and finished edit —
+              all from the photos you've already got.
+            </p>
 
-    <section class="video-section" id="example">
-      <div class="wrap">
-
-        <div class="video-shell" id="cinema">
-          <div class="video-placeholder" id="film-placeholder">
-            <div>
-              <div class="play">▶</div>
-              <strong>SEE WHAT YOUR PHOTOS COULD BECOME.</strong>
-              <span class="placeholder-note">EXAMPLE FILM LOADING…</span>
+            <div class="hero-actions">
+              <button class="button" type="button" id="watch-example">
+                Watch the example →
+              </button>
+              <span class="micro">Made from the photos you already have.</span>
             </div>
           </div>
-          <video
-            id="showcase"
-            poster="/property-films/property-showcase.jpg"
-            controls
-            playsinline
-            preload="none"
-            hidden
-            aria-label="Example cinematic property film"
-            style="width:100%;height:100%;object-fit:cover;background:#0d0f12;">
-          </video>
-        </div>
 
-        <div class="post-video">
-          <h2 id="photography-claim">
-            YOUR PHOTOS.<br>
-            A FILM LIKE THIS.
-          </h2>
+          <div class="hero-video">
+            <div class="video-shell" id="cinema">
 
-          <a class="button" href="#packages">
-            See the options
-          </a>
+              <video
+                id="showcase"
+                src="/property-films/property-showcase.mp4?v=2"
+                controlslist="nodownload noplaybackrate"
+                disablepictureinpicture
+                poster="/property-films/property-showcase.jpg?v=2"
+                playsinline
+                preload="metadata"
+                
+                aria-label="Example cinematic property film"
+                style="width:100%;height:100%;object-fit:cover;background:#0d0f12;">
+              </video>
+
+              <button
+                class="video-play-overlay"
+                id="video-play-overlay"
+                type="button"
+                aria-label="Play example film">
+                <span class="video-play-button">▶</span>
+              </button>
+            </div>
+          </div>
+
         </div>
 
       </div>
     </section>
 
+    <!-- WHY FILM -->
+    <section class="block why-film">
+      <div class="wrap">
+
+        <div class="eyebrow">Why film?</div>
+
+        <div class="why-film-grid">
+          <div>
+            <h2 class="section-title">
+              YOUR LISTING HAS SECONDS<br>
+              TO MAKE SOMEONE<br>
+              WANT TO STAY.
+            </h2>
+
+            <p class="lead">
+              Great photography shows people what your property looks like.
+            </p>
+
+            <p class="why-film-answer">
+              A film helps them imagine being there.
+            </p>
+          </div>
+
+          <div class="experience-stack">
+            <div>THE FIRE BURNING.</div>
+            <div>THE HOT TUB STEAMING.</div>
+            <div>WALKING THROUGH THE BEDROOM.</div>
+            <div>BREAKFAST LAID OUT.</div>
+            <div>THE VIEW OPENING UP OUTSIDE.</div>
+          </div>
+        </div>
+
+        <div class="why-film-close">
+          YOU'RE NOT REPLACING YOUR PHOTOGRAPHY.<br>
+          <span>YOU'RE MAKING IT WORK HARDER.</span>
+        </div>
+
+      </div>
+    </section>
+
+
+    <!-- SIMPLE BIT -->
     <section class="block">
       <div class="wrap split">
 
         <div>
           <div class="eyebrow">The simple bit</div>
+
           <h2 class="section-title">
-            YOU ALREADY HAVE MOST OF WHAT WE NEED.
+            YOU ALREADY<br>
+            HAVE MOST OF<br>
+            WHAT WE NEED.
           </h2>
 
           <p class="lead">
@@ -112,18 +156,20 @@
       </div>
     </section>
 
+
+    <!-- HOW IT WORKS -->
     <section class="block">
       <div class="wrap">
 
         <div class="eyebrow">How it works</div>
-        <h2 class="section-title">HERE'S WHAT WE ACTUALLY DO.</h2>
+        <h2 class="section-title">THREE STEPS. THAT'S IT.</h2>
 
-        <div class="steps">
+        <div class="steps compact-steps">
 
           <div class="step">
             <div class="step-number">01</div>
             <div>
-              <h3>YOU SHOW US THE PROPERTY.</h3>
+              <h3>SHOW US THE PROPERTY.</h3>
               <p>Send us your website or listing and the professional photography you already have.</p>
             </div>
           </div>
@@ -131,32 +177,16 @@
           <div class="step">
             <div class="step-number">02</div>
             <div>
-              <h3>WE FIND THE STORY.</h3>
-              <p>We identify what makes the property desirable and shape the film around the property and the guest experience.</p>
+              <h3>WE CREATE THE FILM.</h3>
+              <p>We build the story, cinematic movement, narration, music and finished edit.</p>
             </div>
           </div>
 
           <div class="step">
             <div class="step-number">03</div>
             <div>
-              <h3>WE BRING THE PHOTOGRAPHY TO LIFE.</h3>
-              <p>We create cinematic movement and scenes from the existing photography using modern filmmaking technology.</p>
-            </div>
-          </div>
-
-          <div class="step">
-            <div class="step-number">04</div>
-            <div>
-              <h3>WE FINISH THE WHOLE THING.</h3>
-              <p>Script. Voiceover. Music. Editing. Production. We put the finished film together for you.</p>
-            </div>
-          </div>
-
-          <div class="step">
-            <div class="step-number">05</div>
-            <div>
-              <h3>YOU GET THE FINISHED FILM.</h3>
-              <p>Once you've agreed to go ahead, we create the complete promotional film ready to use across your marketing.</p>
+              <h3>YOU GET THE FINISHED VERSIONS.</h3>
+              <p>Ready to use across your marketing.</p>
             </div>
           </div>
 
@@ -164,6 +194,7 @@
 
       </div>
     </section>
+
 
     <section class="block">
       <div class="wrap">
@@ -250,14 +281,13 @@
             <div class="package-price">Price discussed with you directly</div>
 
             <ul class="feature-list">
-              <li>30–45 second cinematic property film</li>
+              <li>30–90 second cinematic property film</li>
               <li>Existing photography transformed into moving footage</li>
               <li>Property-specific creative direction</li>
               <li>Written script and narrative</li>
               <li>Professional voiceover</li>
               <li>Music and soundtrack</li>
               <li>Full editing and production</li>
-              <li>Horizontal master version</li>
               <li>1 revision round</li>
               <li>Love Your Film Guarantee</li>
             </ul>
@@ -278,7 +308,7 @@
             <div class="package-price">Price discussed with you directly</div>
 
             <ul class="feature-list">
-              <li>60–90 second cinematic property film</li>
+              <li>30–90 second cinematic property film</li>
               <li>Expanded scene selection</li>
               <li>Full property story and creative direction</li>
               <li>Written script and narrative</li>
@@ -307,7 +337,7 @@
             <div class="package-price">Price discussed with you directly</div>
 
             <ul class="feature-list">
-              <li>90 second+ flagship cinematic film</li>
+              <li>30–90 second cinematic property film</li>
               <li>Full premium scene selection</li>
               <li>Enhanced creative treatment</li>
               <li>Written script and narrative</li>

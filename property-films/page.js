@@ -6,8 +6,6 @@
   const fields = ['name', 'business_name', 'email', 'phone', 'website', 'property_count', 'photography'];
   const submitButton = form.querySelector('button[type=submit]');
   const submitLabel = submitButton.innerHTML;
-  const exampleHeading = document.getElementById('photography-claim');
-  const defaultExampleHeading = exampleHeading.textContent;
   let submissionId = crypto.randomUUID(), started = false, busy = false;
   function event(name, detail = {}) {
     // No personal information is included. Existing analytics can subscribe to this event.
@@ -76,21 +74,79 @@
     } finally { busy = false; button.disabled = false; button.innerHTML = submitLabel; }
   });
   const video = document.getElementById('showcase');
-  const placeholder = document.getElementById('film-placeholder');
-  let played = false, halfway = false, completed = false;
-  video.addEventListener('play', () => { if (!played) { played = true; event('example_video_started'); } });
-  video.addEventListener('timeupdate', () => { if (!halfway && video.duration > 0 && video.currentTime / video.duration >= .5) { halfway = true; event('example_video_50_percent'); } });
-  video.addEventListener('ended', () => { if (!completed) { completed = true; event('example_video_completed'); } });
-  video.addEventListener('error', () => {
-    video.hidden = true; placeholder.hidden = false;
-    document.querySelector('.placeholder-note').textContent = 'EXAMPLE FILM TEMPORARILY UNAVAILABLE';
-    exampleHeading.textContent = defaultExampleHeading;
+  const playOverlay = document.getElementById('video-play-overlay');
+  const watchExample = document.getElementById('watch-example');
+
+  let played = false;
+  let halfway = false;
+  let completed = false;
+
+  // The film is always the real video — no placeholder state.
+  video.controls = false;
+
+  const startVideo = async () => {
+    video.controls = false;
+
+    try {
+      if (video.readyState === 0) {
+        video.load();
+      }
+
+      await video.play();
+
+      if (playOverlay) {
+        playOverlay.hidden = true;
+      }
+    } catch (err) {
+      console.error('Could not start example film:', err);
+
+      if (playOverlay) {
+        playOverlay.hidden = false;
+      }
+    }
+  };
+
+  if (playOverlay) {
+    playOverlay.addEventListener('click', startVideo);
+  }
+
+  if (watchExample) {
+    watchExample.addEventListener('click', startVideo);
+  }
+
+  video.addEventListener('click', () => {
+    if (video.paused) {
+      startVideo();
+    }
   });
-  // Probe before assigning a source so missing media never shows broken playback controls.
-  // Static hosts return their HTML fallback for missing files; check MIME type as well as status.
-  fetch(config.videoUrl, { method: 'HEAD', signal: AbortSignal.timeout(8000) }).then(response => {
-    if (!response.ok || !response.headers.get('content-type')?.startsWith('video/')) return;
-    video.src = config.videoUrl; video.hidden = false; placeholder.hidden = true;
-    if (config.photographyClaimVerified) document.getElementById('photography-claim').textContent = config.photographyClaim;
-  }).catch(() => { /* The deliberately designed placeholder remains usable. */ });
+
+  video.addEventListener('play', () => {
+    if (playOverlay) playOverlay.hidden = true;
+
+    if (!played) {
+      played = true;
+      event('example_video_started');
+    }
+  });
+
+  video.addEventListener('timeupdate', () => {
+    if (
+      !halfway &&
+      video.duration > 0 &&
+      video.currentTime / video.duration >= .5
+    ) {
+      halfway = true;
+      event('example_video_50_percent');
+    }
+  });
+
+  video.addEventListener('ended', () => {
+    if (playOverlay) playOverlay.hidden = false;
+
+    if (!completed) {
+      completed = true;
+      event('example_video_completed');
+    }
+  });
+
 })();
