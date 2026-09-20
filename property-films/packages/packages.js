@@ -7,7 +7,7 @@ let busy = false;
 const retryKeys = new Map();
 
 if (checkoutConfig.enabled) {
-  document.querySelector('.package-note').textContent =
+  if (!location.pathname.includes('/next-steps')) document.querySelector('.package-note').textContent =
     'Secure checkout — payment is processed by Stripe.';
 }
 
@@ -25,10 +25,10 @@ for (const card of document.querySelectorAll('[data-package]')) {
   function update() {
     const chosen = selection();
 
-    card.querySelector('[data-total]').textContent = money(chosen.total);
-    card.querySelector('[data-total-label]').textContent = 'Package total';
+    if (card.querySelector('[data-total]')) card.querySelector('[data-total]').textContent = money(chosen.total);
+    if (card.querySelector('[data-total-label]')) card.querySelector('[data-total-label]').textContent = 'Package total';
 
-    card.querySelector('[data-breakdown]').textContent = count
+    if (card.querySelector('[data-breakdown]')) card.querySelector('[data-breakdown]').textContent = count
       ? `${chosen.propertyCount} ${
           chosen.propertyCount === 1 ? 'property' : 'properties'
         }`
@@ -64,6 +64,7 @@ for (const card of document.querySelectorAll('[data-package]')) {
     const chosen = selection();
 
     if (checkoutConfig.enabled) {
+      window.propertyFilmsEvent?.('checkout_started', { package: card.dataset.package });
       busy = true;
 
       const buttons = [...document.querySelectorAll('[data-choose]')];
@@ -78,7 +79,8 @@ for (const card of document.querySelectorAll('[data-package]')) {
             ? 'multi'
             : card.dataset.package,
         propertyCount: chosen.propertyCount,
-        seasonal: false
+        seasonal: false,
+        ...(location.pathname.includes('/next-steps') ? { funnel_source: 'callback-v1' } : {})
       };
 
       const stateKey = JSON.stringify(state);

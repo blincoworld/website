@@ -8,6 +8,7 @@ try {
   if (!response.ok) throw new Error('We couldn’t check your payment just now. Please refresh this page or contact us before trying another payment.');
   const result = await response.json();
   if (!result.paid) throw new Error('Your payment has not been confirmed yet. Please refresh this page shortly or contact us for help.');
+  if (!result.testMode) window.propertyFilmsEvent?.('purchase_completed');
   label.textContent = 'PAYMENT RECEIVED';
   message.textContent = 'Thank you — your Property Films order is confirmed.';
   // The high-entropy Session reference is a capability, never a trusted purchase description.

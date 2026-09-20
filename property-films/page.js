@@ -3,17 +3,21 @@
   const config = window.PROPERTY_FILMS_CONFIG;
   const form = document.querySelector('#interest-form');
   const error = document.querySelector('#form-error');
-  const fields = ['name', 'business_name', 'email', 'phone', 'website', 'property_count', 'photography'];
+  const fields = ['name', 'business_name', 'email', 'phone', 'selected_package'];
   const submitButton = form.querySelector('button[type=submit]');
   const submitLabel = submitButton.innerHTML;
   let submissionId = crypto.randomUUID(), started = false, busy = false;
-  function event(name, detail = {}) {
-    // No personal information is included. Existing analytics can subscribe to this event.
-    const data = { event: `property_films_${name}`, ...detail };
-    window.dispatchEvent(new CustomEvent('property-films:analytics', { detail: data }));
-    if (Array.isArray(window.dataLayer)) window.dataLayer.push(data);
-  }
+  const event = window.propertyFilmsEvent;
   event('page_viewed');
+  let opened = false;
+  function openForm() { if (!opened) { opened = true; event('callback_form_opened'); } }
+  document.querySelectorAll('a[href="#enquiry"]').forEach(link => link.addEventListener('click', () => {
+    if (link.dataset.package) { form.elements.selected_package.value = link.dataset.package; event('package_selected', { package: link.dataset.package }); }
+    openForm();
+    form.elements.name.focus({ preventScroll: true });
+  }));
+  form.addEventListener('focusin', openForm);
+  form.elements.selected_package.addEventListener('change', () => event('package_selected', { package: form.elements.selected_package.value }));
   document.querySelectorAll('[data-cta]').forEach(link => link.addEventListener('click', () => event('cta_clicked', { cta: link.dataset.cta })));
   form.addEventListener('input', e => {
     if (!started) { started = true; event('form_started'); }
@@ -40,19 +44,10 @@
     });
     if (data.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) fieldError('email', 'Please enter a valid email address.');
     if (data.phone && (!/^[+\d\s().-]+$/.test(data.phone) || data.phone.replace(/\D/g, '').length < 7)) fieldError('phone', 'Please enter a valid phone number.');
-    if (data.website) {
-      try {
-        if (!/^[a-z][a-z\d+.-]*:/i.test(data.website)) data.website = `https://${data.website}`;
-        const url = new URL(data.website);
-        if (!['http:', 'https:'].includes(url.protocol) || !url.hostname.includes('.') || url.username || url.password) throw new Error();
-        data.website = url.href;
-        form.elements.website.value = data.website;
-      } catch { fieldError('website', 'Please enter a valid website or listing URL.'); }
-    }
     const invalid = form.querySelector('[aria-invalid=true]');
     if (invalid) { invalid.focus(); return; }
     const params = new URLSearchParams(location.search);
-    Object.assign(data, { submission_id: submissionId, source: params.get('utm_source') || params.get('source') || 'property-films', landing_page: location.origin + location.pathname, campaign: params.get('utm_campaign') || '', referrer: document.referrer });
+    Object.assign(data, { form_version: 'callback-v1', submission_id: submissionId, source: params.get('utm_source') || params.get('source') || 'property-films', landing_page: location.origin + location.pathname, campaign: params.get('utm_campaign') || '', referrer: document.referrer });
     busy = true;
     const button = form.querySelector('button[type=submit]');
     button.disabled = true; button.textContent = 'SENDING…';
@@ -63,11 +58,10 @@
         if (result?.errors) for (const [name, message] of Object.entries(result.errors)) if (fields.includes(name)) fieldError(name, message);
         throw new Error(result?.error || 'We couldn’t send your details just now. Please try again.');
       }
-      form.hidden = true;
-      const success = document.getElementById('success');
-      success.hidden = false; success.focus();
-      event('form_submitted_successfully');
-      submissionId = crypto.randomUUID();
+      event('form_submitted_successfully', { package: data.selected_package });
+      event('callback_submitted', { package: data.selected_package });
+      try { sessionStorage.setItem('property-films-callback', JSON.stringify({ package: data.selected_package, at: Date.now() })); } catch {}
+      window.location.assign('/property-films/next-steps/#callback=' + encodeURIComponent(data.selected_package));
     } catch (err) {
       error.textContent = err.name === 'TimeoutError' || err.name === 'TypeError' ? 'We couldn’t confirm your submission. Please check your connection and try again — your details are still here.' : err.message;
       form.querySelector('[aria-invalid=true]')?.focus();
@@ -82,10 +76,10 @@
   let completed = false;
 
   // The film is always the real video — no placeholder state.
-  video.controls = false;
+  video.controls = true;
 
   const startVideo = async () => {
-    video.controls = false;
+    video.controls = true;
 
     try {
       if (video.readyState === 0) {
