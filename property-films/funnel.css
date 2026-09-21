@@ -513,3 +513,42 @@ section.compact-capacity { padding-block: 48px; }
   margin-top: 26px;
 }
 
+
+/* Fix: Why Now section — force centred single-column layout */
+section.why-now-section .wrap.split {
+  display: block !important;
+  max-width: 980px;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+}
+
+section.why-now-section .wrap.split > div {
+  width: 100%;
+  max-width: 850px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+section.why-now-section .wrap.split > div:last-child {
+  margin-top: 32px;
+}
+
+section.why-now-section .eyebrow {
+  justify-content: center;
+  text-align: center;
+}
+
+section.why-now-section .section-title {
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+}
+
+section.why-now-section .lead {
+  max-width: 850px;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+}
