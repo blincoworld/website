@@ -889,3 +889,104 @@ section.why-now-section .lead {
     grid-template-columns: 1fr;
   }
 }
+
+
+/* =========================================================
+   Property Films — Next Steps / payment page
+   ========================================================= */
+
+.next-steps-page .hero {
+  min-height: 0;
+  display: block;
+  padding: 72px 0 78px;
+}
+
+.next-steps-page .hero > .wrap {
+  transform: none;
+}
+
+.next-steps-page .reservation-intro {
+  max-width: 860px;
+  margin: 0 auto;
+}
+
+.next-steps-page .reservation-intro h1 {
+  margin-top: 18px;
+  font-size: clamp(3.2rem, 6vw, 5.5rem);
+  line-height: .92;
+}
+
+.next-steps-page .reservation-intro .hero-sub {
+  max-width: 620px;
+  margin-top: 28px;
+}
+
+.next-steps-page #callback-reassurance {
+  margin-top: 14px;
+  color: var(--muted);
+}
+
+.next-steps-page main > .block:not(.guarantee) {
+  padding-top: 78px;
+  padding-bottom: 90px;
+}
+
+.next-steps-page main > .block:not(.guarantee) > .wrap {
+  max-width: 1180px;
+}
+
+.next-steps-page main > .block:not(.guarantee) .section-title {
+  max-width: 900px;
+  margin-top: 18px;
+}
+
+.next-steps-page main > .block:not(.guarantee) > .wrap > .lead {
+  max-width: 720px;
+  margin-top: 24px;
+}
+
+.next-steps-page .reservation-grid {
+  margin-top: 46px;
+}
+
+.next-steps-page .package-note {
+  margin-top: 22px;
+}
+
+.next-steps-page .guarantee {
+  padding-top: 90px;
+  padding-bottom: 90px;
+}
+
+.next-steps-page .guarantee .section-title {
+  margin-top: 18px;
+}
+
+.next-steps-page .guarantee .lead {
+  max-width: 820px;
+}
+
+@media (max-width: 700px) {
+  .next-steps-page .hero {
+    padding-top: 48px;
+    padding-bottom: 56px;
+  }
+
+  .next-steps-page .reservation-intro h1 {
+    font-size: clamp(2.7rem, 13vw, 4rem);
+  }
+
+  .next-steps-page main > .block:not(.guarantee) {
+    padding-top: 58px;
+    padding-bottom: 64px;
+  }
+
+  .next-steps-page .reservation-grid {
+    margin-top: 34px;
+  }
+
+  .next-steps-page .guarantee {
+    padding-top: 64px;
+    padding-bottom: 64px;
+  }
+}
