@@ -882,3 +882,10 @@ section.why-now-section .lead {
     transform: none;
   }
 }
+
+/* Deliverables: responsive card grid */
+@media (max-width: 700px) {
+  .deliverables-grid {
+    grid-template-columns: 1fr;
+  }
+}
