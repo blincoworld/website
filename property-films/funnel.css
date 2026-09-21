@@ -829,3 +829,12 @@ section.why-now-section .lead {
   width: 100%;
   max-width: none;
 }
+
+/* Hero — complete opening viewport */
+.hero {
+  min-height: 100vh;
+  min-height: 100svh;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+}
