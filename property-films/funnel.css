@@ -838,3 +838,9 @@ section.why-now-section .lead {
   display: flex;
   align-items: center;
 }
+
+/* Full-height hero controls its own vertical positioning */
+.hero {
+  padding-top: 0;
+  padding-bottom: 0;
+}
