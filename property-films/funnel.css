@@ -868,3 +868,17 @@ section.why-now-section .lead {
 .hero > .wrap {
   transform: translateY(-70px);
 }
+
+/* Mobile hero: natural document flow beneath navigation */
+@media (max-width: 700px) {
+  .hero {
+    min-height: auto;
+    display: block;
+    padding-top: 72px;
+    padding-bottom: 48px;
+  }
+
+  .hero > .wrap {
+    transform: none;
+  }
+}
