@@ -164,11 +164,9 @@ section.compact-capacity { padding-block: 48px; }
 
 .final-close {
   margin: 0 auto 76px;
-  text-align: center;
 }
 
 .final-close .eyebrow {
-  justify-content: center;
 }
 
 .final-close p {
@@ -178,11 +176,9 @@ section.compact-capacity { padding-block: 48px; }
 
 .enquiry-heading {
   margin: 0 auto 38px;
-  text-align: center;
 }
 
 .enquiry-heading .eyebrow {
-  justify-content: center;
 }
 
 .enquiry-heading h3 {
@@ -270,11 +266,9 @@ section.compact-capacity { padding-block: 48px; }
 /* Hero: make the main proposition feel intentional and central */
 .hero .eyebrow,
 .hero h1 {
-  text-align: center;
 }
 
 .hero .eyebrow {
-  justify-content: center;
 }
 
 .hero h1 {
@@ -287,11 +281,9 @@ section.compact-capacity { padding-block: 48px; }
 .experience-section .statement {
   margin-left: auto;
   margin-right: auto;
-  text-align: center;
 }
 
 .experience-section .eyebrow {
-  justify-content: center;
 }
 
 .experience-section .statement p {
@@ -302,11 +294,9 @@ section.compact-capacity { padding-block: 48px; }
 
 /* Production journey intro */
 .process-section > .wrap {
-  text-align: center;
 }
 
 .process-section .eyebrow {
-  justify-content: center;
 }
 
 .process-section .process-intro {
@@ -328,7 +318,6 @@ section.compact-capacity { padding-block: 48px; }
   border: 1px solid var(--line);
   border-radius: 12px;
   background: #fff;
-  text-align: center;
 }
 
 .production-step:last-child {
@@ -341,7 +330,6 @@ section.compact-capacity { padding-block: 48px; }
   margin: 0 auto 24px;
   display: flex;
   align-items: center;
-  justify-content: center;
   border-radius: 50%;
   background: var(--ink);
   color: #fff;
@@ -363,11 +351,9 @@ section.compact-capacity { padding-block: 48px; }
 
 /* Complete production / deliverables */
 .deliverables-section > .wrap {
-  text-align: center;
 }
 
 .deliverables-section .eyebrow {
-  justify-content: center;
 }
 
 .deliverables-grid {
@@ -466,11 +452,9 @@ section.compact-capacity { padding-block: 48px; }
 
 .hero .eyebrow,
 .hero h1 {
-  text-align: center;
 }
 
 .hero .eyebrow {
-  justify-content: center;
 }
 
 .hero h1 {
@@ -494,12 +478,9 @@ section.compact-capacity { padding-block: 48px; }
   border: 0;
   background: transparent;
   box-shadow: none;
-  text-align: center;
 }
 
 .experience-section .eyebrow {
-  justify-content: center;
-  text-align: center;
 }
 
 .experience-section .statement h2,
@@ -518,11 +499,9 @@ section.compact-capacity { padding-block: 48px; }
 }
 
 .process-section > .wrap {
-  text-align: center;
 }
 
 .process-section .eyebrow {
-  justify-content: center;
 }
 
 .process-section .process-intro {
@@ -540,7 +519,6 @@ section.compact-capacity { padding-block: 48px; }
 
 .production-section .wrap.production-split {
   display: block;
-  text-align: center;
 }
 
 .production-section .production-split > div,
@@ -551,8 +529,6 @@ section.compact-capacity { padding-block: 48px; }
 }
 
 .production-section .eyebrow {
-  justify-content: center;
-  text-align: center;
   color: var(--accent);
 }
 
@@ -568,7 +544,6 @@ section.compact-capacity { padding-block: 48px; }
 .production-section .lead {
   margin-left: auto;
   margin-right: auto;
-  text-align: center;
   opacity: .86;
 }
 
@@ -576,11 +551,9 @@ section.compact-capacity { padding-block: 48px; }
 /* ---------- Complete production ---------- */
 
 .deliverables-section > .wrap {
-  text-align: center;
 }
 
 .deliverables-section .eyebrow {
-  justify-content: center;
 }
 
 
@@ -588,7 +561,6 @@ section.compact-capacity { padding-block: 48px; }
 
 section.why-now-section .wrap.split {
   display: block;
-  text-align: center;
 }
 
 section.why-now-section .wrap.split > div,
@@ -603,15 +575,12 @@ section.why-now-section .wrap.split > div:last-child {
 }
 
 section.why-now-section .eyebrow {
-  justify-content: center;
-  text-align: center;
 }
 
 section.why-now-section .section-title,
 section.why-now-section .lead {
   margin-left: auto;
   margin-right: auto;
-  text-align: center;
 }
 
 
@@ -645,7 +614,6 @@ section.why-now-section .lead {
 
 .capacity-section .wrap.split {
   display: block;
-  text-align: center;
 }
 
 .capacity-section .split > div,
@@ -660,15 +628,12 @@ section.why-now-section .lead {
 }
 
 .capacity-section .eyebrow {
-  justify-content: center;
-  text-align: center;
 }
 
 .capacity-section .section-title,
 .capacity-section .lead {
   margin-left: auto;
   margin-right: auto;
-  text-align: center;
 }
 
 
@@ -690,11 +655,9 @@ section.why-now-section .lead {
 
 .final-close {
   margin: 0 auto 76px;
-  text-align: center;
 }
 
 .final-close .eyebrow {
-  justify-content: center;
 }
 
 .final-close p {
@@ -714,11 +677,9 @@ section.why-now-section .lead {
 
 .enquiry-heading {
   margin: 0 auto 38px;
-  text-align: center;
 }
 
 .enquiry-heading .eyebrow {
-  justify-content: center;
 }
 
 .enquiry-heading p {
@@ -735,3 +696,54 @@ section.why-now-section .lead {
   }
 }
 
+
+
+/* =========================================================
+   Property Films — alignment baseline
+   ========================================================= */
+
+/*
+ * Default editorial alignment is left.
+ * The four production-journey cards are the deliberate exception.
+ */
+
+.hero .eyebrow,
+.experience-section .eyebrow,
+.process-section .eyebrow,
+.production-section .eyebrow,
+.deliverables-section .eyebrow,
+.why-now-section .eyebrow,
+.capacity-section .eyebrow,
+.final-close .eyebrow,
+.enquiry-heading .eyebrow {
+  justify-content: flex-start;
+  text-align: left;
+}
+
+.hero h1,
+.experience-section .statement,
+.process-section > .wrap,
+.production-section .production-split,
+.deliverables-section > .wrap,
+.why-now-section .wrap.split,
+.guarantee > .wrap,
+.capacity-section .wrap.split,
+.objections-section > .wrap,
+.final-close,
+.enquiry-heading {
+  text-align: left;
+}
+
+/* Deliberate exception: the four production process cards */
+.production-step {
+  text-align: center;
+}
+
+.production-step .step-number {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.production-step p {
+  text-align: center;
+}
