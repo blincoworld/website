@@ -76,10 +76,7 @@
   let completed = false;
 
   // The film is always the real video — no placeholder state.
-  video.controls = true;
-
   const startVideo = async () => {
-    video.controls = true;
 
     try {
       if (video.readyState === 0) {
