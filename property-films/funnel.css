@@ -1044,3 +1044,27 @@ section.why-now-section .lead {
   width: 100%;
   max-width: none;
 }
+
+
+/* Next Steps — payment card alignment and price hierarchy */
+.next-steps-page .reservation-grid {
+  align-items: stretch;
+}
+
+.next-steps-page .reservation-grid .package-card.featured {
+  transform: none;
+}
+
+.next-steps-page .reservation-grid .package-cta {
+  margin-top: 0;
+}
+
+.next-steps-page .reservation-grid .planned-price {
+  margin: 14px 0 0;
+  font-size: 13px;
+  opacity: .68;
+}
+
+.next-steps-page .reservation-grid .package-card:not(.featured) .planned-price {
+  color: rgba(255,255,255,.62);
+}
