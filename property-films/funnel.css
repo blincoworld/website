@@ -35,10 +35,6 @@ section.compact-capacity { padding-block: 48px; }
    2026-09-21 — Property Films sales-flow refinement
    ========================================================= */
 
-.process-intro {
-  max-width: 760px;
-}
-
 .production-journey {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -167,7 +163,6 @@ section.compact-capacity { padding-block: 48px; }
 }
 
 .final-close {
-  max-width: 1000px;
   margin: 0 auto 76px;
   text-align: center;
 }
@@ -182,7 +177,6 @@ section.compact-capacity { padding-block: 48px; }
 }
 
 .enquiry-heading {
-  max-width: 760px;
   margin: 0 auto 38px;
   text-align: center;
 }
@@ -291,7 +285,6 @@ section.compact-capacity { padding-block: 48px; }
 
 /* Emotional statement after the example */
 .experience-section .statement {
-  max-width: 900px;
   margin-left: auto;
   margin-right: auto;
   text-align: center;
@@ -302,7 +295,6 @@ section.compact-capacity { padding-block: 48px; }
 }
 
 .experience-section .statement p {
-  max-width: 780px;
   margin-left: auto;
   margin-right: auto;
 }
@@ -455,79 +447,155 @@ section.compact-capacity { padding-block: 48px; }
 }
 
 /* =========================================================
-   2026-09-21 — centred statement sections
+   Property Films — current landing-page layout
    ========================================================= */
 
 /*
- * These sections previously used the site's standard two-column
- * split. They work better here as wide, centred sales statements.
+ * GRID
+ * .wrap in shared.css is the canonical page canvas:
+ * width: min(1180px, calc(100% - 40px)).
+ *
+ * Never override a .wrap with width:100%.
  */
-.production-section .production-split,
-.why-now-section .split,
-.capacity-section .split {
-  display: block;
-  max-width: 980px;
-  margin-left: auto;
-  margin-right: auto;
+
+/* ---------- Hero ---------- */
+
+.hero {
+  background: var(--bg);
+}
+
+.hero .eyebrow,
+.hero h1 {
   text-align: center;
 }
 
-.production-section .eyebrow,
-.why-now-section .eyebrow,
-.capacity-section .eyebrow {
+.hero .eyebrow {
+  justify-content: center;
+}
+
+.hero h1 {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+
+/* ---------- Feel the stay ---------- */
+
+.experience-section {
+  background: #ece5da;
+}
+
+.experience-section .statement {
+  width: 100%;
+  max-width: none;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  text-align: center;
+}
+
+.experience-section .eyebrow {
   justify-content: center;
   text-align: center;
 }
 
-.production-section .section-title,
-.why-now-section .section-title,
-.capacity-section .section-title {
-  max-width: 900px;
+.experience-section .statement h2,
+.experience-section .statement p {
+  width: 100%;
+  max-width: none;
   margin-left: auto;
   margin-right: auto;
 }
 
-.production-section .production-split > div:last-child,
-.why-now-section .split > div:last-child,
-.capacity-section .split > div:last-child {
-  max-width: 850px;
-  margin: 32px auto 0;
+
+/* ---------- Photography / production journey ---------- */
+
+.process-section {
+  background: var(--bg);
 }
 
-.production-section .lead,
-.why-now-section .lead,
-.capacity-section .lead {
-  max-width: 850px;
-  margin-left: auto;
-  margin-right: auto;
+.process-section > .wrap {
   text-align: center;
 }
 
-/* Give the dark production statement a little more presence */
+.process-section .eyebrow {
+  justify-content: center;
+}
+
+.process-section .process-intro {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+
+/* ---------- More than an AI video ---------- */
+
+.production-section {
+  background: var(--dark);
+  color: #fff;
+}
+
+.production-section .wrap.production-split {
+  display: block;
+  text-align: center;
+}
+
+.production-section .production-split > div,
+.production-section .section-title,
+.production-section .lead {
+  width: 100%;
+  max-width: none;
+}
+
+.production-section .eyebrow {
+  justify-content: center;
+  text-align: center;
+  color: var(--accent);
+}
+
+.production-section .section-title,
+.production-section .lead {
+  color: #fff;
+}
+
 .production-section .production-split > div:last-child {
   margin-top: 38px;
 }
 
-/* Capacity is intentionally a little tighter than the major statements */
-.capacity-section .split > div:last-child {
-  margin-top: 26px;
-}
-
-
-/* Fix: Why Now section — force centred single-column layout */
-section.why-now-section .wrap.split {
-  display: block !important;
-  max-width: 980px;
+.production-section .lead {
   margin-left: auto;
   margin-right: auto;
   text-align: center;
+  opacity: .86;
 }
 
-section.why-now-section .wrap.split > div {
+
+/* ---------- Complete production ---------- */
+
+.deliverables-section > .wrap {
+  text-align: center;
+}
+
+.deliverables-section .eyebrow {
+  justify-content: center;
+}
+
+
+/* ---------- Why now ---------- */
+
+section.why-now-section .wrap.split {
+  display: block;
+  text-align: center;
+}
+
+section.why-now-section .wrap.split > div,
+section.why-now-section .section-title,
+section.why-now-section .lead {
   width: 100%;
-  max-width: 850px;
-  margin-left: auto;
-  margin-right: auto;
+  max-width: none;
 }
 
 section.why-now-section .wrap.split > div:last-child {
@@ -539,59 +607,16 @@ section.why-now-section .eyebrow {
   text-align: center;
 }
 
-section.why-now-section .section-title {
-  max-width: 900px;
-  margin-left: auto;
-  margin-right: auto;
-  text-align: center;
-}
-
+section.why-now-section .section-title,
 section.why-now-section .lead {
-  max-width: 850px;
   margin-left: auto;
   margin-right: auto;
   text-align: center;
 }
 
-/* =========================================================
-   2026-09-21 — section background rhythm
-   ========================================================= */
 
-/* Hero / opening */
-.hero {
-  background: var(--bg);
-}
+/* ---------- Guarantee ---------- */
 
-/*
- * Emotional statement:
- * dark beige full-width section, no inner white card.
- */
-.experience-section {
-  background: #ece5da;
-}
-
-.experience-section .statement {
-  max-width: 980px;
-  padding: 0;
-  background: transparent;
-  border: 0;
-  box-shadow: none;
-}
-
-/* Production journey returns to the main light beige */
-.process-section {
-  background: var(--bg);
-}
-
-/* Keep the AI / production positioning dark */
-.production-section {
-  background: var(--dark);
-}
-
-/*
- * Guarantee should now act as the light section immediately
- * before the dark package/offer area.
- */
 .guarantee {
   background: var(--bg);
   color: var(--ink);
@@ -599,6 +624,8 @@ section.why-now-section .lead {
 
 .guarantee .section-title,
 .guarantee .lead {
+  width: 100%;
+  max-width: none;
   color: var(--ink);
 }
 
@@ -606,152 +633,54 @@ section.why-now-section .lead {
   color: var(--ink);
 }
 
-/* Package choice remains the strong dark offer section */
+
+/* ---------- Packages ---------- */
+
 .packages {
   background: var(--dark);
 }
 
 
-/* =========================================================
-   2026-09-21 — normalise page content grid
-   ========================================================= */
+/* ---------- Capacity ---------- */
 
-/*
- * The global .wrap is the page grid:
- * width: min(1180px, calc(100% - 40px)).
- *
- * Section-level containers should use that full canvas.
- * Individual text elements can be narrowed separately where useful.
- */
+.capacity-section .wrap.split {
+  display: block;
+  text-align: center;
+}
 
-/* Emotional statement */
-.experience-section .statement {
+.capacity-section .split > div,
+.capacity-section .section-title,
+.capacity-section .lead {
   width: 100%;
   max-width: none;
 }
 
-/* Production journey */
-.process-section > .wrap {
-  max-width: none;
+.capacity-section .split > div:last-child {
+  margin-top: 26px;
 }
 
-/* AI / production statement */
-.production-section .production-split {
-  width: 100%;
-  max-width: none;
+.capacity-section .eyebrow {
+  justify-content: center;
+  text-align: center;
 }
 
-/* Complete production */
-.deliverables-section > .wrap {
-  max-width: none;
+.capacity-section .section-title,
+.capacity-section .lead {
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
 }
 
-/* Why now */
-section.why-now-section .wrap.split {
-  width: min(1180px, calc(100% - 40px));
-  max-width: none;
-}
 
-/* Guarantee */
-.guarantee > .wrap {
-  max-width: none;
-}
+/* ---------- Objections ---------- */
 
-/* Packages */
-.packages > .wrap {
-  max-width: none;
-}
-
-/* Capacity */
-.capacity-section .split {
-  width: 100%;
-  max-width: none;
-}
-
-/* Objections */
 .objections-section > .wrap {
   max-width: none;
 }
 
-/* Final enquiry */
-.final > .wrap {
-  max-width: none;
-}
 
-@media (max-width: 600px) {
-  section.why-now-section .wrap.split {
-    width: min(100% - 28px, 1180px);
-  }
-}
+/* ---------- Final close ---------- */
 
-/* =========================================================
-   2026-09-21 — unify centred statement content widths
-   ========================================================= */
-
-/*
- * All major centred statement sections now inherit the full
- * 1180px .wrap canvas. Remove accumulated inner max-widths.
- */
-
-/* Feel the stay */
-.experience-section .statement,
-.experience-section .statement h2,
-.experience-section .statement p {
-  width: 100%;
-  max-width: none;
-}
-
-/* More than an AI video */
-.production-section .production-split,
-.production-section .production-split > div,
-.production-section .production-split > div:last-child,
-.production-section .section-title,
-.production-section .lead {
-  width: 100%;
-  max-width: none;
-}
-
-.production-section .production-split > div:last-child {
-  margin-left: 0;
-  margin-right: 0;
-}
-
-/* Standing still */
-section.why-now-section .wrap.split,
-section.why-now-section .wrap.split > div,
-section.why-now-section .section-title,
-section.why-now-section .lead {
-  max-width: none;
-}
-
-section.why-now-section .wrap.split > div {
-  width: 100%;
-}
-
-/* Guarantee */
-.guarantee > .wrap,
-.guarantee .section-title,
-.guarantee .lead {
-  width: 100%;
-  max-width: none;
-}
-
-/* Individually produced */
-.capacity-section .split,
-.capacity-section .split > div,
-.capacity-section .split > div:last-child,
-.capacity-section .section-title,
-.capacity-section .lead {
-  width: 100%;
-  max-width: none;
-}
-
-.capacity-section .split > div:last-child {
-  margin-left: 0;
-  margin-right: 0;
-}
-
-/* Final close */
 .final-close,
 .final-close h2,
 .final-close p {
@@ -759,91 +688,23 @@ section.why-now-section .wrap.split > div {
   max-width: none;
 }
 
-/* Callback heading */
-.enquiry-heading,
-.enquiry-heading h3,
-.enquiry-heading p {
-  width: 100%;
-  max-width: none;
+.final-close {
+  margin: 0 auto 76px;
+  text-align: center;
 }
 
-
-/* =========================================================
-   2026-09-21 — unify centred statement content widths
-   ========================================================= */
-
-/*
- * All major centred statement sections now inherit the full
- * 1180px .wrap canvas. Remove accumulated inner max-widths.
- */
-
-/* Feel the stay */
-.experience-section .statement,
-.experience-section .statement h2,
-.experience-section .statement p {
-  width: 100%;
-  max-width: none;
+.final-close .eyebrow {
+  justify-content: center;
 }
 
-/* More than an AI video */
-.production-section .production-split,
-.production-section .production-split > div,
-.production-section .production-split > div:last-child,
-.production-section .section-title,
-.production-section .lead {
-  width: 100%;
-  max-width: none;
-}
-
-.production-section .production-split > div:last-child {
-  margin-left: 0;
-  margin-right: 0;
-}
-
-/* Standing still */
-section.why-now-section .wrap.split,
-section.why-now-section .wrap.split > div,
-section.why-now-section .section-title,
-section.why-now-section .lead {
-  max-width: none;
-}
-
-section.why-now-section .wrap.split > div {
-  width: 100%;
-}
-
-/* Guarantee */
-.guarantee > .wrap,
-.guarantee .section-title,
-.guarantee .lead {
-  width: 100%;
-  max-width: none;
-}
-
-/* Individually produced */
-.capacity-section .split,
-.capacity-section .split > div,
-.capacity-section .split > div:last-child,
-.capacity-section .section-title,
-.capacity-section .lead {
-  width: 100%;
-  max-width: none;
-}
-
-.capacity-section .split > div:last-child {
-  margin-left: 0;
-  margin-right: 0;
-}
-
-/* Final close */
-.final-close,
-.final-close h2,
 .final-close p {
-  width: 100%;
-  max-width: none;
+  margin-left: auto;
+  margin-right: auto;
 }
 
-/* Callback heading */
+
+/* ---------- Enquiry ---------- */
+
 .enquiry-heading,
 .enquiry-heading h3,
 .enquiry-heading p {
@@ -851,33 +712,26 @@ section.why-now-section .wrap.split > div {
   max-width: none;
 }
 
+.enquiry-heading {
+  margin: 0 auto 38px;
+  text-align: center;
+}
 
-/* Fix: More Than an AI Video must respect the standard 1180px page grid */
-section.production-section .wrap.production-split {
-  width: min(1180px, calc(100% - 40px));
-  max-width: 1180px;
+.enquiry-heading .eyebrow {
+  justify-content: center;
+}
+
+.enquiry-heading p {
   margin-left: auto;
   margin-right: auto;
 }
 
-@media (max-width: 600px) {
-  section.production-section .wrap.production-split {
-    width: min(100% - 28px, 1180px);
+
+/* ---------- Mobile ---------- */
+
+@media (max-width: 620px) {
+  .final-close {
+    margin-bottom: 58px;
   }
 }
 
-/* Fix: centred statement sections must respect standard 1180px page grid */
-section.guarantee > .wrap,
-section.capacity-section .wrap.split {
-  width: min(1180px, calc(100% - 40px));
-  max-width: 1180px;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-@media (max-width: 600px) {
-  section.guarantee > .wrap,
-  section.capacity-section .wrap.split {
-    width: min(100% - 28px, 1180px);
-  }
-}
