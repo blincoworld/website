@@ -1034,3 +1034,13 @@ section.why-now-section .lead {
     width: min(100% - 28px, 1180px);
   }
 }
+
+
+/* Next Steps — full-width statement copy */
+.next-steps-page .reservation-intro h1,
+.next-steps-page .reservation-intro .hero-sub,
+.next-steps-page main > .block:not(.guarantee) .section-title,
+.next-steps-page .guarantee .section-title {
+  width: 100%;
+  max-width: none;
+}
