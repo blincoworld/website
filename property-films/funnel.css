@@ -851,3 +851,17 @@ section.why-now-section .wrap.split > div {
   max-width: none;
 }
 
+
+/* Fix: More Than an AI Video must respect the standard 1180px page grid */
+section.production-section .wrap.production-split {
+  width: min(1180px, calc(100% - 40px));
+  max-width: 1180px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+@media (max-width: 600px) {
+  section.production-section .wrap.production-split {
+    width: min(100% - 28px, 1180px);
+  }
+}
