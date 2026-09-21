@@ -57,9 +57,19 @@
     if (index === 0) shuffle(businesses);
 
     nameEl.textContent = cleanName(business.name);
+    const contextLines = [
+      'One of the properties we’re introducing Property Films to',
+      'Another holiday-let business on our Property Films introduction list',
+      'Property Films is being introduced to businesses like this',
+      'Part of the holiday-let businesses we’re currently reaching out to',
+      'Another property we’re introducing to cinematic Property Films'
+    ];
+
+    const context = contextLines[Math.floor(Math.random() * contextLines.length)];
+
     locationEl.textContent = business.county
-      ? `Holiday property · ${business.county}`
-      : 'Holiday property';
+      ? `${context} · ${business.county}`
+      : context;
 
     popup.classList.add('is-visible');
 
