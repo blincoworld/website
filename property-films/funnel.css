@@ -30,3 +30,241 @@ section.compact-capacity { padding-block: 48px; }
 .compact-objection .feature-list li { color: var(--ink); font-size: 1.1rem; }
 .compact-objection .feature-list { margin-bottom: 0; }
 .compact-objection .split { gap: 28px; }
+
+/* =========================================================
+   2026-09-21 — Property Films sales-flow refinement
+   ========================================================= */
+
+.process-intro {
+  max-width: 760px;
+}
+
+.production-journey {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin-top: 56px;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+
+.production-step {
+  padding: 38px 28px 42px;
+  border-right: 1px solid var(--line);
+}
+
+.production-step:last-child {
+  border-right: 0;
+}
+
+.production-step > span {
+  display: block;
+  margin-bottom: 28px;
+  color: var(--accent);
+  font-size: .8rem;
+  font-weight: 900;
+  letter-spacing: .12em;
+}
+
+.production-step h3 {
+  margin: 0 0 14px;
+  font-size: clamp(1.25rem, 1.8vw, 1.65rem);
+  line-height: 1.05;
+}
+
+.production-step p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.production-section {
+  background: var(--ink);
+  color: #fff;
+}
+
+.production-section .section-title,
+.production-section .lead {
+  color: #fff;
+}
+
+.production-section .lead {
+  opacity: .86;
+}
+
+.production-section .eyebrow {
+  color: var(--accent);
+}
+
+.deliverables-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-top: 52px;
+  border-top: 1px solid var(--line);
+}
+
+.deliverables-grid > div {
+  padding: 32px 30px 34px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.deliverables-grid > div:nth-child(3n+2),
+.deliverables-grid > div:nth-child(3n+3) {
+  padding-left: 30px;
+  border-left: 1px solid var(--line);
+}
+
+.deliverables-grid strong,
+.deliverables-grid span {
+  display: block;
+}
+
+.deliverables-grid strong {
+  margin-bottom: 10px;
+  font-size: 1.15rem;
+}
+
+.deliverables-grid span {
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.objections-section {
+  background: #f4f3ef;
+}
+
+.objections-section > .wrap > .section-title {
+  max-width: 850px;
+}
+
+.objection-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-top: 54px;
+  border-top: 1px solid var(--line);
+}
+
+.objection-grid article {
+  padding: 40px 42px 42px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.objection-grid article:nth-child(even) {
+  padding-left: 42px;
+  border-left: 1px solid var(--line);
+}
+
+.objection-grid h3 {
+  margin: 0 0 18px;
+  font-size: clamp(1.45rem, 2vw, 2rem);
+  line-height: 1.02;
+  letter-spacing: -.035em;
+}
+
+.objection-grid p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.65;
+}
+
+.final-close {
+  max-width: 1000px;
+  margin: 0 auto 76px;
+  text-align: center;
+}
+
+.final-close .eyebrow {
+  justify-content: center;
+}
+
+.final-close p {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.enquiry-heading {
+  max-width: 760px;
+  margin: 0 auto 38px;
+  text-align: center;
+}
+
+.enquiry-heading .eyebrow {
+  justify-content: center;
+}
+
+.enquiry-heading h3 {
+  margin: 0 0 14px;
+  font-size: clamp(2rem, 3.5vw, 3rem);
+  line-height: 1;
+  letter-spacing: -.04em;
+}
+
+.enquiry-heading p {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+@media (max-width: 850px) {
+  .production-journey {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .production-step:nth-child(2) {
+    border-right: 0;
+  }
+
+  .production-step:nth-child(-n+2) {
+    border-bottom: 1px solid var(--line);
+  }
+
+  .deliverables-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .deliverables-grid > div,
+  .deliverables-grid > div:nth-child(3n+2),
+  .deliverables-grid > div:nth-child(3n+3) {
+    padding: 28px 24px;
+    border-left: 0;
+  }
+
+  .deliverables-grid > div:nth-child(even) {
+    border-left: 1px solid var(--line);
+  }
+}
+
+@media (max-width: 620px) {
+  .production-journey,
+  .deliverables-grid,
+  .objection-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .production-step,
+  .production-step:nth-child(2),
+  .production-step:nth-child(-n+2) {
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .production-step:last-child {
+    border-bottom: 0;
+  }
+
+  .deliverables-grid > div,
+  .deliverables-grid > div:nth-child(3n+2),
+  .deliverables-grid > div:nth-child(3n+3),
+  .deliverables-grid > div:nth-child(even) {
+    padding: 26px 0;
+    border-left: 0;
+  }
+
+  .objection-grid article,
+  .objection-grid article:nth-child(even) {
+    padding: 32px 0;
+    border-left: 0;
+  }
+
+  .final-close {
+    margin-bottom: 58px;
+  }
+}
