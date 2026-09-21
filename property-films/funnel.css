@@ -813,3 +813,10 @@ section.why-now-section .lead {
   color: var(--accent);
 }
 
+
+/* Process intro alignment */
+.process-section .process-intro {
+  text-align: left;
+  margin-left: 0;
+  margin-right: 0;
+}
