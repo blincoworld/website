@@ -863,3 +863,8 @@ section.why-now-section .lead {
 .package-card.featured .package-kicker {
   padding-right: 130px;
 }
+
+/* Lift full-screen hero composition */
+.hero > .wrap {
+  transform: translateY(-70px);
+}
