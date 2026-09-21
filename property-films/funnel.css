@@ -990,3 +990,47 @@ section.why-now-section .lead {
     padding-bottom: 64px;
   }
 }
+
+
+/* Next Steps — canonical 1180px left alignment */
+.next-steps-page .reservation-intro {
+  width: min(1180px, calc(100% - 40px));
+  max-width: none;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.next-steps-page .reservation-intro h1,
+.next-steps-page .reservation-intro .hero-sub,
+.next-steps-page #callback-reassurance {
+  margin-left: 0;
+  margin-right: 0;
+}
+
+.next-steps-page main > .block > .wrap {
+  width: min(1180px, calc(100% - 40px));
+  max-width: none;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.next-steps-page .guarantee {
+  text-align: left;
+}
+
+.next-steps-page .guarantee .eyebrow {
+  justify-content: flex-start;
+}
+
+.next-steps-page .guarantee .section-title,
+.next-steps-page .guarantee .lead {
+  margin-left: 0;
+  margin-right: 0;
+}
+
+@media (max-width: 700px) {
+  .next-steps-page .reservation-intro,
+  .next-steps-page main > .block > .wrap {
+    width: min(100% - 28px, 1180px);
+  }
+}
