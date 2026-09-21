@@ -8,7 +8,7 @@
   <link rel="canonical" href="https://piersblinco.com/property-films">
 
   <link rel="stylesheet" href="/property-films/shared.css">
-  <link rel="stylesheet" href="/property-films/funnel.css?v=20260921-13">
+  <link rel="stylesheet" href="/property-films/funnel.css?v=20260921-14">
 </head>
 
 <body>
@@ -318,9 +318,30 @@
     </div>
   </footer>
 
+  <aside class="prospect-popup" id="prospect-popup" aria-live="polite">
+    <div class="prospect-popup-visual" aria-hidden="true">
+      <svg viewBox="0 0 78 62" role="img">
+        <path d="M0 8L21 0l19 8 18-6 20 8v52H0z" fill="#f1e8dc"/>
+        <path d="M21 0v62M40 8v54M58 2v60" fill="none" stroke="#d7c7b5" stroke-width="1.5"/>
+        <path d="M-5 48c16-10 25-7 36-17 11-10 23-5 31-14 6-6 12-7 21-5" fill="none" stroke="#d66f2d" stroke-width="3" stroke-linecap="round"/>
+        <circle cx="42" cy="25" r="5" fill="#d66f2d"/>
+        <circle cx="42" cy="25" r="2" fill="#fff"/>
+      </svg>
+    </div>
+
+    <div class="prospect-popup-copy">
+      <p class="prospect-popup-kicker">Property Films</p>
+      <strong class="prospect-popup-name" data-prospect-name></strong>
+      <p class="prospect-popup-location" data-prospect-location></p>
+    </div>
+
+    <button class="prospect-popup-close" type="button" data-prospect-close aria-label="Close">×</button>
+  </aside>
+
   <script src="/property-films/config.js" defer></script>
   <script src="/property-films/funnel.js" defer></script>
   <script src="/property-films/page.js" defer></script>
+  <script src="/property-films/prospect-popups.js?v=20260921-1" defer></script>
 
 </body>
 </html>
