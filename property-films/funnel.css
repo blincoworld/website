@@ -1289,3 +1289,8 @@ section.why-now-section .lead {
     font-size: .88rem;
   }
 }
+
+/* Native video controls are restored — don't layer our old play UI over them */
+#showcase[controls] + .video-play-overlay {
+  display: none !important;
+}
