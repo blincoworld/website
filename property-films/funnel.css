@@ -611,3 +611,75 @@ section.why-now-section .lead {
   background: var(--dark);
 }
 
+
+/* =========================================================
+   2026-09-21 — normalise page content grid
+   ========================================================= */
+
+/*
+ * The global .wrap is the page grid:
+ * width: min(1180px, calc(100% - 40px)).
+ *
+ * Section-level containers should use that full canvas.
+ * Individual text elements can be narrowed separately where useful.
+ */
+
+/* Emotional statement */
+.experience-section .statement {
+  width: 100%;
+  max-width: none;
+}
+
+/* Production journey */
+.process-section > .wrap {
+  max-width: none;
+}
+
+/* AI / production statement */
+.production-section .production-split {
+  width: 100%;
+  max-width: none;
+}
+
+/* Complete production */
+.deliverables-section > .wrap {
+  max-width: none;
+}
+
+/* Why now */
+section.why-now-section .wrap.split {
+  width: min(1180px, calc(100% - 40px));
+  max-width: none;
+}
+
+/* Guarantee */
+.guarantee > .wrap {
+  max-width: none;
+}
+
+/* Packages */
+.packages > .wrap {
+  max-width: none;
+}
+
+/* Capacity */
+.capacity-section .split {
+  width: 100%;
+  max-width: none;
+}
+
+/* Objections */
+.objections-section > .wrap {
+  max-width: none;
+}
+
+/* Final enquiry */
+.final > .wrap {
+  max-width: none;
+}
+
+@media (max-width: 600px) {
+  section.why-now-section .wrap.split {
+    width: min(100% - 28px, 1180px);
+  }
+}
