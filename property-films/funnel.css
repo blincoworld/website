@@ -1068,3 +1068,22 @@ section.why-now-section .lead {
 .next-steps-page .reservation-grid .package-card:not(.featured) .planned-price {
   color: rgba(255,255,255,.62);
 }
+
+
+/* Next Steps — clearer pricing hierarchy */
+.next-steps-page .reservation-grid .planned-price {
+  margin: 26px 0 0;
+  font-size: 15px;
+  line-height: 1.4;
+  font-weight: 600;
+  opacity: .78;
+}
+
+.next-steps-page .reservation-grid .launch-price {
+  margin-top: 10px;
+  margin-bottom: 0;
+}
+
+.next-steps-page .reservation-grid .package-cta {
+  margin-top: 28px;
+}
