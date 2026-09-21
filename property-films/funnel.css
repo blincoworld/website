@@ -683,3 +683,87 @@ section.why-now-section .wrap.split {
     width: min(100% - 28px, 1180px);
   }
 }
+
+/* =========================================================
+   2026-09-21 — unify centred statement content widths
+   ========================================================= */
+
+/*
+ * All major centred statement sections now inherit the full
+ * 1180px .wrap canvas. Remove accumulated inner max-widths.
+ */
+
+/* Feel the stay */
+.experience-section .statement,
+.experience-section .statement h2,
+.experience-section .statement p {
+  width: 100%;
+  max-width: none;
+}
+
+/* More than an AI video */
+.production-section .production-split,
+.production-section .production-split > div,
+.production-section .production-split > div:last-child,
+.production-section .section-title,
+.production-section .lead {
+  width: 100%;
+  max-width: none;
+}
+
+.production-section .production-split > div:last-child {
+  margin-left: 0;
+  margin-right: 0;
+}
+
+/* Standing still */
+section.why-now-section .wrap.split,
+section.why-now-section .wrap.split > div,
+section.why-now-section .section-title,
+section.why-now-section .lead {
+  max-width: none;
+}
+
+section.why-now-section .wrap.split > div {
+  width: 100%;
+}
+
+/* Guarantee */
+.guarantee > .wrap,
+.guarantee .section-title,
+.guarantee .lead {
+  width: 100%;
+  max-width: none;
+}
+
+/* Individually produced */
+.capacity-section .split,
+.capacity-section .split > div,
+.capacity-section .split > div:last-child,
+.capacity-section .section-title,
+.capacity-section .lead {
+  width: 100%;
+  max-width: none;
+}
+
+.capacity-section .split > div:last-child {
+  margin-left: 0;
+  margin-right: 0;
+}
+
+/* Final close */
+.final-close,
+.final-close h2,
+.final-close p {
+  width: 100%;
+  max-width: none;
+}
+
+/* Callback heading */
+.enquiry-heading,
+.enquiry-heading h3,
+.enquiry-heading p {
+  width: 100%;
+  max-width: none;
+}
+
