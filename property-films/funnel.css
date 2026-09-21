@@ -552,3 +552,62 @@ section.why-now-section .lead {
   margin-right: auto;
   text-align: center;
 }
+
+/* =========================================================
+   2026-09-21 — section background rhythm
+   ========================================================= */
+
+/* Hero / opening */
+.hero {
+  background: var(--bg);
+}
+
+/*
+ * Emotional statement:
+ * dark beige full-width section, no inner white card.
+ */
+.experience-section {
+  background: #ece5da;
+}
+
+.experience-section .statement {
+  max-width: 980px;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+}
+
+/* Production journey returns to the main light beige */
+.process-section {
+  background: var(--bg);
+}
+
+/* Keep the AI / production positioning dark */
+.production-section {
+  background: var(--dark);
+}
+
+/*
+ * Guarantee should now act as the light section immediately
+ * before the dark package/offer area.
+ */
+.guarantee {
+  background: var(--bg);
+  color: var(--ink);
+}
+
+.guarantee .section-title,
+.guarantee .lead {
+  color: var(--ink);
+}
+
+.guarantee .eyebrow {
+  color: var(--ink);
+}
+
+/* Package choice remains the strong dark offer section */
+.packages {
+  background: var(--dark);
+}
+
