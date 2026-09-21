@@ -453,3 +453,63 @@ section.compact-capacity { padding-block: 48px; }
     border: 1px solid var(--line);
   }
 }
+
+/* =========================================================
+   2026-09-21 — centred statement sections
+   ========================================================= */
+
+/*
+ * These sections previously used the site's standard two-column
+ * split. They work better here as wide, centred sales statements.
+ */
+.production-section .production-split,
+.why-now-section .split,
+.capacity-section .split {
+  display: block;
+  max-width: 980px;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+}
+
+.production-section .eyebrow,
+.why-now-section .eyebrow,
+.capacity-section .eyebrow {
+  justify-content: center;
+  text-align: center;
+}
+
+.production-section .section-title,
+.why-now-section .section-title,
+.capacity-section .section-title {
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.production-section .production-split > div:last-child,
+.why-now-section .split > div:last-child,
+.capacity-section .split > div:last-child {
+  max-width: 850px;
+  margin: 32px auto 0;
+}
+
+.production-section .lead,
+.why-now-section .lead,
+.capacity-section .lead {
+  max-width: 850px;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+}
+
+/* Give the dark production statement a little more presence */
+.production-section .production-split > div:last-child {
+  margin-top: 38px;
+}
+
+/* Capacity is intentionally a little tighter than the major statements */
+.capacity-section .split > div:last-child {
+  margin-top: 26px;
+}
+
