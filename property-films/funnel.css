@@ -820,3 +820,12 @@ section.why-now-section .lead {
   margin-left: 0;
   margin-right: 0;
 }
+
+/* Packages intro — full content width */
+.packages-section .section-title,
+.packages-section .lead,
+#packages .section-title,
+#packages .lead {
+  width: 100%;
+  max-width: none;
+}
