@@ -1462,3 +1462,69 @@ section.why-now-section .lead {
   background: transparent;
   color: #fff;
 }
+
+/* =========================================================
+   2026-09-22 — Sales story colour rhythm + H2 hierarchy
+   ========================================================= */
+
+/*
+  Keep the hero H1 as the dominant page headline.
+  All major sales-section H2s below it share one scale.
+*/
+body:not(.next-steps-page) main .experience-section .statement h2,
+body:not(.next-steps-page) main .process-section .section-title,
+body:not(.next-steps-page) main .production-section .section-title,
+body:not(.next-steps-page) main .deliverables-section .section-title,
+body:not(.next-steps-page) main .why-now-section .section-title,
+body:not(.next-steps-page) main .guarantee .section-title,
+body:not(.next-steps-page) main .packages .section-title,
+body:not(.next-steps-page) main .capacity-section .section-title,
+body:not(.next-steps-page) main .objections-section .section-title,
+body:not(.next-steps-page) main .final-close h2 {
+  font-size: clamp(2rem, 3.5vw, 3.4rem);
+  line-height: 0.98;
+  letter-spacing: -0.04em;
+}
+
+/*
+  New sales-story colour sequence.
+
+  1st experience: dark beige
+  1st why-now: light beige
+  2nd experience: dark beige
+  process: light beige
+  production: black
+  deliverables: light beige
+  2nd why-now: dark beige
+  3rd experience/content future pace: light beige
+*/
+body:not(.next-steps-page) main .experience-section {
+  background: #ece5da;
+}
+
+body:not(.next-steps-page) main .why-now-section {
+  background: #f5f0e8;
+}
+
+body:not(.next-steps-page) main .experience-section:nth-of-type(4) {
+  background: #ece5da;
+}
+
+body:not(.next-steps-page) main .process-section {
+  background: #f5f0e8;
+}
+
+body:not(.next-steps-page) main .deliverables-section {
+  background: #f5f0e8;
+}
+
+/* Commercial consequence section */
+body:not(.next-steps-page) main .deliverables-section + .why-now-section {
+  background: #ece5da;
+}
+
+/* Month-of-content future pace */
+body:not(.next-steps-page) main .why-now-section + .experience-section {
+  background: #f5f0e8;
+}
+
