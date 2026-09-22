@@ -1528,3 +1528,23 @@ body:not(.next-steps-page) main .why-now-section + .experience-section {
   background: #f5f0e8;
 }
 
+
+/* =========================================================
+   2026-09-22 — Final dark-beige section corrections
+   ========================================================= */
+
+/* Picture what you have when the film is finished */
+body:not(.next-steps-page) main .why-now-section + .experience-section {
+  background: #ece5da;
+}
+
+/* Love Your Film Guarantee */
+body:not(.next-steps-page) main .guarantee {
+  background: #ece5da;
+}
+
+/* Questions before you decide */
+body:not(.next-steps-page) main .objections-section {
+  background: #ece5da;
+}
+
