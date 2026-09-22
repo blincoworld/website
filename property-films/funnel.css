@@ -1289,3 +1289,163 @@ section.why-now-section .lead {
     font-size: .88rem;
   }
 }
+
+/* =========================================================
+   Property Films — multi-property callback offer
+   ========================================================= */
+
+.multi-property-offer {
+  margin-top: 28px;
+  padding: 30px 32px;
+  border: 1px solid rgba(255,255,255,.18);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px;
+}
+
+.multi-property-offer > div {
+  max-width: 720px;
+}
+
+.multi-property-offer .package-name {
+  margin-bottom: 8px;
+}
+
+.multi-property-offer .package-summary {
+  margin-bottom: 0;
+}
+
+.multi-property-offer .button {
+  flex: 0 0 auto;
+}
+
+@media (max-width: 700px) {
+  .multi-property-offer {
+    display: block;
+    padding: 26px 24px;
+  }
+
+  .multi-property-offer .button {
+    margin-top: 24px;
+    width: 100%;
+  }
+}
+
+/* =========================================================
+   Property Films — three-package layout
+   ========================================================= */
+
+#packages .package-grid,
+.next-steps-page .reservation-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+@media (max-width: 900px) {
+  #packages .package-grid,
+  .next-steps-page .reservation-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* =========================================================
+   Next Steps — align pricing + CTAs across all three cards
+   ========================================================= */
+
+.next-steps-page .reservation-grid .package-card {
+  display: flex;
+  flex-direction: column;
+}
+
+/*
+ * The feature lists can contain different amounts of copy.
+ * Let them absorb the spare vertical space so everything
+ * from planned price downward begins on the same baseline.
+ */
+.next-steps-page .reservation-grid .feature-list {
+  flex: 1 1 auto;
+  margin-bottom: 0;
+}
+
+.next-steps-page .reservation-grid .planned-price {
+  margin-top: 32px;
+}
+
+.next-steps-page .reservation-grid .launch-price {
+  margin-top: 10px;
+  margin-bottom: 0;
+}
+
+.next-steps-page .reservation-grid .package-cta {
+  margin-top: 28px;
+}
+
+/* Keep CTA dimensions consistent across all three packages */
+.next-steps-page .reservation-grid .package-cta {
+  min-height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+/*
+ * On mobile the cards stack, so each card can return
+ * to its natural content height.
+ */
+@media (max-width: 900px) {
+  .next-steps-page .reservation-grid .feature-list {
+    flex: 0 0 auto;
+  }
+}
+
+/* =========================================================
+   Next Steps — align pricing + CTAs across all three cards
+   ========================================================= */
+
+.next-steps-page .reservation-grid .package-card {
+  display: flex;
+  flex-direction: column;
+}
+
+/*
+ * The feature lists can contain different amounts of copy.
+ * Let them absorb the spare vertical space so everything
+ * from planned price downward begins on the same baseline.
+ */
+.next-steps-page .reservation-grid .feature-list {
+  flex: 1 1 auto;
+  margin-bottom: 0;
+}
+
+.next-steps-page .reservation-grid .planned-price {
+  margin-top: 32px;
+}
+
+.next-steps-page .reservation-grid .launch-price {
+  margin-top: 10px;
+  margin-bottom: 0;
+}
+
+.next-steps-page .reservation-grid .package-cta {
+  margin-top: 28px;
+}
+
+/* Keep CTA dimensions consistent across all three packages */
+.next-steps-page .reservation-grid .package-cta {
+  min-height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+/*
+ * On mobile the cards stack, so each card can return
+ * to its natural content height.
+ */
+@media (max-width: 900px) {
+  .next-steps-page .reservation-grid .feature-list {
+    flex: 0 0 auto;
+  }
+}

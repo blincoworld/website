@@ -2,6 +2,7 @@
 export const packages = Object.freeze({
   essential: { name: 'Essential', base: 49500, seasonal: 29500 },
   signature: { name: 'Signature', base: 79500, seasonal: 49500 },
+  content: { name: 'Content', base: 149500, seasonal: 49500 },
   'multi-property': { name: 'Multi-Property', base: 79500, additional: 39500, seasonal: 79500 },
 });
 export const money = amount => new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP', maximumFractionDigits: 0 }).format(amount / 100);
