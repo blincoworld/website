@@ -1568,3 +1568,33 @@ body:not(.next-steps-page) main .objections-section {
   background: #ece5da;
 }
 
+
+/* =========================================================
+   2026-09-22 — Explicit landing-page section colours
+   ========================================================= */
+
+/* Let them feel the stay */
+body:not(.next-steps-page) main .guest-experience-section {
+  background: #ece5da;
+}
+
+/* One property. More ways to sell the experience. */
+body:not(.next-steps-page) main .owner-experience-section {
+  background: #ece5da;
+}
+
+/* Imagine having the next month of content */
+body:not(.next-steps-page) main .content-experience-section {
+  background: #f5f0e8;
+}
+
+/* Love Your Film Guarantee */
+body:not(.next-steps-page) main .film-guarantee-section {
+  background: #ece5da;
+}
+
+/* Questions before you decide */
+body:not(.next-steps-page) main .questions-section {
+  background: #ece5da;
+}
+
