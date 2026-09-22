@@ -1598,3 +1598,9 @@ body:not(.next-steps-page) main .questions-section {
   background: #ece5da;
 }
 
+
+/* Content future-pacing section — light beige */
+body:not(.next-steps-page) main .content-experience-section {
+  background: #f5f0e8 !important;
+}
+
