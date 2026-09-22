@@ -1449,3 +1449,16 @@ section.why-now-section .lead {
     flex: 0 0 auto;
   }
 }
+
+/* Multiple Properties CTA */
+.multi-property-offer .package-cta {
+  background: #fff;
+  color: #111;
+  border: 1px solid #fff;
+  text-decoration: none;
+}
+
+.multi-property-offer .package-cta:hover {
+  background: transparent;
+  color: #fff;
+}
