@@ -1604,3 +1604,93 @@ body:not(.next-steps-page) main .content-experience-section {
   background: #f5f0e8 !important;
 }
 
+/* =========================================================
+   Property Films interest modal
+   ========================================================= */
+
+body.modal-open {
+  overflow: hidden;
+}
+
+.interest-modal[hidden] {
+  display: none;
+}
+
+.interest-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  opacity: 0;
+  transition: opacity 180ms ease;
+}
+
+.interest-modal.is-open {
+  opacity: 1;
+}
+
+.interest-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(20, 18, 15, 0.72);
+  backdrop-filter: blur(3px);
+}
+
+.interest-modal-dialog {
+  position: relative;
+  z-index: 1;
+  width: min(720px, 100%);
+  max-height: calc(100vh - 48px);
+  overflow-y: auto;
+  background: #f5f0e8;
+  padding: 42px;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.28);
+  transform: translateY(12px);
+  transition: transform 180ms ease;
+}
+
+.interest-modal.is-open .interest-modal-dialog {
+  transform: translateY(0);
+}
+
+.interest-modal-close {
+  position: absolute;
+  top: 14px;
+  right: 18px;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  font-size: 32px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 6px;
+}
+
+.interest-modal .enquiry-heading {
+  margin-bottom: 28px;
+  padding-right: 28px;
+}
+
+.interest-modal .enquiry-heading h2 {
+  margin-top: 8px;
+}
+
+.interest-modal .form-shell {
+  margin: 0;
+}
+
+@media (max-width: 640px) {
+  .interest-modal {
+    padding: 12px;
+    align-items: flex-start;
+  }
+
+  .interest-modal-dialog {
+    margin-top: 12px;
+    max-height: calc(100vh - 24px);
+    padding: 32px 20px 24px;
+  }
+}
