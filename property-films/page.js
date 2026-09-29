@@ -7,7 +7,9 @@
   const submitButton = form.querySelector('button[type=submit]');
   const submitLabel = submitButton.innerHTML;
   let submissionId = crypto.randomUUID(), started = false, busy = false;
-  const event = window.propertyFilmsEvent;
+  const event = typeof window.propertyFilmsEvent === 'function'
+    ? window.propertyFilmsEvent
+    : () => {};
   event('page_viewed');
   const modal = document.querySelector('#interest-modal');
   const modalDialog = modal?.querySelector('.interest-modal-dialog');
