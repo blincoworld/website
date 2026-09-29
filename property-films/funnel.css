@@ -1694,3 +1694,109 @@ body.modal-open {
     padding: 32px 20px 24px;
   }
 }
+
+/* Legacy mobile / iPad modal hardening */
+
+.interest-modal {
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
+
+.interest-modal-backdrop {
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  -webkit-backdrop-filter: blur(3px);
+}
+
+.interest-modal-dialog {
+  width: 100%;
+  max-width: 720px;
+  -webkit-overflow-scrolling: touch;
+}
+
+.interest-modal-close {
+  width: 48px;
+  height: 48px;
+  min-width: 48px;
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.interest-modal input,
+.interest-modal select,
+.interest-modal textarea,
+.interest-modal button {
+  font-size: 16px;
+}
+
+@media (max-width: 900px) {
+  .interest-modal {
+    padding: 20px;
+  }
+
+  .interest-modal-dialog {
+    max-height: calc(100vh - 40px);
+    padding: 36px 28px 28px;
+  }
+}
+
+@media (max-width: 640px) {
+  .interest-modal {
+    padding: 8px;
+    align-items: flex-start;
+  }
+
+  .interest-modal-dialog {
+    width: 100%;
+    max-width: none;
+    max-height: calc(100vh - 16px);
+    margin-top: 8px;
+    padding: 30px 16px 20px;
+  }
+
+  .interest-modal .enquiry-heading {
+    padding-right: 34px;
+    margin-bottom: 20px;
+  }
+
+  .interest-modal .enquiry-heading p {
+    font-size: 16px;
+    line-height: 1.45;
+  }
+
+  .interest-modal .form-grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .interest-modal .button {
+    width: 100%;
+    min-height: 54px;
+  }
+}
+
+@media (max-width: 360px) {
+  .interest-modal-dialog {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+}
+
+@media (max-height: 520px) {
+  .interest-modal {
+    align-items: flex-start;
+    padding-top: 6px;
+    padding-bottom: 6px;
+  }
+
+  .interest-modal-dialog {
+    margin-top: 0;
+    max-height: calc(100vh - 12px);
+  }
+}

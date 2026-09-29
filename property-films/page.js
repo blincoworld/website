@@ -6,23 +6,47 @@
   const fields = ['name', 'business_name', 'email', 'phone', 'selected_package'];
   const submitButton = form.querySelector('button[type=submit]');
   const submitLabel = submitButton.innerHTML;
-  let submissionId = crypto.randomUUID(), started = false, busy = false;
+  function makeSubmissionId() {
+    if (window.crypto && typeof window.crypto.randomUUID === 'function') {
+      return window.crypto.randomUUID();
+    }
+
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+      var r = Math.floor(Math.random() * 16);
+
+      if (window.crypto && typeof window.crypto.getRandomValues === 'function') {
+        var values = new Uint8Array(1);
+        window.crypto.getRandomValues(values);
+        r = values[0] % 16;
+      }
+
+      var v = c === 'x' ? r : (r & 3) | 8;
+      return v.toString(16);
+    });
+  }
+
+  let submissionId = makeSubmissionId(), started = false, busy = false;
   const event = typeof window.propertyFilmsEvent === 'function'
     ? window.propertyFilmsEvent
     : () => {};
   event('page_viewed');
   const modal = document.querySelector('#interest-modal');
-  const modalDialog = modal?.querySelector('.interest-modal-dialog');
+  const modalDialog = modal
+    ? modal.querySelector('.interest-modal-dialog')
+    : null;
   let opened = false;
   let previousFocus = null;
 
   function openForm(link) {
     previousFocus = document.activeElement;
 
-    const packageInterest = link?.dataset.package || 'unsure';
+    const packageInterest =
+      link && link.dataset && link.dataset.package
+        ? link.dataset.package
+        : 'unsure';
     form.elements.selected_package.value = packageInterest;
 
-    if (link?.dataset.package) {
+    if (link && link.dataset && link.dataset.package) {
       event('package_selected', { package: packageInterest });
     }
 
@@ -48,7 +72,9 @@
 
     window.setTimeout(() => {
       modal.hidden = true;
-      previousFocus?.focus?.();
+      if (previousFocus && typeof previousFocus.focus === 'function') {
+        previousFocus.focus();
+      }
     }, 180);
   }
 
@@ -59,9 +85,11 @@
     });
   });
 
-  modal?.querySelectorAll('[data-modal-close]').forEach(button => {
-    button.addEventListener('click', closeForm);
-  });
+  if (modal) {
+    modal.querySelectorAll('[data-modal-close]').forEach(button => {
+      button.addEventListener('click', closeForm);
+    });
+  }
 
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape' && modal && !modal.hidden) {
@@ -69,9 +97,11 @@
     }
   });
 
-  modalDialog?.addEventListener('click', e => {
-    e.stopPropagation();
-  });
+  if (modalDialog) {
+    modalDialog.addEventListener('click', e => {
+      e.stopPropagation();
+    });
+  }
 
   form.addEventListener('focusin', () => {
     if (!opened) {
@@ -115,9 +145,17 @@
     try {
       const response = await fetch(config.apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data), signal: AbortSignal.timeout(20000), credentials: 'omit' });
       const result = await response.json().catch(() => null);
-      if (!response.ok || !result?.success) {
-        if (result?.errors) for (const [name, message] of Object.entries(result.errors)) if (fields.includes(name)) fieldError(name, message);
-        throw new Error(result?.error || 'We couldn’t send your details just now. Please try again.');
+      if (!response.ok || !result || !result.success) {
+        if (result && result.errors) {
+          for (const [name, message] of Object.entries(result.errors)) {
+            if (fields.includes(name)) fieldError(name, message);
+          }
+        }
+        throw new Error(
+          result && result.error
+            ? result.error
+            : 'We couldn’t send your details just now. Please try again.'
+        );
       }
       event('form_submitted_successfully', { package: data.selected_package });
       event('callback_submitted', { package: data.selected_package });
@@ -125,7 +163,8 @@
       window.location.assign('/property-films/next-steps/#callback=' + encodeURIComponent(data.selected_package));
     } catch (err) {
       error.textContent = err.name === 'TimeoutError' || err.name === 'TypeError' ? 'We couldn’t confirm your submission. Please check your connection and try again — your details are still here.' : err.message;
-      form.querySelector('[aria-invalid=true]')?.focus();
+      const firstInvalid = form.querySelector('[aria-invalid=true]');
+      if (firstInvalid) firstInvalid.focus();
     } finally { busy = false; button.disabled = false; button.innerHTML = submitLabel; }
   });
   const video = document.getElementById('showcase');
