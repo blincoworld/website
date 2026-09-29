@@ -9,15 +9,74 @@
   let submissionId = crypto.randomUUID(), started = false, busy = false;
   const event = window.propertyFilmsEvent;
   event('page_viewed');
+  const modal = document.querySelector('#interest-modal');
+  const modalDialog = modal?.querySelector('.interest-modal-dialog');
   let opened = false;
-  function openForm() { if (!opened) { opened = true; event('callback_form_opened'); } }
-  document.querySelectorAll('a[href="#enquiry"]').forEach(link => link.addEventListener('click', () => {
-    if (link.dataset.package) { form.elements.selected_package.value = link.dataset.package; event('package_selected', { package: link.dataset.package }); }
-    openForm();
-    form.elements.name.focus({ preventScroll: true });
-  }));
-  form.addEventListener('focusin', openForm);
-  form.elements.selected_package.addEventListener('change', () => event('package_selected', { package: form.elements.selected_package.value }));
+  let previousFocus = null;
+
+  function openForm(link) {
+    previousFocus = document.activeElement;
+
+    const packageInterest = link?.dataset.package || 'unsure';
+    form.elements.selected_package.value = packageInterest;
+
+    if (link?.dataset.package) {
+      event('package_selected', { package: packageInterest });
+    }
+
+    if (!opened) {
+      opened = true;
+      event('callback_form_opened');
+    }
+
+    modal.hidden = false;
+    document.body.classList.add('modal-open');
+
+    requestAnimationFrame(() => {
+      modal.classList.add('is-open');
+      form.elements.name.focus();
+    });
+  }
+
+  function closeForm() {
+    if (!modal || modal.hidden) return;
+
+    modal.classList.remove('is-open');
+    document.body.classList.remove('modal-open');
+
+    window.setTimeout(() => {
+      modal.hidden = true;
+      previousFocus?.focus?.();
+    }, 180);
+  }
+
+  document.querySelectorAll('a[href="#enquiry"]').forEach(link => {
+    link.addEventListener('click', e => {
+      e.preventDefault();
+      openForm(link);
+    });
+  });
+
+  modal?.querySelectorAll('[data-modal-close]').forEach(button => {
+    button.addEventListener('click', closeForm);
+  });
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && modal && !modal.hidden) {
+      closeForm();
+    }
+  });
+
+  modalDialog?.addEventListener('click', e => {
+    e.stopPropagation();
+  });
+
+  form.addEventListener('focusin', () => {
+    if (!opened) {
+      opened = true;
+      event('callback_form_opened');
+    }
+  });
   document.querySelectorAll('[data-cta]').forEach(link => link.addEventListener('click', () => event('cta_clicked', { cta: link.dataset.cta })));
   form.addEventListener('input', e => {
     if (!started) { started = true; event('form_started'); }

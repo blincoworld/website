@@ -15,7 +15,7 @@
 
   <header class="wrap topbar">
     <div class="brand">HOLIDAY LET FILMS</div>
-    <a class="top-cta" href="#enquiry">Request a Callback</a>
+    <a class="top-cta" href="#enquiry">I’m Interested — Tell Me More</a>
   </header>
 
   <main>
@@ -245,7 +245,7 @@
       <li>1 revision round</li>
       <li>Love Your Film Guarantee</li>
     </ul>
-    <a class="button package-cta" href="#enquiry" data-package="essential">Request a Callback</a>
+    <a class="button package-cta" href="#enquiry" data-package="essential">I’m Interested — Tell Me More</a>
   </article>
 
   <article class="package-card featured">
@@ -260,7 +260,7 @@
       <li>2 revision rounds</li>
       <li>Love Your Film Guarantee</li>
     </ul>
-    <a class="button package-cta" href="#enquiry" data-package="signature">Request a Callback</a>
+    <a class="button package-cta" href="#enquiry" data-package="signature">I’m Interested — Tell Me More</a>
   </article>
 
   <article class="package-card">
@@ -275,7 +275,7 @@
       <li>Ready for your social channels</li>
       <li>Love Your Film Guarantee</li>
     </ul>
-    <a class="button package-cta" href="#enquiry" data-package="content">Request a Callback</a>
+    <a class="button package-cta" href="#enquiry" data-package="content">I’m Interested — Tell Me More</a>
   </article>
 
 </div>
@@ -286,7 +286,7 @@
     <h3 class="package-name">Multiple Properties</h3>
     <p class="package-summary">If you have a portfolio, group of cottages or several properties to promote, talk to us about a package built around them.</p>
   </div>
-  <a class="button package-cta" href="#enquiry" data-package="bespoke">Request a Callback</a>
+  <a class="button package-cta" href="#enquiry" data-package="bespoke">I’m Interested — Tell Me More</a>
 </div>
 
 </div></section>
@@ -354,19 +354,30 @@
       </div>
     </section>
 
-    <section class="final" id="enquiry">
-      <div class="wrap">
+    <div class="interest-modal" id="interest-modal" hidden>
+      <div class="interest-modal-backdrop" data-modal-close></div>
 
-        <div class="final-close">
-          <div class="eyebrow">Ready when you are</div>
-          <h2>YOUR PROPERTY ALREADY LOOKS GREAT.<br>NOW MAKE IT HARDER TO OVERLOOK.</h2>
-          <p>Give potential guests more to experience wherever they discover you — on your property listings, your own website and social media. Tell us which option interests you and we’ll take a look at your property, talk through what would work and answer any questions before you decide.</p>
-        </div>
+      <div
+        class="interest-modal-dialog"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="interest-modal-title"
+      >
+        <button
+          class="interest-modal-close"
+          type="button"
+          data-modal-close
+          aria-label="Close"
+        >×</button>
 
         <div class="enquiry-heading">
-          <div class="eyebrow">Your details</div>
-          <h3>Request your callback</h3>
-          <p>Check your package choice and leave your details. We’ll call to discuss your property and pricing. No obligation.</p>
+          <div class="eyebrow">Interested?</div>
+          <h2 id="interest-modal-title">LET’S TALK ABOUT YOUR PROPERTY.</h2>
+          <p>
+            Leave your details and choose a convenient time for me to call.
+            I’ll take a look at your property beforehand, then we can talk
+            through what would work, the options and pricing. No obligation.
+          </p>
         </div>
 
         <div class="form-shell" id="form-area">
@@ -376,66 +387,120 @@
             <div class="form-grid">
               <div>
                 <label for="name">Your name</label>
-                <input id="name" name="name" type="text" autocomplete="name" maxlength="150" required aria-describedby="name-error" placeholder="Jane Smith">
+                <input
+                  id="name"
+                  name="name"
+                  type="text"
+                  autocomplete="name"
+                  maxlength="150"
+                  required
+                  aria-describedby="name-error"
+                  placeholder="Jane Smith"
+                >
                 <span class="field-error" id="name-error"></span>
               </div>
 
               <div>
                 <label for="business_name">Business / property name</label>
-                <input id="business_name" name="business_name" type="text" autocomplete="organization" maxlength="200" required aria-describedby="business_name-error" placeholder="Oak Tree Cottages">
+                <input
+                  id="business_name"
+                  name="business_name"
+                  type="text"
+                  autocomplete="organization"
+                  maxlength="200"
+                  required
+                  aria-describedby="business_name-error"
+                  placeholder="Oak Tree Cottages"
+                >
                 <span class="field-error" id="business_name-error"></span>
               </div>
 
               <div>
                 <label for="email">Email</label>
-                <input id="email" name="email" type="email" autocomplete="email" maxlength="254" required aria-describedby="email-error" placeholder="jane@example.com">
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  autocomplete="email"
+                  maxlength="254"
+                  required
+                  aria-describedby="email-error"
+                  placeholder="jane@example.com"
+                >
                 <span class="field-error" id="email-error"></span>
               </div>
 
               <div>
                 <label for="phone">Phone</label>
-                <input id="phone" name="phone" type="tel" autocomplete="tel" maxlength="40" required aria-describedby="phone-error" placeholder="07123 456789">
+                <input
+                  id="phone"
+                  name="phone"
+                  type="tel"
+                  autocomplete="tel"
+                  maxlength="40"
+                  required
+                  aria-describedby="phone-error"
+                  placeholder="07123 456789"
+                >
                 <span class="field-error" id="phone-error"></span>
-              </div>
-
-              <div class="field-full"><label for="selected_package">Selected package / requirement</label>
-                <select id="selected_package" name="selected_package" required aria-describedby="selected_package-error">
-                  <option value="essential">Property Film</option>
-                  <option value="signature" selected>Property Film + Social</option>
-                  <option value="content">Property Film + Content</option>
-                  <option value="bespoke">Multiple Properties</option>
-                  <option value="unsure">Not sure yet</option>
-                </select><span class="field-error" id="selected_package-error"></span>
               </div>
             </div>
 
-            <div class="honeypot" aria-hidden="true" style="position:absolute;left:-9999px;">
+            <!--
+              Internal signal only.
+              The visitor never needs to choose or confirm a package.
+            -->
+            <input
+              type="hidden"
+              id="selected_package"
+              name="selected_package"
+              value="unsure"
+            >
+
+            <div
+              class="honeypot"
+              aria-hidden="true"
+              style="position:absolute;left:-9999px;"
+            >
               <label for="company_fax">Leave this empty</label>
-              <input id="company_fax" name="company_fax" tabindex="-1" autocomplete="off">
+              <input
+                id="company_fax"
+                name="company_fax"
+                tabindex="-1"
+                autocomplete="off"
+              >
             </div>
 
             <p id="form-error" class="form-error" role="alert"></p>
 
             <button class="button" type="submit">
-              Request a Callback
+              Request My Callback
             </button>
 
             <div class="form-note">
-              No obligation to proceed. Your details will be used to review your property and respond to your enquiry.
+              No obligation to proceed. Your details will be used to review
+              your property and respond to your enquiry.
               <a href="/property-films/privacy.html">Privacy information</a>
             </div>
           </form>
 
-          <div class="success" id="success" hidden tabindex="-1" role="status">
+          <div
+            class="success"
+            id="success"
+            hidden
+            tabindex="-1"
+            role="status"
+          >
             <h3>THANKS. WE'VE GOT IT.</h3>
             <p>We'll take a look at your property and come back to you shortly.</p>
           </div>
 
-          <noscript><p>Please enable JavaScript to send this form.</p></noscript>
+          <noscript>
+            <p>Please enable JavaScript to send this form.</p>
+          </noscript>
         </div>
-
       </div>
-    </section>
+    </div>
 
   </main>
 
