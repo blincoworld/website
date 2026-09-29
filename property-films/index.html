@@ -8,7 +8,7 @@
   <link rel="canonical" href="https://piersblinco.com/property-films">
 
   <link rel="stylesheet" href="/property-films/shared.css">
-  <link rel="stylesheet" href="/property-films/funnel.css?v=20260929-2">
+  <link rel="stylesheet" href="/property-films/funnel.css?v=20260929-3">
 </head>
 
 <body>
@@ -446,6 +446,54 @@
               </div>
             </div>
 
+            <div class="callback-picker">
+              <fieldset class="callback-fieldset">
+                <legend>When would you like me to call?</legend>
+
+                <div class="callback-picker-section">
+                  <div class="callback-picker-label">Choose a day</div>
+                  <div
+                    class="callback-options callback-days"
+                    id="callback-days"
+                    role="group"
+                    aria-label="Choose a callback day"
+                  ></div>
+                </div>
+
+                <div class="callback-picker-section">
+                  <div class="callback-picker-label">Choose a time</div>
+                  <div
+                    class="callback-options callback-times"
+                    id="callback-times"
+                    role="group"
+                    aria-label="Choose a callback time"
+                  ></div>
+                </div>
+
+                <input
+                  type="hidden"
+                  id="callback_date"
+                  name="callback_date"
+                  value=""
+                >
+                <input
+                  type="hidden"
+                  id="callback_window"
+                  name="callback_window"
+                  value=""
+                >
+
+                <span
+                  class="field-error callback-error"
+                  id="callback_date-error"
+                ></span>
+                <span
+                  class="field-error callback-error"
+                  id="callback_window-error"
+                ></span>
+              </fieldset>
+            </div>
+
             <!--
               Internal signal only.
               The visitor never needs to choose or confirm a package.
@@ -531,8 +579,8 @@
   </aside>
 
   <script src="/property-films/config.js" defer></script>
-  <script src="/property-films/funnel.js" defer></script>
-  <script src="/property-films/page.js?v=20260929-3" defer></script>
+  <script src="/property-films/funnel.js?v=20260929-2" defer></script>
+  <script src="/property-films/page.js?v=20260929-5" defer></script>
   <script src="/property-films/prospect-popups.js?v=20260921-2" defer></script>
   <script src="/property-films/availability.js?v=20260921-1" defer></script>
 
