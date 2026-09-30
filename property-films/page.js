@@ -3,7 +3,7 @@
   const config = window.PROPERTY_FILMS_CONFIG;
   const form = document.querySelector('#interest-form');
   const error = document.querySelector('#form-error');
-  const fields = ['name', 'business_name', 'email', 'phone', 'selected_package', 'callback_date', 'callback_window'];
+  const fields = ['name', 'business_name', 'email', 'phone', 'selected_package', 'cta_source', 'callback_date', 'callback_window'];
   const submitButton = form.querySelector('button[type=submit]');
   const submitLabel = submitButton.innerHTML;
   function makeSubmissionId() {
@@ -224,6 +224,18 @@
         ? link.dataset.package
         : 'unsure';
     form.elements.selected_package.value = packageInterest;
+
+    const ctaSource =
+      link && link.dataset && link.dataset.ctaSource
+        ? link.dataset.ctaSource
+        : 'unknown';
+
+    form.elements.cta_source.value = ctaSource;
+
+    event('cta_source_selected', {
+      package: packageInterest,
+      cta_source: ctaSource
+    });
 
     if (link && link.dataset && link.dataset.package) {
       event('package_selected', { package: packageInterest });
