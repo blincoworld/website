@@ -3,7 +3,7 @@
   const config = window.PROPERTY_FILMS_CONFIG;
   const form = document.querySelector('#interest-form');
   const error = document.querySelector('#form-error');
-  const fields = ['name', 'business_name', 'email', 'phone', 'selected_package', 'cta_source', 'callback_date', 'callback_window'];
+  const fields = ['name', 'business_name', 'email', 'phone', 'callback_date', 'callback_window'];
   const submitButton = form.querySelector('button[type=submit]');
   const submitLabel = submitButton.innerHTML;
   function makeSubmissionId() {
