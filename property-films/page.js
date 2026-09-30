@@ -39,6 +39,62 @@
 
   const callbackDays = document.querySelector('#callback-days');
   const callbackTimes = document.querySelector('#callback-times');
+  let occupiedCallbackSlots = {};
+
+  function callbackAvailabilityUrl() {
+    return config.apiUrl.replace(
+      /\/submit(?:\?.*)?$/,
+      '/callback-availability'
+    );
+  }
+
+  function slotKey(date, windowValue) {
+    return date + '|' + windowValue;
+  }
+
+  function callbackSlotOccupied(date, windowValue) {
+    return Boolean(
+      occupiedCallbackSlots[slotKey(date, windowValue)]
+    );
+  }
+
+  async function refreshCallbackAvailability() {
+    const today = localDateValue(new Date());
+
+    try {
+      const response = await fetch(
+        callbackAvailabilityUrl() +
+          '?from=' + encodeURIComponent(today),
+        {
+          method: 'GET',
+          headers: { Accept: 'application/json' },
+          cache: 'no-store'
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error('Callback availability request failed.');
+      }
+
+      const data = await response.json();
+      const occupied = {};
+
+      (data.occupied || []).forEach(function(slot) {
+        if (slot && slot.date && slot.window) {
+          occupied[slotKey(slot.date, slot.window)] = true;
+        }
+      });
+
+      occupiedCallbackSlots = occupied;
+    } catch (availabilityError) {
+      console.error(
+        'Could not refresh callback availability:',
+        availabilityError
+      );
+    }
+
+    renderCallbackPicker();
+  }
 
   const callbackSchedule = {
     // Monday
@@ -98,12 +154,18 @@
     const daySchedule = callbackSchedule[date.getDay()] || [];
     const now = new Date();
 
-    if (localDateValue(date) !== localDateValue(now)) {
-      return daySchedule.slice();
-    }
-
-    // Same-day callbacks need at least 30 minutes' notice.
     return daySchedule.filter(function(option) {
+      const dateValue = localDateValue(date);
+
+      if (callbackSlotOccupied(dateValue, option.value)) {
+        return false;
+      }
+
+      if (dateValue !== localDateValue(now)) {
+        return true;
+      }
+
+      // Same-day callbacks need at least 30 minutes' notice.
       const slotStart = new Date(
         date.getFullYear(),
         date.getMonth(),
@@ -218,6 +280,7 @@
 
   function openForm(link) {
     previousFocus = document.activeElement;
+    refreshCallbackAvailability();
 
     const packageInterest =
       link && link.dataset && link.dataset.package
