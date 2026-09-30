@@ -1886,3 +1886,31 @@ body.modal-open {
     grid-template-columns: 1fr;
   }
 }
+
+
+/* 2026-09-30 — keep interest CTAs compact and on one line */
+.package-cta,
+.top-cta,
+.hero-interest-cta {
+  white-space: nowrap;
+}
+
+.package-cta {
+  font-size: 14px;
+  padding-left: 12px;
+  padding-right: 12px;
+}
+
+.hero-interest-cta {
+  text-align: center;
+}
+
+@media (max-width: 380px) {
+  .package-cta,
+  .top-cta,
+  .hero-interest-cta {
+    font-size: 13px;
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+}
