@@ -22,6 +22,19 @@ window.propertyFilmsEvent = (name, detail = {}) => {
   }
 
   if (name === 'page_viewed') {
+    let visitorId = '';
+
+    try {
+      visitorId = localStorage.getItem('property_films_visitor_id') || '';
+
+      if (!visitorId) {
+        visitorId = crypto.randomUUID();
+        localStorage.setItem('property_films_visitor_id', visitorId);
+      }
+    } catch (_) {
+      // Page-view tracking can continue without a persistent visitor ID.
+    }
+
     fetch(
       'https://business-os.pbwebonlinesales.workers.dev/api/property-business/property-films/event',
       {
@@ -31,6 +44,7 @@ window.propertyFilmsEvent = (name, detail = {}) => {
         },
         body: JSON.stringify({
           event: 'page_viewed',
+          visitor_id: visitorId,
           source: new URLSearchParams(location.search).get('source') || '',
           referrer: document.referrer || ''
         }),
