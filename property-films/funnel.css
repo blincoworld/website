@@ -1092,7 +1092,8 @@ section.why-now-section .lead {
 /* Property Films prospect rotation */
 .prospect-popup {
   position: fixed;
-  right: 22px;
+  left: 22px;
+  right: auto;
   bottom: 22px;
   z-index: 1045;
   width: min(390px, calc(100vw - 28px));
@@ -1189,7 +1190,7 @@ section.why-now-section .lead {
 @media (max-width: 700px) {
   .prospect-popup {
     left: 12px;
-    right: 12px;
+    right: auto;
     bottom: 12px;
     width: auto;
     grid-template-columns: 68px minmax(0, 1fr) 28px;
