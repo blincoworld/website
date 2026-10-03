@@ -348,3 +348,31 @@
     bottom: 76px;
   }
 }
+
+/* Mobile chat dock — full-width dark base behind CTA */
+@media (max-width: 600px) {
+  .property-chat-launcher {
+    left: 12px;
+    right: 12px;
+    bottom: 12px;
+    min-height: 52px;
+    box-shadow: 0 5px 18px rgba(0, 0, 0, .22);
+  }
+
+  .property-chat-launcher::before {
+    content: "";
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 76px;
+    background: #111315;
+    z-index: -1;
+    pointer-events: none;
+  }
+
+  .property-chat-panel,
+  .prospect-popup {
+    bottom: 88px;
+  }
+}
