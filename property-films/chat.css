@@ -298,3 +298,32 @@
     max-width: 88%;
   }
 }
+
+/* Mobile floating UI — chat becomes a full-width bottom action */
+@media (max-width: 600px) {
+  .property-chat-launcher {
+    left: 12px;
+    right: 12px;
+    bottom: 12px;
+    width: auto;
+    min-height: 52px;
+    justify-content: center;
+    box-sizing: border-box;
+  }
+
+  .property-chat-panel {
+    left: 10px;
+    right: 10px;
+    bottom: 76px;
+    width: auto;
+    height: min(620px, calc(100dvh - 96px));
+  }
+}
+
+/* Don't let prospect activity compete with an open chat on mobile */
+@media (max-width: 600px) {
+  body:has(.property-chat-panel.is-open) .prospect-popup {
+    opacity: 0 !important;
+    pointer-events: none !important;
+  }
+}

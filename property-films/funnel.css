@@ -1899,3 +1899,14 @@ body.modal-open {
 .hero-interest-cta {
   text-align: center;
 }
+
+/* Mobile floating UI — prospect activity sits above chat action */
+@media (max-width: 600px) {
+  .prospect-popup {
+    left: 12px;
+    right: 12px;
+    bottom: 76px;
+    width: auto;
+    box-sizing: border-box;
+  }
+}
