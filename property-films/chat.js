@@ -30,9 +30,54 @@
     return;
   }
 
+  const STORAGE_KEY = 'property-films-chat-history';
+  const MAX_STORED_MESSAGES = 20;
+
   let history = [];
   let busy = false;
   let openedOnce = false;
+
+  function loadHistory() {
+    try {
+      const stored = JSON.parse(sessionStorage.getItem(STORAGE_KEY));
+
+      if (!Array.isArray(stored)) return [];
+
+      return stored
+        .filter(item =>
+          item &&
+          (item.role === 'user' || item.role === 'assistant') &&
+          typeof item.content === 'string' &&
+          item.content.trim()
+        )
+        .slice(-MAX_STORED_MESSAGES);
+    } catch {
+      return [];
+    }
+  }
+
+  function saveHistory() {
+    try {
+      sessionStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify(history.slice(-MAX_STORED_MESSAGES))
+      );
+    } catch {}
+  }
+
+  function restoreHistory() {
+    const stored = loadHistory();
+
+    if (!stored.length) return;
+
+    history = stored;
+
+    messages.innerHTML = '';
+
+    for (const item of history) {
+      addMessage(item.role, item.content);
+    }
+  }
 
   function track(name, data = {}) {
     if (typeof window.propertyFilmsEvent === 'function') {
@@ -129,6 +174,8 @@
       content: message
     });
 
+    saveHistory();
+
     track('chat_message_sent');
 
     input.value = '';
@@ -168,6 +215,8 @@
         content: data.reply
       });
 
+      saveHistory();
+
       track('chat_reply_received');
 
     } catch (error) {
@@ -185,6 +234,8 @@
       setBusy(false);
     }
   }
+
+  restoreHistory();
 
   launcher.addEventListener('click', () => {
     if (panel.hidden) {

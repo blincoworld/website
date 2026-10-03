@@ -4,6 +4,7 @@
 <meta name="robots" content="noindex"><meta name="referrer" content="no-referrer">
 <title>Your next step — Property Films</title>
 <link rel="stylesheet" href="/property-films/shared.css"><link rel="stylesheet" href="/property-films/funnel.css?v=20260921-next-5">
+<link rel="stylesheet" href="/property-films/chat.css?v=20261003-2">
 </head><body class="next-steps-page">
 <header class="wrap topbar"><div class="brand">HOLIDAY LET FILMS</div><a class="top-cta" href="/property-films/">Explore Property Films</a></header>
 <main>
@@ -12,7 +13,7 @@
 <p class="hero-sub" id="callback-message">Choose a production slot below, or request a callback to talk through your property first.</p>
 <p id="callback-reassurance"><a href="/property-films/#enquiry">Request a Callback</a></p>
 </div></section>
-<section class="block"><div class="wrap">
+<section class="block" id="packages"><div class="wrap">
 <div class="eyebrow">Ready to go ahead?</div><h2 class="section-title">RESERVE YOUR PRODUCTION SLOT NOW.</h2>
 <p class="lead">If you already know you’d like to go ahead, there’s no need to wait for your callback. Choose your package below and reserve your production slot now.</p>
 
@@ -51,6 +52,98 @@
 <noscript><p>Please enable JavaScript to reserve online, or <a href="/property-films/#enquiry">request a callback</a>.</p></noscript>
 </div></section>
 <section class="block guarantee"><div class="wrap"><div class="eyebrow">Love Your Film Guarantee</div><h2 class="section-title">LOVE YOUR FINISHED FILM.<br>OR YOUR MONEY BACK.</h2><p class="lead">Reserve your production slot. If you don’t love the finished film, we’ll refund you in full.</p><p class="lead">After payment, we’ll take you through a short property intake to collect your website, listing and photography. We’ll then agree your brief and production start date with you.</p></div></section>
-</main><footer><div class="wrap">Holiday Let Films · <a href="/property-films/privacy.html">Privacy information</a></div></footer>
-<script src="/property-films/funnel.js" defer></script><script type="module" src="./next-steps.js"></script>
+</main>
+
+  <!-- Property Films Chat -->
+  <div class="property-chat-dock">
+    <button
+      class="property-chat-launcher"
+      id="property-chat-launcher"
+      type="button"
+      aria-controls="property-chat"
+      aria-expanded="false"
+    >
+      <svg class="property-chat-launcher-icon" viewBox="0 0 24 24" aria-hidden="true">
+        <path
+          fill="currentColor"
+          d="M4 4h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H9l-5 4v-4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Zm2 5h12V7H6v2Zm0 4h9v-2H6v2Z"
+        />
+      </svg>
+      <span>Ask a question</span>
+    </button>
+  </div>
+
+  <aside
+    class="property-chat-panel"
+    id="property-chat"
+    aria-label="Property Films assistant"
+    hidden
+  >
+    <div class="property-chat-inner">
+
+      <header class="property-chat-header">
+        <div class="property-chat-header-copy">
+          <p class="property-chat-kicker">Property Films</p>
+          <h2 class="property-chat-title">How can we help?</h2>
+          <p class="property-chat-status">Ask us anything about the service</p>
+        </div>
+
+        <button
+          class="property-chat-close"
+          id="property-chat-close"
+          type="button"
+          aria-label="Close chat"
+        >×</button>
+      </header>
+
+      <div
+        class="property-chat-messages"
+        id="property-chat-messages"
+        aria-live="polite"
+        aria-relevant="additions"
+      >
+        <div class="property-chat-message property-chat-message-assistant">
+          <div class="property-chat-bubble">
+            Hi — have a question about Property Films? Ask away.
+          </div>
+        </div>
+      </div>
+
+      <div class="property-chat-handoff">
+        <a
+          class="button"
+          href="#packages"
+          data-cta-source="chat"
+        >Choose Your Package</a>
+      </div>
+
+      <form class="property-chat-form" id="property-chat-form">
+        <textarea
+          class="property-chat-input"
+          id="property-chat-input"
+          rows="1"
+          maxlength="2000"
+          placeholder="Type your question..."
+          aria-label="Your question"
+        ></textarea>
+
+        <button
+          class="property-chat-send"
+          id="property-chat-send"
+          type="submit"
+        >Send</button>
+      </form>
+
+      <p class="property-chat-disclaimer">
+        AI assistant — please don't include sensitive personal information.
+      </p>
+
+    </div>
+  </aside>
+
+<footer><div class="wrap">Holiday Let Films · <a href="/property-films/privacy.html">Privacy information</a></div></footer>
+<script src="/property-films/config.js?v=20261003-2" defer></script>
+<script src="/property-films/funnel.js" defer></script>
+<script src="/property-films/chat.js?v=20261003-2" defer></script>
+<script type="module" src="./next-steps.js"></script>
 </body></html>
