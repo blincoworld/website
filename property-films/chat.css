@@ -327,3 +327,24 @@
     pointer-events: none !important;
   }
 }
+
+/* Mobile chat dock — separates the persistent action from page content */
+@media (max-width: 600px) {
+  .property-chat-launcher {
+    bottom: 8px;
+    left: 8px;
+    right: 8px;
+    min-height: 52px;
+    box-shadow:
+      0 0 0 8px rgba(17, 19, 21, .92),
+      0 10px 30px rgba(0, 0, 0, .28);
+  }
+
+  .property-chat-panel {
+    bottom: 76px;
+  }
+
+  .prospect-popup {
+    bottom: 76px;
+  }
+}
