@@ -2,7 +2,8 @@
 
 .property-chat-launcher {
   position: fixed;
-  right: 24px;
+  left: 24px;
+  right: auto;
   bottom: 24px;
   z-index: 900;
   display: flex;
@@ -36,7 +37,8 @@
 
 .property-chat-panel {
   position: fixed;
-  right: 24px;
+  left: 24px;
+  right: auto;
   bottom: 90px;
   z-index: 901;
   width: min(390px, calc(100vw - 32px));
@@ -272,14 +274,16 @@
 
 @media (max-width: 600px) {
   .property-chat-launcher {
-    right: 14px;
+    left: 14px;
+    right: auto;
     bottom: 14px;
     min-height: 50px;
     padding: 0 16px;
   }
 
   .property-chat-panel {
-    right: 10px;
+    left: 10px;
+    right: auto;
     bottom: 76px;
     width: calc(100vw - 20px);
     height: min(620px, calc(100dvh - 96px));
