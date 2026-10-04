@@ -297,7 +297,83 @@
     return wrap;
   }
 
-  async function renderCallbackAction() {
+  
+function getExistingCallbackBooking() {
+  try {
+    const raw =
+      localStorage.getItem('property-films-callback') ||
+      sessionStorage.getItem('property-films-callback');
+
+    if (!raw) return null;
+
+    const booking = JSON.parse(raw);
+
+    if (
+      !booking ||
+      typeof booking !== 'object' ||
+      !booking.date ||
+      !booking.window
+    ) {
+      return null;
+    }
+
+    return booking;
+  } catch {
+    return null;
+  }
+}
+
+function formatCallbackBooking(booking) {
+  const date = new Date(booking.date + 'T12:00:00');
+
+  const prettyDate = date.toLocaleDateString('en-GB', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long'
+  });
+
+  const selectedOption =
+    Object.values(callbackSchedule)
+      .flat()
+      .find(option => option.value === booking.window);
+
+  return {
+    prettyDate,
+    prettyWindow: selectedOption?.label || booking.window
+  };
+}
+
+function renderExistingCallbackBooking(booking) {
+  const wrap = document.createElement('div');
+  wrap.className = 'property-chat-action-wrap';
+
+  const card = document.createElement('div');
+  card.className = 'property-chat-action-card';
+
+  const formatted = formatCallbackBooking(booking);
+
+  card.innerHTML = `
+    <div class="property-chat-action-title">
+      You’re already booked in
+    </div>
+    <div class="property-chat-action-copy">
+      Piers will call you on ${escapeHtml(formatted.prettyDate)},
+      ${escapeHtml(formatted.prettyWindow)}.
+    </div>
+  `;
+
+  wrap.appendChild(card);
+  messages.appendChild(wrap);
+  scrollToBottom();
+}
+
+async function renderCallbackAction() {
+  const existingBooking = getExistingCallbackBooking();
+
+  if (existingBooking) {
+    renderExistingCallbackBooking(existingBooking);
+    return;
+  }
     const wrap = addActionContainer();
 
     wrap.innerHTML = `
@@ -637,12 +713,20 @@
         }
 
         try {
-          sessionStorage.setItem(
+          const callbackBooking = JSON.stringify({
+            package: data.selected_package,
+            date: selectedDate,
+            window: selectedWindow,
+            at: Date.now()
+          });
+
+          localStorage.setItem(
             'property-films-callback',
-            JSON.stringify({
-              package: data.selected_package,
-              at: Date.now()
-            })
+            callbackBooking
+          );
+
+          sessionStorage.removeItem(
+            'property-films-callback'
           );
         } catch {}
 
