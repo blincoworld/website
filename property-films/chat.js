@@ -298,6 +298,25 @@
   }
 
   
+function propertyFilmsVisitorId() {
+  try {
+    let visitorId =
+      localStorage.getItem('property_films_visitor_id') || '';
+
+    if (!visitorId) {
+      visitorId = crypto.randomUUID();
+      localStorage.setItem(
+        'property_films_visitor_id',
+        visitorId
+      );
+    }
+
+    return visitorId;
+  } catch {
+    return '';
+  }
+}
+
 function getExistingCallbackBooking() {
   try {
     const raw =
@@ -360,10 +379,319 @@ function renderExistingCallbackBooking(booking) {
       Piers will call you on ${formatted.prettyDate},
       ${formatted.prettyWindow}.
     </div>
+    <button
+      type="button"
+      class="property-chat-action-primary property-chat-change-time"
+    >
+      Change time
+    </button>
   `;
+
+  card
+    .querySelector('.property-chat-change-time')
+    .addEventListener('click', () => {
+      wrap.remove();
+      renderCallbackChangeAction();
+    });
 
   wrap.appendChild(card);
   messages.appendChild(wrap);
+  scrollToBottom();
+}
+
+
+async function renderCallbackChangeAction() {
+  const existingBooking = getExistingCallbackBooking();
+
+  if (!existingBooking) {
+    renderCallbackAction();
+    return;
+  }
+
+  const wrap = addActionContainer();
+
+  wrap.innerHTML = `
+    <div class="property-chat-action-card">
+      <div class="property-chat-action-title">
+        Change callback time
+      </div>
+      <div class="property-chat-action-copy">
+        Choose a new day and time below.
+      </div>
+      <div class="property-chat-action-loading">
+        Checking callback availability…
+      </div>
+    </div>
+  `;
+
+  const card =
+    wrap.querySelector('.property-chat-action-card');
+
+  let occupied = {};
+
+  try {
+    const response = await fetch(
+      callbackAvailabilityUrl() +
+        '?from=' +
+        encodeURIComponent(localDateValue(new Date())) +
+        '&visitor_id=' +
+        encodeURIComponent(propertyFilmsVisitorId()),
+      {
+        method: 'GET',
+        headers: {
+          Accept: 'application/json'
+        },
+        cache: 'no-store'
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error('Availability request failed');
+    }
+
+    const data = await response.json();
+
+    for (const slot of data.occupied || []) {
+      if (
+        slot &&
+        slot.date &&
+        slot.window &&
+        !(
+          slot.date === existingBooking.date &&
+          slot.window === existingBooking.window
+        )
+      ) {
+        occupied[`${slot.date}|${slot.window}`] = true;
+      }
+    }
+  } catch (error) {
+    console.error(
+      'Could not load callback availability:',
+      error
+    );
+  }
+
+  card.querySelector(
+    '.property-chat-action-loading'
+  ).remove();
+
+  const picker = document.createElement('div');
+  picker.className = 'property-chat-callback-picker';
+
+  const dayLabel = document.createElement('div');
+  dayLabel.className = 'property-chat-action-label';
+  dayLabel.textContent = 'Choose a day';
+
+  const days = document.createElement('div');
+  days.className = 'property-chat-action-options';
+
+  const timeLabel = document.createElement('div');
+  timeLabel.className = 'property-chat-action-label';
+  timeLabel.textContent = 'Choose a time';
+
+  const times = document.createElement('div');
+  times.className = 'property-chat-action-options';
+
+  const pickerError = document.createElement('div');
+  pickerError.className = 'property-chat-action-error';
+
+  let selectedDate = '';
+  let selectedWindow = '';
+
+  function selectButton(container, button) {
+    container
+      .querySelectorAll('button')
+      .forEach(item =>
+        item.classList.remove('is-selected')
+      );
+
+    button.classList.add('is-selected');
+  }
+
+  function renderTimes(date) {
+    times.innerHTML = '';
+    selectedWindow = '';
+    pickerError.textContent = '';
+
+    for (
+      const option of
+      availableWindowsForDate(date, occupied)
+    ) {
+      const button = document.createElement('button');
+
+      button.type = 'button';
+      button.className =
+        'property-chat-action-choice';
+      button.textContent = option.label;
+
+      button.addEventListener('click', () => {
+        selectButton(times, button);
+        selectedWindow = option.value;
+        pickerError.textContent = '';
+      });
+
+      times.appendChild(button);
+    }
+  }
+
+  const now = new Date();
+  const dates = [];
+
+  let candidate = new Date(
+    now.getFullYear(),
+    now.getMonth(),
+    now.getDate()
+  );
+
+  while (dates.length < 5) {
+    const windows =
+      availableWindowsForDate(candidate, occupied);
+
+    if (
+      candidate.getDay() !== 0 &&
+      candidate.getDay() !== 6 &&
+      windows.length
+    ) {
+      dates.push(new Date(candidate.getTime()));
+    }
+
+    candidate.setDate(candidate.getDate() + 1);
+  }
+
+  for (const date of dates) {
+    const button = document.createElement('button');
+
+    button.type = 'button';
+    button.className =
+      'property-chat-action-choice';
+    button.textContent = callbackDayLabel(date);
+
+    button.addEventListener('click', () => {
+      selectButton(days, button);
+      selectedDate = localDateValue(date);
+      pickerError.textContent = '';
+      renderTimes(date);
+    });
+
+    days.appendChild(button);
+  }
+
+  picker.append(
+    dayLabel,
+    days,
+    timeLabel,
+    times,
+    pickerError
+  );
+
+  const submit = document.createElement('button');
+  submit.type = 'button';
+  submit.className = 'property-chat-action-primary';
+  submit.textContent = 'Change my callback';
+
+  const formError = document.createElement('div');
+  formError.className =
+    'property-chat-action-error property-chat-action-form-error';
+
+  card.append(picker, submit, formError);
+
+  submit.addEventListener('click', async () => {
+    formError.textContent = '';
+
+    if (!selectedDate || !selectedWindow) {
+      pickerError.textContent =
+        'Please choose a callback day and time.';
+      return;
+    }
+
+    submit.disabled = true;
+    submit.textContent = 'Changing…';
+
+    try {
+      const response = await fetch(
+        config.apiUrl.replace(
+          /\/submit(?:\?.*)?$/,
+          '/callback-reschedule'
+        ),
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            visitor_id: propertyFilmsVisitorId(),
+            callback_date: selectedDate,
+            callback_window: selectedWindow
+          }),
+          signal: AbortSignal.timeout(20000),
+          credentials: 'omit'
+        }
+      );
+
+      const result =
+        await response.json().catch(() => null);
+
+      if (
+        !response.ok ||
+        !result ||
+        !result.success
+      ) {
+        throw new Error(
+          result?.error ||
+          'We couldn’t change your callback just now.'
+        );
+      }
+
+      const booking = {
+        package: existingBooking.package || 'unsure',
+        date: selectedDate,
+        window: selectedWindow,
+        at: Date.now()
+      };
+
+      try {
+        localStorage.setItem(
+          'property-films-callback',
+          JSON.stringify(booking)
+        );
+      } catch {}
+
+      const formatted =
+        formatCallbackBooking(booking);
+
+      wrap.innerHTML = `
+        <div class="property-chat-action-card property-chat-action-success">
+          <div class="property-chat-action-title">
+            Callback changed
+          </div>
+          <div class="property-chat-action-copy">
+            Piers will now call you on ${formatted.prettyDate},
+            ${formatted.prettyWindow}.
+          </div>
+        </div>
+      `;
+
+      history.push({
+        role: 'assistant',
+        content:
+          `Callback changed to ${formatted.prettyDate}, ${formatted.prettyWindow}.`
+      });
+
+      saveHistory();
+      scrollToBottom();
+
+    } catch (error) {
+      formError.textContent =
+        error.name === 'TimeoutError' ||
+        error instanceof TypeError
+          ? 'We couldn’t confirm the change. Please check your connection and try again.'
+          : error.message;
+
+      submit.disabled = false;
+      submit.textContent = 'Change my callback';
+    }
+  });
+
   scrollToBottom();
 }
 
@@ -667,6 +995,7 @@ async function renderCallbackAction() {
       const params = new URLSearchParams(location.search);
 
       Object.assign(data, {
+        visitor_id: propertyFilmsVisitorId(),
         callback_date: selectedDate,
         callback_window: selectedWindow,
         selected_package: 'unsure',
@@ -929,6 +1258,11 @@ async function renderCallbackAction() {
   function handleSalesAction(data) {
     if (data.action === 'callback') {
       renderCallbackAction();
+      return;
+    }
+
+    if (data.action === 'callback_change') {
+      renderCallbackChangeAction();
       return;
     }
 
