@@ -357,8 +357,8 @@ function renderExistingCallbackBooking(booking) {
       You’re already booked in
     </div>
     <div class="property-chat-action-copy">
-      Piers will call you on ${escapeHtml(formatted.prettyDate)},
-      ${escapeHtml(formatted.prettyWindow)}.
+      Piers will call you on ${formatted.prettyDate},
+      ${formatted.prettyWindow}.
     </div>
   `;
 
