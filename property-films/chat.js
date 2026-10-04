@@ -1085,34 +1085,75 @@ async function renderCallbackAction() {
     scrollToBottom();
   }
 
-  function packageDetails(key) {
+  function packageDetails(key, propertyCount) {
+    const count = Number(propertyCount);
+
+    if (
+      !Number.isInteger(count) ||
+      count < 1 ||
+      count > 20
+    ) {
+      return null;
+    }
+
     const packages = {
       essential: {
         name: 'Property Film',
-        price: '£495'
+        basePrice: 495,
+        additionalPrice: 195
       },
       signature: {
         name: 'Property Film + Social',
-        price: '£795'
+        basePrice: 795,
+        additionalPrice: 295
       },
       content: {
         name: 'Property Film + Content',
-        price: '£1,495'
+        basePrice: 1495,
+        additionalPrice: null
       }
     };
 
-    return packages[key] || null;
+    const details = packages[key];
+
+    if (!details) {
+      return null;
+    }
+
+    if (key === 'content' && count !== 1) {
+      return null;
+    }
+
+    const total =
+      details.basePrice +
+      (count - 1) * (details.additionalPrice || 0);
+
+    return {
+      ...details,
+      propertyCount: count,
+      total,
+      price: new Intl.NumberFormat('en-GB', {
+        style: 'currency',
+        currency: 'GBP',
+        maximumFractionDigits: 0
+      }).format(total)
+    };
   }
 
   function renderCheckoutAction(data) {
-    const details = packageDetails(data.package);
+    const details =
+      packageDetails(data.package, data.propertyCount);
 
-    if (
-      !details ||
-      Number(data.propertyCount) !== 1
-    ) {
+    if (!details) {
       return;
     }
+
+    const count = details.propertyCount;
+
+    const propertyLabel =
+      count === 1
+        ? '1 property'
+        : `${count} properties`;
 
     const wrap = addActionContainer();
 
@@ -1125,7 +1166,7 @@ async function renderCallbackAction() {
           ${details.price}
         </div>
         <div class="property-chat-action-copy">
-          Secure checkout. You're covered by the Love Your Film Guarantee.
+          ${propertyLabel}. Secure checkout. You're covered by the Love Your Film Guarantee.
         </div>
         <button
           type="button"
@@ -1151,7 +1192,9 @@ async function renderCallbackAction() {
       error.textContent = '';
 
       track('checkout_started', {
-        package: data.package
+        package: data.package,
+        property_count: count,
+        value: details.total
       });
 
       try {
@@ -1165,7 +1208,7 @@ async function renderCallbackAction() {
           },
           body: JSON.stringify({
             package: data.package,
-            propertyCount: 1,
+            propertyCount: count,
             seasonal: false,
             funnel_source: 'chat'
           })
