@@ -162,6 +162,697 @@
     }
   }
 
+  function makeId() {
+    if (window.crypto && typeof window.crypto.randomUUID === 'function') {
+      return window.crypto.randomUUID();
+    }
+
+    return (
+      Date.now().toString(36) +
+      Math.random().toString(36).slice(2)
+    );
+  }
+
+  function callbackAvailabilityUrl() {
+    return config.apiUrl.replace(
+      /\/submit(?:\?.*)?$/,
+      '/callback-availability'
+    );
+  }
+
+  function checkoutUrl() {
+    return config.apiUrl.replace(
+      /\/submit(?:\?.*)?$/,
+      '/checkout'
+    );
+  }
+
+  function localDateValue(date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+
+    return `${year}-${month}-${day}`;
+  }
+
+  function callbackDayLabel(date) {
+    return date.toLocaleDateString('en-GB', {
+      weekday: 'short',
+      day: 'numeric',
+      month: 'short'
+    });
+  }
+
+  const callbackSchedule = {
+    1: [
+      { value: '09:00-10:00', label: '9–10am', startHour: 9 },
+      { value: '10:00-11:00', label: '10–11am', startHour: 10 },
+      { value: '11:00-12:00', label: '11am–12pm', startHour: 11 }
+    ],
+    2: [
+      { value: '09:00-10:00', label: '9–10am', startHour: 9 },
+      { value: '10:00-11:00', label: '10–11am', startHour: 10 },
+      { value: '11:00-12:00', label: '11am–12pm', startHour: 11 },
+      { value: '13:00-14:00', label: '1–2pm', startHour: 13 },
+      { value: '14:00-15:00', label: '2–3pm', startHour: 14 }
+    ],
+    3: [
+      { value: '09:00-10:00', label: '9–10am', startHour: 9 },
+      { value: '10:00-11:00', label: '10–11am', startHour: 10 },
+      { value: '11:00-12:00', label: '11am–12pm', startHour: 11 },
+      { value: '13:00-14:00', label: '1–2pm', startHour: 13 },
+      { value: '14:00-15:00', label: '2–3pm', startHour: 14 }
+    ],
+    4: [
+      { value: '09:00-10:00', label: '9–10am', startHour: 9 },
+      { value: '10:00-11:00', label: '10–11am', startHour: 10 },
+      { value: '11:00-12:00', label: '11am–12pm', startHour: 11 },
+      { value: '13:00-14:00', label: '1–2pm', startHour: 13 },
+      { value: '14:00-15:00', label: '2–3pm', startHour: 14 }
+    ],
+    5: [
+      { value: '09:00-10:00', label: '9–10am', startHour: 9 },
+      { value: '10:00-11:00', label: '10–11am', startHour: 10 },
+      { value: '11:00-12:00', label: '11am–12pm', startHour: 11 }
+    ]
+  };
+
+  function availableWindowsForDate(date, occupied) {
+    const schedule = callbackSchedule[date.getDay()] || [];
+    const now = new Date();
+    const dateValue = localDateValue(date);
+
+    return schedule.filter(option => {
+      if (occupied[`${dateValue}|${option.value}`]) {
+        return false;
+      }
+
+      if (dateValue !== localDateValue(now)) {
+        return true;
+      }
+
+      const slotStart = new Date(
+        date.getFullYear(),
+        date.getMonth(),
+        date.getDate(),
+        option.startHour,
+        0,
+        0,
+        0
+      );
+
+      return slotStart.getTime() - now.getTime() >= 30 * 60 * 1000;
+    });
+  }
+
+  function addActionContainer() {
+    const wrap = document.createElement('div');
+    wrap.className = 'property-chat-action-wrap';
+
+    messages.appendChild(wrap);
+    scrollToBottom();
+
+    return wrap;
+  }
+
+  function field(label, name, type, placeholder, autocomplete) {
+    const wrap = document.createElement('label');
+    wrap.className = 'property-chat-action-field';
+
+    const title = document.createElement('span');
+    title.textContent = label;
+
+    const input = document.createElement('input');
+    input.name = name;
+    input.type = type;
+    input.placeholder = placeholder;
+    input.autocomplete = autocomplete;
+    input.required = true;
+
+    const error = document.createElement('small');
+    error.className = 'property-chat-action-error';
+
+    wrap.append(title, input, error);
+
+    return wrap;
+  }
+
+  async function renderCallbackAction() {
+    const wrap = addActionContainer();
+
+    wrap.innerHTML = `
+      <div class="property-chat-action-card">
+        <div class="property-chat-action-title">
+          Arrange a callback
+        </div>
+        <div class="property-chat-action-copy">
+          Leave your details and choose a convenient time for Piers to call.
+        </div>
+        <div class="property-chat-action-loading">
+          Checking callback availability…
+        </div>
+      </div>
+    `;
+
+    const card = wrap.querySelector('.property-chat-action-card');
+
+    let occupied = {};
+
+    try {
+      const response = await fetch(
+        callbackAvailabilityUrl() +
+          '?from=' +
+          encodeURIComponent(localDateValue(new Date())),
+        {
+          method: 'GET',
+          headers: {
+            Accept: 'application/json'
+          },
+          cache: 'no-store'
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error('Availability request failed');
+      }
+
+      const data = await response.json();
+
+      for (const slot of data.occupied || []) {
+        if (slot && slot.date && slot.window) {
+          occupied[`${slot.date}|${slot.window}`] = true;
+        }
+      }
+
+    } catch (error) {
+      console.error(
+        'Could not load callback availability:',
+        error
+      );
+    }
+
+    const bookingForm = document.createElement('form');
+    bookingForm.className = 'property-chat-callback-form';
+    bookingForm.noValidate = true;
+
+    const fields = document.createElement('div');
+    fields.className = 'property-chat-action-fields';
+
+    fields.append(
+      field(
+        'Your name',
+        'name',
+        'text',
+        'Jane Smith',
+        'name'
+      ),
+      field(
+        'Business / property',
+        'business_name',
+        'text',
+        'Oak Tree Cottages',
+        'organization'
+      ),
+      field(
+        'Email',
+        'email',
+        'email',
+        'jane@example.com',
+        'email'
+      ),
+      field(
+        'Phone',
+        'phone',
+        'tel',
+        '07123 456789',
+        'tel'
+      )
+    );
+
+    const picker = document.createElement('div');
+    picker.className = 'property-chat-callback-picker';
+
+    const dayLabel = document.createElement('div');
+    dayLabel.className = 'property-chat-action-label';
+    dayLabel.textContent = 'Choose a day';
+
+    const days = document.createElement('div');
+    days.className = 'property-chat-action-options';
+
+    const timeLabel = document.createElement('div');
+    timeLabel.className = 'property-chat-action-label';
+    timeLabel.textContent = 'Choose a time';
+
+    const times = document.createElement('div');
+    times.className = 'property-chat-action-options';
+
+    let selectedDate = '';
+    let selectedWindow = '';
+
+    const pickerError = document.createElement('div');
+    pickerError.className = 'property-chat-action-error';
+
+    function selectButton(container, button) {
+      container
+        .querySelectorAll('button')
+        .forEach(item => item.classList.remove('is-selected'));
+
+      button.classList.add('is-selected');
+    }
+
+    function renderTimes(date) {
+      times.innerHTML = '';
+      selectedWindow = '';
+      pickerError.textContent = '';
+
+      for (
+        const option of availableWindowsForDate(date, occupied)
+      ) {
+        const button = document.createElement('button');
+
+        button.type = 'button';
+        button.className = 'property-chat-action-choice';
+        button.textContent = option.label;
+
+        button.addEventListener('click', () => {
+          selectButton(times, button);
+          selectedWindow = option.value;
+          pickerError.textContent = '';
+        });
+
+        times.appendChild(button);
+      }
+    }
+
+    const now = new Date();
+    const dates = [];
+
+    let candidate = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate()
+    );
+
+    while (dates.length < 5) {
+      const windows =
+        availableWindowsForDate(candidate, occupied);
+
+      if (
+        candidate.getDay() !== 0 &&
+        candidate.getDay() !== 6 &&
+        windows.length
+      ) {
+        dates.push(new Date(candidate.getTime()));
+      }
+
+      candidate.setDate(candidate.getDate() + 1);
+    }
+
+    for (const date of dates) {
+      const button = document.createElement('button');
+
+      button.type = 'button';
+      button.className = 'property-chat-action-choice';
+      button.textContent = callbackDayLabel(date);
+
+      button.addEventListener('click', () => {
+        selectButton(days, button);
+        selectedDate = localDateValue(date);
+        pickerError.textContent = '';
+        renderTimes(date);
+      });
+
+      days.appendChild(button);
+    }
+
+    picker.append(
+      dayLabel,
+      days,
+      timeLabel,
+      times,
+      pickerError
+    );
+
+    const submit = document.createElement('button');
+    submit.type = 'submit';
+    submit.className = 'property-chat-action-primary';
+    submit.textContent = 'Book my callback';
+
+    const formError = document.createElement('div');
+    formError.className =
+      'property-chat-action-error property-chat-action-form-error';
+
+    bookingForm.append(
+      fields,
+      picker,
+      submit,
+      formError
+    );
+
+    card.querySelector(
+      '.property-chat-action-loading'
+    ).remove();
+
+    card.appendChild(bookingForm);
+
+    bookingForm.addEventListener('submit', async event => {
+      event.preventDefault();
+
+      formError.textContent = '';
+
+      const data =
+        Object.fromEntries(new FormData(bookingForm));
+
+      let firstInvalid = null;
+
+      bookingForm
+        .querySelectorAll('.property-chat-action-field')
+        .forEach(wrap => {
+          const input = wrap.querySelector('input');
+          const error = wrap.querySelector('small');
+
+          input.value = input.value.trim();
+          data[input.name] = input.value;
+          error.textContent = '';
+          input.removeAttribute('aria-invalid');
+
+          if (!input.value) {
+            error.textContent = 'Please complete this field.';
+            input.setAttribute('aria-invalid', 'true');
+            firstInvalid ||= input;
+          }
+        });
+
+      if (
+        data.email &&
+        !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)
+      ) {
+        const input = bookingForm.elements.email;
+        const error =
+          input.closest('label').querySelector('small');
+
+        error.textContent =
+          'Please enter a valid email address.';
+        input.setAttribute('aria-invalid', 'true');
+        firstInvalid ||= input;
+      }
+
+      if (
+        data.phone &&
+        (
+          !/^[+\d\s().-]+$/.test(data.phone) ||
+          data.phone.replace(/\D/g, '').length < 7
+        )
+      ) {
+        const input = bookingForm.elements.phone;
+        const error =
+          input.closest('label').querySelector('small');
+
+        error.textContent =
+          'Please enter a valid phone number.';
+        input.setAttribute('aria-invalid', 'true');
+        firstInvalid ||= input;
+      }
+
+      if (!selectedDate || !selectedWindow) {
+        pickerError.textContent =
+          'Please choose a callback day and time.';
+      }
+
+      if (
+        firstInvalid ||
+        !selectedDate ||
+        !selectedWindow
+      ) {
+        firstInvalid?.focus();
+        return;
+      }
+
+      const params = new URLSearchParams(location.search);
+
+      Object.assign(data, {
+        callback_date: selectedDate,
+        callback_window: selectedWindow,
+        selected_package: 'unsure',
+        cta_source: 'chat',
+        form_version: 'callback-v2',
+        submission_id: makeId(),
+        source:
+          params.get('utm_source') ||
+          params.get('source') ||
+          'property-films',
+        landing_page:
+          location.origin + location.pathname,
+        campaign:
+          params.get('utm_campaign') || '',
+        referrer: document.referrer
+      });
+
+      submit.disabled = true;
+      submit.textContent = 'Booking…';
+
+      try {
+        const response = await fetch(config.apiUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(data),
+          signal: AbortSignal.timeout(20000),
+          credentials: 'omit'
+        });
+
+        const result =
+          await response.json().catch(() => null);
+
+        if (
+          !response.ok ||
+          !result ||
+          !result.success
+        ) {
+          throw new Error(
+            result?.error ||
+            'We couldn’t book your callback just now. Please try again.'
+          );
+        }
+
+        try {
+          sessionStorage.setItem(
+            'property-films-callback',
+            JSON.stringify({
+              package: data.selected_package,
+              at: Date.now()
+            })
+          );
+        } catch {}
+
+        track('form_submitted_successfully', {
+          package: data.selected_package
+        });
+
+        track('callback_submitted', {
+          package: data.selected_package
+        });
+
+        const date = new Date(
+          selectedDate + 'T12:00:00'
+        );
+
+        const prettyDate =
+          date.toLocaleDateString('en-GB', {
+            weekday: 'long',
+            day: 'numeric',
+            month: 'long'
+          });
+
+        const selectedOption =
+          Object.values(callbackSchedule)
+            .flat()
+            .find(
+              option =>
+                option.value === selectedWindow
+            );
+
+        const prettyTime =
+          selectedOption?.label || selectedWindow;
+
+        wrap.innerHTML = `
+          <div class="property-chat-action-card property-chat-action-success">
+            <div class="property-chat-action-title">
+              Callback booked
+            </div>
+            <div class="property-chat-action-copy">
+              Piers will call you on ${prettyDate}, ${prettyTime}.
+            </div>
+          </div>
+        `;
+
+        addMessage(
+          'assistant',
+          `Perfect — you're booked in. Piers will call you on ${prettyDate}, ${prettyTime}.`
+        );
+
+        history.push({
+          role: 'assistant',
+          content:
+            `Callback booked for ${prettyDate}, ${prettyTime}.`
+        });
+
+        saveHistory();
+
+        scrollToBottom();
+
+      } catch (error) {
+        formError.textContent =
+          error.name === 'TimeoutError' ||
+          error instanceof TypeError
+            ? 'We couldn’t confirm your callback. Please check your connection and try again.'
+            : error.message;
+
+      } finally {
+        submit.disabled = false;
+        submit.textContent = 'Book my callback';
+      }
+    });
+
+    scrollToBottom();
+  }
+
+  function packageDetails(key) {
+    const packages = {
+      essential: {
+        name: 'Property Film',
+        price: '£495'
+      },
+      signature: {
+        name: 'Property Film + Social',
+        price: '£795'
+      },
+      content: {
+        name: 'Property Film + Content',
+        price: '£1,495'
+      }
+    };
+
+    return packages[key] || null;
+  }
+
+  function renderCheckoutAction(data) {
+    const details = packageDetails(data.package);
+
+    if (
+      !details ||
+      Number(data.propertyCount) !== 1
+    ) {
+      return;
+    }
+
+    const wrap = addActionContainer();
+
+    wrap.innerHTML = `
+      <div class="property-chat-action-card">
+        <div class="property-chat-action-title">
+          ${details.name}
+        </div>
+        <div class="property-chat-checkout-price">
+          ${details.price}
+        </div>
+        <div class="property-chat-action-copy">
+          Secure checkout. You're covered by the Love Your Film Guarantee.
+        </div>
+        <button
+          type="button"
+          class="property-chat-action-primary"
+        >
+          Reserve my production slot
+        </button>
+        <div class="property-chat-action-error property-chat-action-form-error"></div>
+      </div>
+    `;
+
+    const button =
+      wrap.querySelector('.property-chat-action-primary');
+
+    const error =
+      wrap.querySelector('.property-chat-action-form-error');
+
+    button.addEventListener('click', async () => {
+      if (button.disabled) return;
+
+      button.disabled = true;
+      button.textContent = 'Opening secure checkout…';
+      error.textContent = '';
+
+      track('checkout_started', {
+        package: data.package
+      });
+
+      try {
+        const response = await fetch(checkoutUrl(), {
+          method: 'POST',
+          credentials: 'omit',
+          signal: AbortSignal.timeout(30000),
+          headers: {
+            'Content-Type': 'application/json',
+            'Idempotency-Key': makeId()
+          },
+          body: JSON.stringify({
+            package: data.package,
+            propertyCount: 1,
+            seasonal: false,
+            funnel_source: 'chat'
+          })
+        });
+
+        const result =
+          await response.json().catch(() => null);
+
+        if (!response.ok || !result) {
+          throw new Error(
+            result?.error ||
+            'Unable to open secure checkout. Please try again.'
+          );
+        }
+
+        if (
+          !result.checkoutUrl ||
+          new URL(result.checkoutUrl).origin !==
+            'https://checkout.stripe.com'
+        ) {
+          throw new Error(
+            'Unable to open secure checkout. Please try again.'
+          );
+        }
+
+        window.location.assign(result.checkoutUrl);
+
+      } catch (checkoutError) {
+        error.textContent =
+          checkoutError.name === 'TimeoutError' ||
+          checkoutError instanceof TypeError
+            ? 'We couldn’t connect to secure checkout. Please try again.'
+            : checkoutError.message;
+
+        button.disabled = false;
+        button.textContent =
+          'Reserve my production slot';
+      }
+    });
+
+    scrollToBottom();
+  }
+
+  function handleSalesAction(data) {
+    if (data.action === 'callback') {
+      renderCallbackAction();
+      return;
+    }
+
+    if (data.action === 'checkout') {
+      renderCheckoutAction(data);
+    }
+  }
+
   async function sendMessage(message) {
     if (!message || busy) return;
 
@@ -209,6 +900,8 @@
       }
 
       addMessage('assistant', data.reply);
+
+      handleSalesAction(data);
 
       history.push({
         role: 'assistant',

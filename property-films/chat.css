@@ -363,3 +363,186 @@
     bottom: 84px;
   }
 }
+
+
+/* =========================================================
+   Property Films chat sales actions
+   ========================================================= */
+
+.property-chat-action-wrap {
+  flex: 0 0 auto;
+  margin: 0 0 12px 36px;
+  max-width: calc(100% - 36px);
+}
+
+.property-chat-action-card {
+  box-sizing: border-box;
+  padding: 14px;
+  border: 1px solid #ded9d2;
+  border-radius: 14px;
+  background: #faf8f5;
+  color: #222;
+}
+
+.property-chat-action-title {
+  margin: 0 0 4px;
+  font-size: 15px;
+  line-height: 1.3;
+  font-weight: 800;
+}
+
+.property-chat-action-copy {
+  margin: 0 0 12px;
+  color: #5f5a54;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.property-chat-action-loading {
+  color: #777;
+  font-size: 12px;
+}
+
+.property-chat-action-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 9px;
+  margin: 12px 0;
+}
+
+.property-chat-action-field {
+  display: block;
+  min-width: 0;
+}
+
+.property-chat-action-field > span,
+.property-chat-action-label {
+  display: block;
+  margin-bottom: 4px;
+  color: #4f4a45;
+  font-size: 11px;
+  line-height: 1.3;
+  font-weight: 700;
+}
+
+.property-chat-action-field input {
+  width: 100%;
+  min-width: 0;
+  height: 38px;
+  box-sizing: border-box;
+  padding: 8px 9px;
+  border: 1px solid #d7d2cb;
+  border-radius: 8px;
+  outline: none;
+  background: #fff;
+  color: #222;
+  font: inherit;
+  font-size: 12px;
+}
+
+.property-chat-action-field input:focus {
+  border-color: #d66f2d;
+  box-shadow: 0 0 0 2px rgba(214, 111, 45, .12);
+}
+
+.property-chat-action-field input[aria-invalid="true"] {
+  border-color: #a33;
+}
+
+.property-chat-action-error {
+  display: block;
+  min-height: 0;
+  margin-top: 3px;
+  color: #a33;
+  font-size: 10px;
+  line-height: 1.3;
+}
+
+.property-chat-callback-picker {
+  margin-top: 10px;
+}
+
+.property-chat-action-label {
+  margin-top: 10px;
+}
+
+.property-chat-action-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.property-chat-action-choice {
+  appearance: none;
+  padding: 7px 9px;
+  border: 1px solid #d7d2cb;
+  border-radius: 8px;
+  background: #fff;
+  color: #333;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.property-chat-action-choice:hover {
+  border-color: #aaa39a;
+}
+
+.property-chat-action-choice.is-selected {
+  border-color: #111315;
+  background: #111315;
+  color: #fff;
+}
+
+.property-chat-action-primary {
+  display: block;
+  width: 100%;
+  min-height: 42px;
+  margin-top: 14px;
+  padding: 9px 12px;
+  border: 0;
+  border-radius: 9px;
+  background: #111315;
+  color: #fff;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.property-chat-action-primary:disabled {
+  opacity: .65;
+  cursor: wait;
+}
+
+.property-chat-action-form-error {
+  margin-top: 7px;
+  text-align: center;
+}
+
+.property-chat-checkout-price {
+  margin: 2px 0 8px;
+  font-size: 24px;
+  line-height: 1;
+  font-weight: 850;
+}
+
+.property-chat-action-success {
+  border-color: #c9d8c8;
+}
+
+@media (max-width: 600px) {
+  .property-chat-action-wrap {
+    margin-left: 24px;
+    max-width: calc(100% - 24px);
+  }
+
+  .property-chat-action-fields {
+    grid-template-columns: 1fr;
+  }
+
+  .property-chat-action-card {
+    padding: 13px;
+  }
+}
