@@ -317,31 +317,6 @@ function propertyFilmsVisitorId() {
   }
 }
 
-function getExistingCallbackBooking() {
-  try {
-    const raw =
-      localStorage.getItem('property-films-callback') ||
-      sessionStorage.getItem('property-films-callback');
-
-    if (!raw) return null;
-
-    const booking = JSON.parse(raw);
-
-    if (
-      !booking ||
-      typeof booking !== 'object' ||
-      !booking.date ||
-      !booking.window
-    ) {
-      return null;
-    }
-
-    return booking;
-  } catch {
-    return null;
-  }
-}
-
 function formatCallbackBooking(booking) {
   const date = new Date(booking.date + 'T12:00:00');
 
@@ -401,13 +376,6 @@ function renderExistingCallbackBooking(booking) {
 
 
 async function renderCallbackChangeAction() {
-  const existingBooking = getExistingCallbackBooking();
-
-  if (!existingBooking) {
-    renderCallbackAction();
-    return;
-  }
-
   const wrap = addActionContainer();
 
   wrap.innerHTML = `
@@ -428,6 +396,7 @@ async function renderCallbackChangeAction() {
     wrap.querySelector('.property-chat-action-card');
 
   let occupied = {};
+  let existingBooking = null;
 
   try {
     const response = await fetch(
@@ -450,6 +419,14 @@ async function renderCallbackChangeAction() {
     }
 
     const data = await response.json();
+
+    existingBooking = data.existingCallback || null;
+
+    if (!existingBooking) {
+      wrap.remove();
+      renderCallbackAction();
+      return;
+    }
 
     for (const slot of data.occupied || []) {
       if (
@@ -643,18 +620,9 @@ async function renderCallbackChangeAction() {
       }
 
       const booking = {
-        package: existingBooking.package || 'unsure',
         date: selectedDate,
-        window: selectedWindow,
-        at: Date.now()
+        window: selectedWindow
       };
-
-      try {
-        localStorage.setItem(
-          'property-films-callback',
-          JSON.stringify(booking)
-        );
-      } catch {}
 
       const formatted =
         formatCallbackBooking(booking);
@@ -696,12 +664,6 @@ async function renderCallbackChangeAction() {
 }
 
 async function renderCallbackAction() {
-  const existingBooking = getExistingCallbackBooking();
-
-  if (existingBooking) {
-    renderExistingCallbackBooking(existingBooking);
-    return;
-  }
     const wrap = addActionContainer();
 
     wrap.innerHTML = `
@@ -726,7 +688,9 @@ async function renderCallbackAction() {
       const response = await fetch(
         callbackAvailabilityUrl() +
           '?from=' +
-          encodeURIComponent(localDateValue(new Date())),
+          encodeURIComponent(localDateValue(new Date())) +
+          '&visitor_id=' +
+          encodeURIComponent(propertyFilmsVisitorId()),
         {
           method: 'GET',
           headers: {
@@ -741,6 +705,14 @@ async function renderCallbackAction() {
       }
 
       const data = await response.json();
+
+      if (data.existingCallback) {
+        wrap.remove();
+        renderExistingCallbackBooking(
+          data.existingCallback
+        );
+        return;
+      }
 
       for (const slot of data.occupied || []) {
         if (slot && slot.date && slot.window) {
@@ -1040,24 +1012,6 @@ async function renderCallbackAction() {
             'We couldn’t book your callback just now. Please try again.'
           );
         }
-
-        try {
-          const callbackBooking = JSON.stringify({
-            package: data.selected_package,
-            date: selectedDate,
-            window: selectedWindow,
-            at: Date.now()
-          });
-
-          localStorage.setItem(
-            'property-films-callback',
-            callbackBooking
-          );
-
-          sessionStorage.removeItem(
-            'property-films-callback'
-          );
-        } catch {}
 
         track('form_submitted_successfully', {
           package: data.selected_package
