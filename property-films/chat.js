@@ -33,6 +33,10 @@
   const STORAGE_KEY = 'property-films-chat-history';
   const MAX_STORED_MESSAGES = 20;
 
+  const SESSION_KEY='property-films-marketing-session';
+  let marketingSession=sessionStorage.getItem(SESSION_KEY)||'';
+  let marketingCard=null;
+  let callbackActive=false;
   let history = [];
   let busy = false;
   let openedOnce = false;
@@ -973,6 +977,7 @@ async function renderCallbackAction() {
         selected_package: 'unsure',
         cta_source: 'chat',
         form_version: 'callback-v2',
+        chat_session_id:marketingSession,
         submission_id: makeId(),
         source:
           params.get('utm_source') ||
@@ -1017,6 +1022,7 @@ async function renderCallbackAction() {
           package: data.selected_package
         });
 
+        callbackActive=false;
         track('callback_submitted', {
           package: data.selected_package
         });
@@ -1252,13 +1258,59 @@ async function renderCallbackAction() {
     scrollToBottom();
   }
 
+  function rememberMarketingSession(data) {
+    if(data.sessionId){marketingSession=data.sessionId;try{sessionStorage.setItem(SESSION_KEY,marketingSession);}catch{}}
+  }
+  function renderMarketing(data) {
+    if(!data.marketingOffer && data.action!=='marketing_email')return;
+    if(marketingCard?.isConnected)return;
+    const wrap=addActionContainer();
+    marketingCard=wrap;
+    const card=document.createElement('div');card.className='property-chat-action-card';wrap.append(card);
+    const offer=data.marketingOffer||{};
+    const copy=document.createElement('p');copy.textContent=offer.offer||'What email address would you like me to use?';card.append(copy);
+    const wording=document.createElement('p');wording.textContent=offer.wording||data.wording;card.append(wording);
+    const error=document.createElement('p');error.setAttribute('role','status');card.append(error);
+    const controls=document.createElement('div');card.append(controls);
+    async function decide(action,email){
+      if(busy)return;
+      setBusy(true);error.textContent='';
+      try {
+        const response=await fetch(apiUrl,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sessionId:marketingSession,marketingAction:action,email})});
+        const result=await response.json();if(!response.ok)throw new Error(result.error||'Please try again.');
+        rememberMarketingSession(result);
+        if(result.action==='marketing_email'){showEmail();copy.textContent=result.reply;}
+        else {wrap.remove();marketingCard=null;addMessage('assistant',result.reply);history.push({role:'assistant',content:result.reply});saveHistory();}
+      }catch(e){error.textContent=e.message;}finally{setBusy(false);}
+    }
+    function showEmail(){
+      controls.replaceChildren();
+      const capture=document.createElement('form'),label=document.createElement('label'),field=document.createElement('input'),submit=document.createElement('button');
+      label.className='property-chat-action-field';const title=document.createElement('span');title.textContent='Email address';label.append(title);field.type='email';field.required=true;field.maxLength=254;field.autocomplete='email';field.name='marketing_email';label.append(field);
+      submit.type='submit';submit.className='property-chat-action-primary';submit.textContent='Subscribe to updates';capture.append(label,submit);controls.append(capture);
+      const cancel=document.createElement('button');cancel.type='button';cancel.textContent='No thanks';cancel.addEventListener('click',()=>decide('decline'));controls.append(cancel);
+      capture.addEventListener('submit',e=>{e.preventDefault();if(capture.reportValidity())decide('email',field.value);});
+      field.focus();
+    }
+    if(data.action==='marketing_email')showEmail();
+    else {
+      const accept=document.createElement('button');accept.type='button';accept.className='property-chat-action-primary';accept.textContent=offer.email?'Yes — use '+offer.email:'Yes, keep me updated';accept.addEventListener('click',()=>decide('accept',offer.email));
+      const decline=document.createElement('button');decline.type='button';decline.textContent='No thanks';decline.addEventListener('click',()=>decide('decline'));controls.append(accept,decline);
+    }
+    scrollToBottom();
+  }
+
   function handleSalesAction(data) {
     if (data.action === 'callback') {
+      callbackActive=true;
+      marketingCard?.remove();marketingCard=null;
       renderCallbackAction();
       return;
     }
 
     if (data.action === 'callback_change') {
+      callbackActive=true;
+      marketingCard?.remove();marketingCard=null;
       renderCallbackChangeAction();
       return;
     }
@@ -1298,7 +1350,9 @@ async function renderCallbackAction() {
         },
         body: JSON.stringify({
           message,
-          history: previousHistory
+          history: previousHistory,
+          sessionId:marketingSession,
+          callbackActive
         })
       });
 
@@ -1314,9 +1368,11 @@ async function renderCallbackAction() {
         throw new Error(data.error || 'Chat request failed');
       }
 
+      rememberMarketingSession(data);
       addMessage('assistant', data.reply);
 
       handleSalesAction(data);
+      renderMarketing(data);
 
       history.push({
         role: 'assistant',
