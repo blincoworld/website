@@ -1,3 +1,5 @@
+> **Completion update:** All remaining experience references listed below have now been updated in the authoritative CMS content and Worker. See [EXPERIENCE-COMPLETION.md](EXPERIENCE-COMPLETION.md). This document records the initial two-change release.
+
 # Homepage experience update — deployed 4 November 2026
 
 Production `website-cms` version: `3c99d51a-683d-41c9-ac34-d47058d2d5bf`, 100% traffic.

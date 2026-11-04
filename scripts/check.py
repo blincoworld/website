@@ -34,6 +34,11 @@ assert "fetch('/brands.json')" in (root / 'site.js').read_text()
 assert "fetch('/api/enquiries/agency'" in (root / 'enquiry.js').read_text()
 assert 'I’ve spent over 30 years building software for businesses that depend on it.' in html['/']
 assert 'experience-number">30<span' in html['/']
+assert 'experience-number">30<span' in html['/agency-partners/']
+assert 'More than 30 years of software, ecommerce and systems experience.' in html['/agency-partners/']
+assert '30+ years of relevant experience' in html['/agency-partners/']
+assert 'Over 30 years of professional development experience.' in html['/']
+assert not any(re.search(r'\b20(?:\+)? years', text) for text in html.values())
 assert 'data-enquiry-ready="true"' in html['/agency-partners/']
 for name in files:
     path = root / name

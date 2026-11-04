@@ -68,7 +68,7 @@ try {
         assert(await evaluate('document.fonts.check("600 16px Inter")'),'Font failed');
         assert(await evaluate('document.documentElement.scrollWidth <= innerWidth'),'Horizontal overflow');
         assert(await evaluate('[...document.querySelectorAll("a[href^=\\"#\\"]")].every(a=>document.getElementById(a.hash.slice(1)))'),'Broken anchors');
-        const boxes=await evaluate(`Object.fromEntries(['.experience-number','.experience-note','#experience-heading','.hero','.hero-person','#experience','.home-sections','.site-footer'].filter(s=>document.querySelector(s)).map(s=>{const r=document.querySelector(s).getBoundingClientRect();return [s,{x:r.x+scrollX,y:r.y+scrollY,width:r.width,height:r.height}]}))`);
+        const boxes=await evaluate(`Object.fromEntries(['.experience-number','.experience-note','#experience-heading','#background-heading','#background .agency-copy > p:first-child','.hero','.hero-person','#experience','.home-sections','.site-footer'].filter(s=>document.querySelector(s)).map(s=>{const r=document.querySelector(s).getBoundingClientRect();return [s,{x:r.x+scrollX,y:r.y+scrollY,width:r.width,height:r.height}]}))`);
         layouts.push(boxes);
         const shot=await send('Page.captureScreenshot',{format:'png',captureBeyondViewport:true});
         const bytes=Buffer.from(shot.data,'base64');shots.push(bytes);
@@ -76,8 +76,8 @@ try {
         results.push({kind,path,width,images:await evaluate('document.images.length'),font:true,noOverflow:true});
         if(kind==='local' && path==='/')assert(await evaluate('document.body.innerText.includes("I’ve spent over 30 years building software for businesses that depend on it.")'));
       }
-      if(path==='/agency-partners/')assert(shots[0].equals(shots[1]),'Agency visual baseline differs');
-      else {const geometry=structuredClone(layouts);assert(Math.abs(geometry[0]['.experience-number'].width-geometry[1]['.experience-number'].width)<3,'Unexpected counter width change');for(const item of geometry)delete item['.experience-number'].width;assert.deepEqual(geometry[0],geometry[1], 'Homepage section geometry changed');await writeFile(join(audit, `home-layout-${width}.json`),JSON.stringify(layouts));}
+      const geometry=structuredClone(layouts);assert(Math.abs(geometry[0]['.experience-number'].width-geometry[1]['.experience-number'].width)<3,'Unexpected counter width change');for(const item of geometry)delete item['.experience-number'].width;assert.deepEqual(geometry[0],geometry[1], 'Page section geometry changed');await writeFile(join(audit, `${path==='/'?'home':'agency'}-layout-${width}.json`),JSON.stringify(layouts));
+      if(path==='/')assert(shots[0].equals(shots[1]),'Homepage visual baseline differs');
     }
   }
   // Rotation still works when visitors have not requested reduced motion.
@@ -106,9 +106,9 @@ try {
   assert.equal(exceptions.length,0,JSON.stringify(exceptions));
   assert.deepEqual(badResponses.filter(x=>!x.endsWith('/api/enquiries/agency')),[]);
   assert(requests.every(x=>x.url.startsWith('http://127.0.0.1:')),'Browser made an external request');
-  const report={checks:results,agencyScreenshotsIdentical:true,rotationAndPause:true,ctaNavigation:true,formValidation:true,mockedFormSuccessAndRetry:true,externalRequests:0,missingAssets:0,consoleExceptions:0};
+  const report={checks:results,homepageScreenshotsIdentical:true,rotationAndPause:true,ctaNavigation:true,formValidation:true,mockedFormSuccessAndRetry:true,externalRequests:0,missingAssets:0,consoleExceptions:0};
   await writeFile(join(audit,'browser-results.json'),JSON.stringify(report,null,2)+'\n');
-  console.log('PASS: desktop/tablet/mobile; Agency screenshots match live baseline; fonts/images/anchors; logo rotation/pause; CTA navigation; form validation, mocked error/retry/success; no external requests or JS exceptions.');
+  console.log('PASS: desktop/tablet/mobile; Homepage screenshots match live baseline; Agency section geometry unchanged; fonts/images/anchors; logo rotation/pause; CTA navigation; form validation, mocked error/retry/success; no external requests or JS exceptions.');
 } finally {
   socket?.close();chrome.kill();
   await Promise.all([baseline,local].map(({server})=>new Promise(r=>{server.close(r);server.closeAllConnections();})));
