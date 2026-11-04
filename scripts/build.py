@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Create a review-only static bundle. This does not deploy or replace the CMS."""
+"""Build the standalone static homepage from an explicit production allowlist."""
 import json
 import shutil
 from pathlib import Path
@@ -17,4 +17,4 @@ for name in files:
     target = output / name
     target.parent.mkdir(parents=True, exist_ok=True)
     shutil.copyfile(source, target)
-print(f'Review bundle: {len(files)} files, {sum((output / f).stat().st_size for f in files):,} bytes')
+print(f'Static build: {len(files)} files, {sum((output / f).stat().st_size for f in files):,} bytes')

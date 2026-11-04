@@ -1,50 +1,82 @@
 #!/usr/bin/env python3
-"""Validate local page, CSS, manifest, metadata and navigation dependencies."""
+"""Check the standalone homepage, transitive assets and production allowlist."""
 import json
 import re
+from html.parser import HTMLParser
 from pathlib import Path
 from urllib.parse import urljoin, urlsplit, unquote
-from capture_live import References
+from xml.etree import ElementTree
 
 root = Path(__file__).resolve().parent.parent
 files = set(json.loads((root / 'production-files.json').read_text()))
-html = { '/': (root / 'index.html').read_text(), '/agency-partners/': (root / 'agency-partners/index.html').read_text() }
-ids = {url: set(re.findall(r'\bid="([^"]+)"', text)) for url, text in html.items()}
+html = (root / 'index.html').read_text()
+
+class Page(HTMLParser):
+    def __init__(self):
+        super().__init__()
+        self.assets = set(); self.links = []; self.ids = set(); self.meta = {}; self.buttons = []; self.text = []
+        self.scripts = []; self.forbidden = []
+    def handle_starttag(self, tag, attrs):
+        a = dict(attrs)
+        if a.get('id'): self.ids.add(a['id'])
+        if tag in ('form', 'input', 'textarea', 'nav'): self.forbidden.append(tag)
+        if tag == 'button': self.buttons.append(a.get('id'))
+        if tag == 'script': self.scripts.append(a.get('src')); self.assets.add(a.get('src', ''))
+        if tag in ('img', 'source') and a.get('src'): self.assets.add(a['src'])
+        if a.get('srcset'): self.assets.update(s.strip().split()[0] for s in a['srcset'].split(','))
+        if tag == 'link':
+            if a.get('rel') == 'canonical': self.canonical = a['href']
+            else: self.assets.add(a['href'])
+        if tag == 'meta':
+            key = a.get('property', a.get('name')); self.meta[key] = a.get('content')
+            if key in ('og:image', 'twitter:image'): self.assets.add(a['content'])
+        if tag == 'a': self.links.append(a.get('href', ''))
+    def handle_data(self, value): self.text.append(value)
+
+page = Page(); page.feed(html)
 
 def check_ref(ref, source):
     url = urlsplit(urljoin('https://piersblinco.com' + source, ref))
-    if url.scheme in ('mailto', 'tel', 'data'): return
-    assert url.netloc == 'piersblinco.com', f'Unexpected external dependency: {ref}'
-    page = '/' if url.path == '/' else '/agency-partners/' if url.path.rstrip('/') == '/agency-partners' else None
-    if page:
-        if url.fragment: assert unquote(url.fragment) in ids[page], (source, ref)
+    assert url.scheme == 'https' and url.netloc == 'piersblinco.com', f'Non-local link/dependency: {ref}'
+    if url.path == '/':
+        if url.fragment: assert unquote(url.fragment) in page.ids, ref
     else:
-        assert url.path.lstrip('/') in files, (source, ref)
-        assert (root / url.path.lstrip('/')).is_file(), ref
+        name = url.path.lstrip('/')
+        assert name in files and (root / name).is_file(), (source, ref)
 
-for source, text in html.items():
-    parser = References(); parser.feed(text)
-    for ref in parser.assets | parser.links: check_ref(ref, source)
-    assert '<meta name="description"' in text and 'rel="canonical"' in text
-    assert 'og:image' in text and 'twitter:card' in text
-    assert not re.search(r'property-films|tradeos|fonts.googleapis.com', text, re.I)
-for ref in re.findall(r'url\([\s\"\']*([^\)\"\'\s]+)', (root / 'styles.css').read_text()): check_ref(ref, '/styles.css')
-for brand in json.loads((root / 'brands.json').read_text()): check_ref(brand['src'], '/brands.json')
-assert "fetch('/brands.json')" in (root / 'site.js').read_text()
-assert "fetch('/api/enquiries/agency'" in (root / 'enquiry.js').read_text()
-assert 'I’ve spent over 30 years building software for businesses that depend on it.' in html['/']
-assert 'experience-number">30<span' in html['/']
-assert 'experience-number">30<span' in html['/agency-partners/']
-assert 'More than 30 years of software, ecommerce and systems experience.' in html['/agency-partners/']
-assert '30+ years of relevant experience' in html['/agency-partners/']
-assert 'Over 30 years of professional development experience.' in html['/']
-assert not any(re.search(r'\b20(?:\+)? years', text) for text in html.values())
-assert 'data-enquiry-ready="true"' in html['/agency-partners/']
+assert not page.forbidden, page.forbidden
+assert page.buttons == ['brand-pause'], 'Only the functional logo pause control may remain'
+assert page.scripts == ['/site.js']
+assert page.canonical == 'https://piersblinco.com/'
+assert page.meta['og:url'] == page.canonical
+assert page.meta['description'] == page.meta['og:description']
+assert 'Over 25 years of professional development experience.' in page.meta['description']
+assert 'I’ve spent over 25 years building software for businesses that depend on it.' in html
+assert 'experience-number">25<span' in html
+assert not re.search(r'\b(?:20|30)\s*\+?\s*years', ' '.join(page.text), re.I)
+assert not re.search(r'agency-partners|enquiry|mailto:|contact-banner|hero-actions|Discuss your project|Explore my experience|Let’s talk', html, re.I)
+for ref in page.assets | set(page.links): check_ref(ref, '/')
+styles = (root / 'styles.css').read_text()
+for ref in re.findall(r'url\([\s\"\']*([^\)\"\'\s]+)', styles): check_ref(ref, '/styles.css')
+assert not re.search(r'agency-|enquiry|contact-banner|hero-actions|article-|#site-nav|#menu-toggle', styles)
+assert '.is-changing' in styles and ':focus-visible' in styles and 'prefers-reduced-motion' in styles
+brands = json.loads((root / 'brands.json').read_text())
+assert len(brands) == 33 and len({b['src'] for b in brands}) == 33
+for brand in brands: check_ref(brand['src'], '/brands.json')
+script = (root / 'site.js').read_text()
+assert re.findall(r"fetch\(['\"]([^'\"]+)", script) == ['/brands.json']
+assert not re.search(r'/api/|agency-partners|enquiry|sessionStorage|#menu-toggle|#site-nav', script)
+assert (root / 'assets/fonts/OFL.txt').is_file()
+assert {f for f in files if f.endswith('.html')} == {'index.html'}
+assert set(root.glob('*.html')) == {root / 'index.html'}
 for name in files:
-    path = root / name
-    assert path.is_file() and not path.is_symlink(), name
-    assert path.stat().st_size <= 25 * 1024 * 1024, name
-    assert (root / 'dist' / name).read_bytes() == path.read_bytes(), name
+    source = root / name
+    assert source.is_file() and not source.is_symlink(), name
+    assert source.stat().st_size <= 25 * 1024 * 1024, name
+    assert (root / 'dist' / name).read_bytes() == source.read_bytes(), name
 actual = {str(p.relative_to(root / 'dist')) for p in (root / 'dist').rglob('*') if p.is_file()}
 assert actual == files, 'Build includes extra/missing files'
-print(f'PASS: two pages, navigation/fragments, CSS/font/SEO assets, {len(json.loads((root / "brands.json").read_text()))} dynamic logos, form endpoint, wording, {len(files)} production files and size limits')
+sitemap = ElementTree.fromstring((root / 'sitemap.xml').read_text())
+assert [e.text for e in sitemap.iter('{http://www.sitemaps.org/schemas/sitemap/0.9}loc')] == ['https://piersblinco.com/']
+assert 'Sitemap: https://piersblinco.com/sitemap.xml' in (root / 'robots.txt').read_text()
+print(f'PASS: one static homepage; 25-year copy and SEO; no sales links/forms/APIs; local assets and 33 logo paths; homepage-only sitemap; {len(files)} production files')

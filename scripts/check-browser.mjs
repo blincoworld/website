@@ -1,115 +1,106 @@
-// Dependency-free Chrome smoke test. Enquiries are mocked on loopback only.
+// Standalone static-site smoke test. Only a local file server is available.
 import assert from 'node:assert/strict';
-import { readFile, writeFile, mkdir } from 'node:fs/promises';
-import { createServer } from 'node:http';
-import { spawn } from 'node:child_process';
-import { once } from 'node:events';
+import { access, mkdir, readFile, writeFile } from 'node:fs/promises';
 import { resolve, join } from 'node:path';
+import { browser, serve } from './browser.mjs';
 
 const root = resolve(import.meta.dirname, '..');
-const audit = join(root, '.audit');
+const audit = join(root, '.audit/static-portfolio');
 await mkdir(audit, {recursive:true});
-const manifest = JSON.parse(await readFile(join(audit, 'live-manifest.json')));
-const production = new Set(JSON.parse(await readFile(join(root, 'production-files.json'))));
-let posted = [], postMode = 'success';
-async function serve(directory) {
-  const server = createServer(async (req, res) => {
-    try {
-      const path = new URL(req.url, 'http://localhost').pathname;
-      if (req.method === 'POST' && path === '/api/enquiries/agency') {
-        const chunks=[];for await (const c of req) chunks.push(c);
-        posted.push(JSON.parse(Buffer.concat(chunks).toString()));
-        res.writeHead(postMode === 'error' ? 503 : 200, {'Content-Type':'application/json'});
-        res.end(JSON.stringify(postMode === 'error' ? {error:'Mock unavailable; retry safely.'} : {status:'sent'}));return;
-      }
-      if (req.method !== 'GET') {res.writeHead(405);res.end();return;}
-      const record = manifest.files[path === '/agency-partners/' ? '/agency-partners' : path];
-      if (!record || !production.has(record.file)) {res.writeHead(404);res.end('Not found');return;}
-      const body=await readFile(join(directory,record.file));
-      res.writeHead(200, record.headers);res.end(body);
-    } catch {res.writeHead(500);res.end('Fixture failed');}
-  });
-  await new Promise(r=>server.listen(0,'127.0.0.1',r));
-  return {server, origin:`http://127.0.0.1:${server.address().port}`};
-}
-const baseline=await serve(join(audit,'live')), local=await serve(join(root,'dist'));
-const chrome=spawn(process.env.CHROME_BIN || '/usr/bin/google-chrome', ['--headless=new','--no-sandbox','--disable-dev-shm-usage','--no-first-run','--no-default-browser-check','--disable-background-networking','--remote-debugging-port=0',`--user-data-dir=${join(audit,'chrome')}`,'about:blank'],{stdio:['ignore','ignore','pipe']});
-let socket;
+const files = new Set(JSON.parse(await readFile(join(root,'production-files.json'))));
+const brands = JSON.parse(await readFile(join(root,'brands.json')));
+const local = await serve(join(root,'dist'), files);
+let reference, chrome;
 try {
-  const debuggerOrigin=await new Promise((resolve,reject)=>{
-    let output='';const timer=setTimeout(()=>reject(Error('Chrome start timeout')),10000);
-    chrome.stderr.on('data',c=>{output+=c;const m=output.match(/DevTools listening on ws:\/\/(127\.0\.0\.1:\d+)/);if(m){clearTimeout(timer);resolve('http://'+m[1]);}});
-    chrome.once('error',reject);
+  // Optional one-time visual comparison: simplified HTML with original full CSS.
+  const hasReference = await access(join(audit,'original-styles.css')).then(()=>true,()=>false);
+  if (hasReference) reference = await serve(join(root,'dist'), files, {
+    '/':join(audit,'reference-index.html'),
+    '/styles.css':join(audit,'original-styles.css'),
+    '/site.js':join(audit,'original-site.js'),
   });
-  const pages=await fetch(debuggerOrigin+'/json/list').then(r=>r.json());
-  socket=new WebSocket(pages.find(p=>p.type==='page').webSocketDebuggerUrl);await once(socket,'open');
-  let sequence=0;const pending=new Map(), exceptions=[],badResponses=[],requests=[];
-  socket.addEventListener('message',event=>{
-    const m=JSON.parse(event.data);
-    if(m.id){const p=pending.get(m.id);if(!p)return;pending.delete(m.id);clearTimeout(p.timer);m.error?p.reject(Error(m.error.message)):p.resolve(m.result);}
-    if(m.method==='Runtime.exceptionThrown')exceptions.push(m.params.exceptionDetails);
-    if(m.method==='Network.responseReceived' && m.params.response.status>=400)badResponses.push(m.params.response.url);
-    if(m.method==='Network.requestWillBeSent')requests.push({url:m.params.request.url,method:m.params.request.method});
-  });
-  function send(method,params={}){const id=++sequence;return new Promise((resolve,reject)=>{const timer=setTimeout(()=>reject(Error('CDP timeout '+method)),15000);pending.set(id,{resolve,reject,timer});socket.send(JSON.stringify({id,method,params}));});}
-  async function evaluate(expression){const r=await send('Runtime.evaluate',{expression,awaitPromise:true,returnByValue:true});if(r.exceptionDetails)throw Error(JSON.stringify(r.exceptionDetails));return r.result.value;}
-  async function waitFor(expression){for(let i=0;i<200;i++){if(await evaluate(`Boolean(${expression})`))return;await new Promise(r=>setTimeout(r,40));}throw Error('Timed out '+expression);}
-  await send('Page.enable');await send('Runtime.enable');await send('Network.enable');
+  chrome = await browser(join(audit,'browser-check'));
+  const {send,evaluate,waitFor} = chrome;
   await send('Emulation.setEmulatedMedia',{features:[{name:'prefers-reduced-motion',value:'reduce'}]});
-  const results=[];
-  for(const width of [1440,768,375]) {
+  const loaded = 'document.readyState === "complete" && document.querySelector(".brand-grid") && [...document.images].every(i=>i.complete && i.naturalWidth>0)';
+  const result = [];
+  for (const width of [1440,768,375]) {
     await send('Emulation.setDeviceMetricsOverride',{width,height:1000,deviceScaleFactor:1,mobile:false});
-    for(const path of ['/','/agency-partners/']) {
-      const shots=[]; const layouts=[];
-      for(const [kind,fixture] of [['baseline',baseline],['local',local]]) {
-        await send('Page.navigate',{url:fixture.origin+path});
-        await waitFor('document.readyState === "complete" && document.querySelector(".brand-grid") && [...document.images].every(i=>i.complete && i.naturalWidth > 0)');
-        await evaluate('document.fonts.ready');
-        assert(await evaluate('document.fonts.check("600 16px Inter")'),'Font failed');
-        assert(await evaluate('document.documentElement.scrollWidth <= innerWidth'),'Horizontal overflow');
-        assert(await evaluate('[...document.querySelectorAll("a[href^=\\"#\\"]")].every(a=>document.getElementById(a.hash.slice(1)))'),'Broken anchors');
-        const boxes=await evaluate(`Object.fromEntries(['.experience-number','.experience-note','#experience-heading','#background-heading','#background .agency-copy > p:first-child','.hero','.hero-person','#experience','.home-sections','.site-footer'].filter(s=>document.querySelector(s)).map(s=>{const r=document.querySelector(s).getBoundingClientRect();return [s,{x:r.x+scrollX,y:r.y+scrollY,width:r.width,height:r.height}]}))`);
-        layouts.push(boxes);
-        const shot=await send('Page.captureScreenshot',{format:'png',captureBeyondViewport:true});
-        const bytes=Buffer.from(shot.data,'base64');shots.push(bytes);
-        await writeFile(join(audit,`${kind}-${path==='/'?'home':'agency'}-${width}.png`),bytes);
-        results.push({kind,path,width,images:await evaluate('document.images.length'),font:true,noOverflow:true});
-        if(kind==='local' && path==='/')assert(await evaluate('document.body.innerText.includes("I’ve spent over 30 years building software for businesses that depend on it.")'));
-      }
-      const geometry=structuredClone(layouts);assert(Math.abs(geometry[0]['.experience-number'].width-geometry[1]['.experience-number'].width)<3,'Unexpected counter width change');for(const item of geometry)delete item['.experience-number'].width;assert.deepEqual(geometry[0],geometry[1], 'Page section geometry changed');await writeFile(join(audit, `${path==='/'?'home':'agency'}-layout-${width}.json`),JSON.stringify(layouts));
-      if(path==='/')assert(shots[0].equals(shots[1]),'Homepage visual baseline differs');
+    const shots = [];
+    for (const [name,fixture] of [...(reference?[['reference',reference]]:[]),['static',local]]) {
+      await send('Page.navigate',{url:fixture.origin});await waitFor(loaded);await evaluate('document.fonts.ready');
+      assert(await evaluate('document.fonts.check("600 16px Inter")'),'Local font failed');
+      assert(await evaluate('document.documentElement.scrollWidth<=innerWidth'),'Horizontal overflow');
+      assert.equal(await evaluate('document.querySelector(".experience-number").textContent'),'25+');
+      assert.equal(await evaluate('document.querySelector("#experience-heading").textContent'),'I’ve spent over 25 years building software for businesses that depend on it.');
+      assert(await evaluate(`!document.querySelector('form,input,textarea,nav,.hero-actions,.contact-banner,.button')`));
+      assert.equal(await evaluate('document.querySelectorAll("button").length'),1);
+      assert.equal(await evaluate('document.querySelectorAll(".brand-slot img").length'),6);
+      assert(await evaluate('document.querySelector(".portrait").naturalWidth>0'));
+      assert(await evaluate('[...document.querySelectorAll("a[href^=\\"#\\"]")].every(a=>document.getElementById(a.hash.slice(1)))'));
+      assert(await evaluate('document.querySelector("#brand-pause").hidden'),'Reduced-motion pause state');
+      const meta = await evaluate(`Object.fromEntries([...document.querySelectorAll('meta[name],meta[property]')].map(m=>[m.name||m.getAttribute('property'),m.content]))`);
+      assert.equal(meta.description,meta['og:description']);
+      assert(meta.description.includes('Over 25 years of professional development experience.'));
+      assert(!/\b30\s*\+?\s*years/i.test(await evaluate('document.body.innerText')));
+      const png = Buffer.from((await send('Page.captureScreenshot',{format:'png',captureBeyondViewport:true})).data,'base64');
+      shots.push(png);await writeFile(join(audit,`${name}-${width}.png`),png);
+      // The native directory works by keyboard and includes every organisation.
+      await evaluate('document.querySelector(".brand-directory summary").focus()');
+      await send('Input.dispatchKeyEvent',{type:'keyDown',key:'Enter',code:'Enter',windowsVirtualKeyCode:13,text:'\r'});
+      await send('Input.dispatchKeyEvent',{type:'keyUp',key:'Enter',code:'Enter',windowsVirtualKeyCode:13});
+      await waitFor('document.querySelector(".brand-directory").open');
+      const names = await evaluate('[...document.querySelectorAll(".brand-directory li")].map(li=>li.textContent)');
+      assert.deepEqual(names,brands.map(b=>b.name));
+      assert(await evaluate('document.querySelector(".brand-directory ul").getBoundingClientRect().height>0'));
+      result.push({width,kind:name,font:true,portrait:true,initialLogos:6,directoryNames:names.length,noOverflow:true,experience:'25+'});
     }
+    if(reference) assert(shots[0].equals(shots[1]),`Trimmed CSS changed retained design at ${width}px`);
   }
-  // Rotation still works when visitors have not requested reduced motion.
+  // Initial portrait/logos and all 33 names remain available without JavaScript.
+  await send('Emulation.setScriptExecutionDisabled',{value:true});
+  await send('Page.navigate',{url:local.origin});await waitFor(loaded);await evaluate('document.fonts.ready');
+  assert.equal(await evaluate('document.querySelectorAll(".brand-directory li").length'),33);
+  await evaluate('document.querySelector(".brand-directory summary").click()');
+  assert(await evaluate('document.querySelector(".brand-directory").open'));
+  assert(await evaluate('document.querySelector("#brand-pause").hidden'));
+  await send('Emulation.setScriptExecutionDisabled',{value:false});
+  // Normal motion: test rotation, sustained pause, resume and keyboard focus.
   await send('Emulation.setEmulatedMedia',{features:[{name:'prefers-reduced-motion',value:'no-preference'}]});
-  await send('Page.navigate',{url:local.origin+'/'});
-  await waitFor('document.readyState === "complete" && document.querySelector("#brand-pause") && !document.querySelector("#brand-pause").hidden');
-  const initial=await evaluate('[...document.querySelectorAll(".brand-grid img")].map(i=>i.src).join()');
-  await waitFor(`[...document.querySelectorAll('.brand-grid img')].map(i=>i.src).join() !== ${JSON.stringify(initial)}`);
+  await send('Page.navigate',{url:local.origin});await waitFor(loaded);
+  await waitFor('!document.querySelector("#brand-pause").hidden');
+  const current = '[...document.querySelectorAll(".brand-slot img")].map(i=>i.src).join()';
+  const initial = await evaluate(current);
+  await waitFor(`${current} !== ${JSON.stringify(initial)}`);
   await evaluate('document.querySelector("#brand-pause").click()');
   assert.equal(await evaluate('document.querySelector("#brand-pause").getAttribute("aria-pressed")'),'true');
+  const paused = await evaluate(current);await new Promise(r=>setTimeout(r,4500));
+  assert.equal(await evaluate(current),paused,'Logos rotated while paused');
   await evaluate('document.querySelector("#brand-pause").click()');
-  assert.equal(await evaluate('document.querySelector("#brand-pause").getAttribute("aria-pressed")'),'false');
-  // Follow the homepage CTA into Agency Partners.
-  await evaluate('document.querySelector(".hero-actions a").click()');
-  await waitFor('location.pathname === "/agency-partners/" && location.hash === "#enquiry" && document.querySelector("#agency-enquiry-form fieldset").disabled === false');
-  const fill=`(() => {const f=document.querySelector('#agency-enquiry-form');f.elements.name.value='Local test';f.elements.company.value='Fixture agency';f.elements.email.value='test@example.com';f.elements.project_summary.value='Mock submission, never sent to production.';f.elements.response_requested.checked=true;f.requestSubmit();})()`;
-  await evaluate('document.querySelector("#agency-enquiry-form").requestSubmit()');
-  assert.equal(posted.length,0,'HTML validation did not block empty form');
-  postMode='error';await evaluate(fill);
-  await waitFor('document.querySelector("#agency-form-status").textContent.includes("Mock unavailable")');
-  const first=posted[0];assert(first.response_requested && first.submission_id && first.email==='test@example.com');
-  postMode='success';await evaluate('document.querySelector("#agency-enquiry-form").requestSubmit()');
-  await waitFor('document.querySelector("#agency-form-status").textContent.includes("received successfully")');
-  assert.deepEqual(posted[1],first,'Retry changed idempotency payload');
-  assert(await evaluate('document.querySelector("#agency-enquiry-form fieldset").disabled'));
-  assert.equal(exceptions.length,0,JSON.stringify(exceptions));
-  assert.deepEqual(badResponses.filter(x=>!x.endsWith('/api/enquiries/agency')),[]);
-  assert(requests.every(x=>x.url.startsWith('http://127.0.0.1:')),'Browser made an external request');
-  const report={checks:results,homepageScreenshotsIdentical:true,rotationAndPause:true,ctaNavigation:true,formValidation:true,mockedFormSuccessAndRetry:true,externalRequests:0,missingAssets:0,consoleExceptions:0};
+  await waitFor(`${current} !== ${JSON.stringify(paused)}`);
+  assert.equal(await evaluate('new Set([...document.querySelectorAll(".brand-slot img")].map(i=>i.src)).size'),6);
+  // Decode every manifest image in the browser, not merely its initial six.
+  const decoded = await evaluate(`Promise.all(${JSON.stringify(brands)}.map(b=>new Promise((resolve,reject)=>{const image=new Image();image.onload=()=>image.naturalWidth?resolve(b.name):reject(Error(b.name));image.onerror=()=>reject(Error(b.name));image.src=b.src;})))`);
+  assert.equal(decoded.length,33);
+  // Reload and tab to the skip link, then activate its native in-page target.
+  await send('Page.navigate',{url:local.origin});await waitFor(loaded);
+  await send('Input.dispatchKeyEvent',{type:'keyDown',key:'Tab',code:'Tab',windowsVirtualKeyCode:9});
+  await send('Input.dispatchKeyEvent',{type:'keyUp',key:'Tab',code:'Tab',windowsVirtualKeyCode:9});
+  assert.equal(await evaluate('document.activeElement.className'),'skip-link');
+  assert(await evaluate('document.activeElement.getBoundingClientRect().top>=0'));
+  await send('Input.dispatchKeyEvent',{type:'keyDown',key:'Enter',code:'Enter',windowsVirtualKeyCode:13,text:'\r'});
+  await send('Input.dispatchKeyEvent',{type:'keyUp',key:'Enter',code:'Enter',windowsVirtualKeyCode:13});
+  await waitFor('location.hash === "#main"');
+  // Unknown paths return 404; there is no backend, proxy or homepage fallback.
+  for (const path of ['/agency-partners/','/api/pages/home','/api/enquiries/agency','/missing']) {
+    assert.equal((await fetch(local.origin+path)).status,404,path);
+  }
+  assert.deepEqual(chrome.exceptions,[]);
+  assert.deepEqual(chrome.badResponses,[]);
+  assert(chrome.requests.every(r=>r.url.startsWith(local.origin) || reference && r.url.startsWith(reference.origin)),'External request attempted');
+  assert(chrome.requests.every(r=>['GET','HEAD'].includes(r.method)),'Write request attempted');
+  assert(local.requests.filter(r=>r.path.startsWith('/api/')).length===2,'Unexpected API traffic'); // Only explicit 404 checks above.
+  const report={checks:result,visualComparisonWithOriginalCss:Boolean(reference),all33ImagesDecoded:true,rotationPauseResume:true,viewAllKeyboard:true,noJavaScriptFallback:true,skipLinkKeyboard:true,noMissingAssets:true,noRuntimeApiCalls:true,noExternalRequests:true,exceptions:[]};
   await writeFile(join(audit,'browser-results.json'),JSON.stringify(report,null,2)+'\n');
-  console.log('PASS: desktop/tablet/mobile; Homepage screenshots match live baseline; Agency section geometry unchanged; fonts/images/anchors; logo rotation/pause; CTA navigation; form validation, mocked error/retry/success; no external requests or JS exceptions.');
-} finally {
-  socket?.close();chrome.kill();
-  await Promise.all([baseline,local].map(({server})=>new Promise(r=>{server.close(r);server.closeAllConnections();})));
-}
+  console.log('PASS: 1440/768/375px; retained design unchanged by CSS trimming; 25-year content/SEO; all 33 logos; rotation/pause/resume; keyboard view-all/skip link; no-JS fallback; no missing assets, external requests, CMS calls or JS errors.');
+} finally {chrome?.close();await local.close();await reference?.close();}

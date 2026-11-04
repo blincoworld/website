@@ -1,25 +1,3 @@
-const toggle = document.querySelector('#menu-toggle');
-const nav = document.querySelector('#site-nav');
-const mobile = window.matchMedia('(max-width: 760px)');
-function closeMenu() {
-  toggle.setAttribute('aria-expanded', 'false');
-  nav.hidden = mobile.matches;
-}
-function sync() { toggle.hidden = !mobile.matches; closeMenu(); }
-if (toggle && nav) {
-  sync();
-  mobile.addEventListener('change', sync);
-  toggle.addEventListener('click', () => {
-    const open = toggle.getAttribute('aria-expanded') !== 'true';
-    toggle.setAttribute('aria-expanded', String(open));
-    nav.hidden = !open;
-  });
-  document.addEventListener('keydown', event => {
-    if (event.key === 'Escape' && toggle.getAttribute('aria-expanded') === 'true') { closeMenu(); toggle.focus(); }
-  });
-  nav.addEventListener('click', event => { if (event.target.closest('a') && mobile.matches) closeMenu(); });
-}
-
 // A shuffled queue keeps every off-screen brand ahead of recently removed ones.
 // Images preload before fading; a failed load leaves the current slot intact.
 const grid = document.querySelector('.brand-grid');
@@ -89,5 +67,5 @@ if (grid && pause) {
     const unique = new Map(brands.map(brand => [brand.src, brand]));
     queue = shuffle([...unique.values()].filter(brand => !visible.has(brand.src)));
     syncRotation();
-  }).catch(() => { /* The six server-rendered logos remain usable without JS. */ });
+  }).catch(() => { /* The six initial static logos remain usable without JS. */ });
 }

@@ -1,9 +1,0 @@
-diff --git a/website/hero.js b/website/hero.js
-index ba8c9b9..973fe0c 100644
---- a/website/hero.js
-+++ b/website/hero.js
-@@ -4,3 +4,3 @@ import { escape as e } from './urls.js';
- // Both pages use the homepage's structure and the same .hero CSS at every width.
--export function hero({ headlineHTML, eyebrowHTML, introHTML, primary, secondary, experienceHTML, headingId = '', experienceYears = 20 }) {
-+export function hero({ headlineHTML, eyebrowHTML, introHTML, primary, secondary, experienceHTML, headingId = '', experienceYears = 30 }) {
-   return `<section class="hero consultancy-hero wrap"${headingId ? ` aria-labelledby="${e(headingId)}"` : ''}><div class="hero-copy"><p class="eyebrow">${eyebrowHTML}</p>
