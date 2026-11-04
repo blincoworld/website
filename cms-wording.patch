@@ -1,0 +1,11 @@
+--- a/website/templates.js
++++ b/website/templates.js
+@@ -82,7 +82,7 @@
+     secondary: { href: '#experience', label: 'Explore my experience' },
+     experienceHTML: 'years of professional<br>development experience',
+   })}
+-    <section class="experience-section wrap" id="experience" aria-labelledby="experience-heading"><div class="section-top"><div><p class="eyebrow">01 / Previous professional experience</p><h2 id="experience-heading">I’ve spent over 20 years building software for businesses that depend on it.</h2></div><p class="section-description">Experience gained across previous roles and delivery partnerships. These organisations have not necessarily commissioned my independent business or endorsed it.</p></div>
++    <section class="experience-section wrap" id="experience" aria-labelledby="experience-heading"><div class="section-top"><div><p class="eyebrow">01 / Previous professional experience</p><h2 id="experience-heading">I’ve been building things online for more than 30 years.</h2></div><p class="section-description">Experience gained across previous roles and delivery partnerships. These organisations have not necessarily commissioned my independent business or endorsed it.</p></div>
+ ${brandLogos()}
+     </section>
+     <div class="wrap home-sections">${sections.filter(section => section.title !== 'Selected work' || env.SHOW_SELECTED_WORK === 'true').map((section, i) => `<section class="home-section${section.title === 'What I do' ? ' expertise-section' : section.title === 'How I work' ? ' approach-section' : ''}"${section.title === 'Selected work' ? ' id="selected-work"' : ''}><div class="section-heading"><p class="eyebrow">0${i + 2} / ${e(section.title)}</p><h2>${e(section.title === 'What I do' ? 'Good software starts with understanding the problem.' : section.title === 'How I work' ? 'Clear thinking. Direct communication. Accountable delivery.' : section.title)}</h2></div><div class="prose">${section.html}</div></section>`).join('')}</div>
