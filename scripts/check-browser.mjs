@@ -60,7 +60,7 @@ try {
   for(const width of [1440,768,375]) {
     await send('Emulation.setDeviceMetricsOverride',{width,height:1000,deviceScaleFactor:1,mobile:false});
     for(const path of ['/','/agency-partners/']) {
-      const shots=[];
+      const shots=[]; const layouts=[];
       for(const [kind,fixture] of [['baseline',baseline],['local',local]]) {
         await send('Page.navigate',{url:fixture.origin+path});
         await waitFor('document.readyState === "complete" && document.querySelector(".brand-grid") && [...document.images].every(i=>i.complete && i.naturalWidth > 0)');
@@ -68,13 +68,16 @@ try {
         assert(await evaluate('document.fonts.check("600 16px Inter")'),'Font failed');
         assert(await evaluate('document.documentElement.scrollWidth <= innerWidth'),'Horizontal overflow');
         assert(await evaluate('[...document.querySelectorAll("a[href^=\\"#\\"]")].every(a=>document.getElementById(a.hash.slice(1)))'),'Broken anchors');
+        const boxes=await evaluate(`Object.fromEntries(['.experience-number','.experience-note','#experience-heading','.hero','.hero-person','#experience','.home-sections','.site-footer'].filter(s=>document.querySelector(s)).map(s=>{const r=document.querySelector(s).getBoundingClientRect();return [s,{x:r.x+scrollX,y:r.y+scrollY,width:r.width,height:r.height}]}))`);
+        layouts.push(boxes);
         const shot=await send('Page.captureScreenshot',{format:'png',captureBeyondViewport:true});
         const bytes=Buffer.from(shot.data,'base64');shots.push(bytes);
         await writeFile(join(audit,`${kind}-${path==='/'?'home':'agency'}-${width}.png`),bytes);
         results.push({kind,path,width,images:await evaluate('document.images.length'),font:true,noOverflow:true});
-        if(kind==='local' && path==='/')assert(await evaluate('document.body.innerText.includes("for more than 30 years.")'));
+        if(kind==='local' && path==='/')assert(await evaluate('document.body.innerText.includes("I’ve spent over 30 years building software for businesses that depend on it.")'));
       }
       if(path==='/agency-partners/')assert(shots[0].equals(shots[1]),'Agency visual baseline differs');
+      else {const geometry=structuredClone(layouts);assert(Math.abs(geometry[0]['.experience-number'].width-geometry[1]['.experience-number'].width)<3,'Unexpected counter width change');for(const item of geometry)delete item['.experience-number'].width;assert.deepEqual(geometry[0],geometry[1], 'Homepage section geometry changed');await writeFile(join(audit, `home-layout-${width}.json`),JSON.stringify(layouts));}
     }
   }
   // Rotation still works when visitors have not requested reduced motion.

@@ -1,11 +1,25 @@
+diff --git a/website/hero.js b/website/hero.js
+index 1e74371..ba8c9b9 100644
+--- a/website/hero.js
++++ b/website/hero.js
+@@ -4,3 +4,3 @@ import { escape as e } from './urls.js';
+ // Both pages use the homepage's structure and the same .hero CSS at every width.
+-export function hero({ headlineHTML, eyebrowHTML, introHTML, primary, secondary, experienceHTML, headingId = '' }) {
++export function hero({ headlineHTML, eyebrowHTML, introHTML, primary, secondary, experienceHTML, headingId = '', experienceYears = 20 }) {
+   return `<section class="hero consultancy-hero wrap"${headingId ? ` aria-labelledby="${e(headingId)}"` : ''}><div class="hero-copy"><p class="eyebrow">${eyebrowHTML}</p>
+@@ -8,3 +8,3 @@ export function hero({ headlineHTML, eyebrowHTML, introHTML, primary, secondary,
+     <div class="hero-actions"><a class="button" href="${e(primary.href)}">${e(primary.label)} <span aria-hidden="true">↗</span></a><a class="text-link" href="${e(secondary.href)}">${e(secondary.label)} <span aria-hidden="true">↓</span></a></div></div>
+-    <div class="hero-person"><figure class="portrait-frame"><img class="portrait" src="/assets/images/piers-portrait-3b2768d94f.webp" alt="Piers Blinco" width="800" height="800" fetchpriority="high" decoding="async"></figure><aside class="experience-note" aria-label="Professional experience"><span class="experience-number">20<span aria-hidden="true">+</span></span><p>${experienceHTML}</p><span class="note-rule" aria-hidden="true"></span><p class="experience-detail">Independent thinking.<br>Commercial understanding.<br>A direct working relationship.</p></aside></div></section>`;
++    <div class="hero-person"><figure class="portrait-frame"><img class="portrait" src="/assets/images/piers-portrait-3b2768d94f.webp" alt="Piers Blinco" width="800" height="800" fetchpriority="high" decoding="async"></figure><aside class="experience-note" aria-label="Professional experience"><span class="experience-number">${e(experienceYears)}<span aria-hidden="true">+</span></span><p>${experienceHTML}</p><span class="note-rule" aria-hidden="true"></span><p class="experience-detail">Independent thinking.<br>Commercial understanding.<br>A direct working relationship.</p></aside></div></section>`;
+ }
+diff --git a/website/templates.js b/website/templates.js
+index 6ec6a9e..5949d51 100644
 --- a/website/templates.js
 +++ b/website/templates.js
-@@ -82,7 +82,7 @@
-     secondary: { href: '#experience', label: 'Explore my experience' },
+@@ -83,4 +83,5 @@ export function home(request, env, page, articles) {
      experienceHTML: 'years of professional<br>development experience',
++    experienceYears: 30,
    })}
 -    <section class="experience-section wrap" id="experience" aria-labelledby="experience-heading"><div class="section-top"><div><p class="eyebrow">01 / Previous professional experience</p><h2 id="experience-heading">I’ve spent over 20 years building software for businesses that depend on it.</h2></div><p class="section-description">Experience gained across previous roles and delivery partnerships. These organisations have not necessarily commissioned my independent business or endorsed it.</p></div>
-+    <section class="experience-section wrap" id="experience" aria-labelledby="experience-heading"><div class="section-top"><div><p class="eyebrow">01 / Previous professional experience</p><h2 id="experience-heading">I’ve been building things online for more than 30 years.</h2></div><p class="section-description">Experience gained across previous roles and delivery partnerships. These organisations have not necessarily commissioned my independent business or endorsed it.</p></div>
++    <section class="experience-section wrap" id="experience" aria-labelledby="experience-heading"><div class="section-top"><div><p class="eyebrow">01 / Previous professional experience</p><h2 id="experience-heading">I’ve spent over 30 years building software for businesses that depend on it.</h2></div><p class="section-description">Experience gained across previous roles and delivery partnerships. These organisations have not necessarily commissioned my independent business or endorsed it.</p></div>
  ${brandLogos()}
-     </section>
-     <div class="wrap home-sections">${sections.filter(section => section.title !== 'Selected work' || env.SHOW_SELECTED_WORK === 'true').map((section, i) => `<section class="home-section${section.title === 'What I do' ? ' expertise-section' : section.title === 'How I work' ? ' approach-section' : ''}"${section.title === 'Selected work' ? ' id="selected-work"' : ''}><div class="section-heading"><p class="eyebrow">0${i + 2} / ${e(section.title)}</p><h2>${e(section.title === 'What I do' ? 'Good software starts with understanding the problem.' : section.title === 'How I work' ? 'Clear thinking. Direct communication. Accountable delivery.' : section.title)}</h2></div><div class="prose">${section.html}</div></section>`).join('')}</div>

@@ -32,7 +32,8 @@ for ref in re.findall(r'url\([\s\"\']*([^\)\"\'\s]+)', (root / 'styles.css').rea
 for brand in json.loads((root / 'brands.json').read_text()): check_ref(brand['src'], '/brands.json')
 assert "fetch('/brands.json')" in (root / 'site.js').read_text()
 assert "fetch('/api/enquiries/agency'" in (root / 'enquiry.js').read_text()
-assert 'for more than 30 years.' in html['/']
+assert 'I’ve spent over 30 years building software for businesses that depend on it.' in html['/']
+assert 'experience-number">30<span' in html['/']
 assert 'data-enquiry-ready="true"' in html['/agency-partners/']
 for name in files:
     path = root / name

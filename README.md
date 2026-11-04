@@ -3,7 +3,7 @@
 A minimal review copy of the two public pages at https://piersblinco.com,
 using the live website captured on 4 November 2026 as the baseline.
 
-- `index.html`: homepage, with the pending “for more than 30 years.” correction.
+- `index.html`: homepage, with the deployed 30+ counter and “I’ve spent over 30 years…” heading.
 - `agency-partners/index.html`: the live Agency Partners page and enquiry form.
 - `styles.css`, `site.js`, `enquiry.js`, `brands.json`, `assets/`: their dependencies.
 - `robots.txt`, `sitemap.xml`, favicon: existing live SEO/discovery assets.
@@ -41,6 +41,6 @@ Capture only writes `.audit/`; importing a later capture into the reviewed pages
 is a separate deliberate edit.
 
 See [AUDIT.md](AUDIT.md) for retained/deleted files, the live/repository comparison,
-verified hostname ownership and the production update procedure awaiting approval.
-[cms-wording.patch](cms-wording.patch) is the prepared one-line Worker template
-change. It has not been applied to the CMS repository or deployed.
+verified hostname ownership and the production update procedure and completed release record.
+[cms-wording.patch](cms-wording.patch) records the deployed homepage template changes. See
+[EXPERIENCE-RELEASE.md](EXPERIENCE-RELEASE.md) for the production version and checks.

@@ -1,3 +1,5 @@
+> **Release update:** The owner subsequently approved two homepage changes: the counter to 30+ and the heading to “I’ve spent over 30 years building software for businesses that depend on it.” Both are now deployed. See [EXPERIENCE-RELEASE.md](EXPERIENCE-RELEASE.md). The cleanup audit below records the earlier baseline; its pending one-line wording proposal is superseded.
+
 # Website cleanup and production handover — 4 November 2026
 
 ## Outcome and boundary
