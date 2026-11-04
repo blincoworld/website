@@ -36,7 +36,7 @@ export async function browser(directory) {
     });
     const pages=await fetch(origin+'/json/list').then(r=>r.json());
     socket=new WebSocket(pages.find(page=>page.type==='page').webSocketDebuggerUrl);await once(socket,'open');
-    let sequence=0;const pending=new Map(),exceptions=[],badResponses=[],requests=[];
+    let sequence=0;const pending=new Map(),exceptions=[],consoleErrors=[],badResponses=[],requests=[];
     const send=(method,params={})=>new Promise((resolve,reject)=>{
       const id=++sequence;const timer=setTimeout(()=>{pending.delete(id);reject(Error('CDP timeout: '+method));},15000);
       pending.set(id,{resolve,reject,timer});socket.send(JSON.stringify({id,method,params}));
@@ -45,12 +45,14 @@ export async function browser(directory) {
       const message=JSON.parse(event.data);
       if(message.id){const task=pending.get(message.id);if(!task)return;pending.delete(message.id);clearTimeout(task.timer);message.error?task.reject(Error(message.error.message)):task.resolve(message.result);}
       if(message.method==='Runtime.exceptionThrown')exceptions.push(message.params.exceptionDetails);
+      if(message.method==='Runtime.consoleAPICalled' && message.params.type==='error')consoleErrors.push(message.params.args.map(a=>a.value||a.description).join(' '));
+      if(message.method==='Log.entryAdded' && message.params.entry.level==='error')consoleErrors.push(message.params.entry.text);
       if(message.method==='Network.responseReceived' && message.params.response.status>=400)badResponses.push(message.params.response.url);
       if(message.method==='Network.requestWillBeSent')requests.push({url:message.params.request.url,method:message.params.request.method});
     });
     const evaluate=async expression=>{const result=await send('Runtime.evaluate',{expression,awaitPromise:true,returnByValue:true});if(result.exceptionDetails)throw Error(JSON.stringify(result.exceptionDetails));return result.result.value;};
     const waitFor=async expression=>{for(let i=0;i<250;i++){if(await evaluate(`Boolean(${expression})`))return;await new Promise(r=>setTimeout(r,40));}throw Error('Timed out: '+expression);};
-    await send('Page.enable');await send('Runtime.enable');await send('Network.enable');
-    return {send,evaluate,waitFor,exceptions,badResponses,requests,close:()=>{socket.close();chrome.kill();}};
+    await send('Page.enable');await send('Runtime.enable');await send('Network.enable');await send('Log.enable');
+    return {send,evaluate,waitFor,exceptions,consoleErrors,badResponses,requests,close:()=>{socket.close();chrome.kill();}};
   } catch(error){socket?.close();chrome.kill();throw error;}
 }

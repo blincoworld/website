@@ -9,7 +9,11 @@ const audit = join(root, '.audit/static-portfolio');
 await mkdir(audit, {recursive:true});
 const files = new Set(JSON.parse(await readFile(join(root,'production-files.json'))));
 const brands = JSON.parse(await readFile(join(root,'brands.json')));
-const local = await serve(join(root,'dist'), files);
+const remoteOrigin = process.env.SITE_ORIGIN?.replace(/\/$/, '');
+if (remoteOrigin) assert(new URL(remoteOrigin).protocol === 'https:', 'Remote checks require HTTPS');
+const label = process.env.SITE_LABEL || (remoteOrigin ? 'remote' : 'static');
+assert(/^[a-z0-9-]+$/.test(label));
+const local = remoteOrigin ? {origin:remoteOrigin,requests:[],close:async()=>{}} : await serve(join(root,'dist'), files);
 let reference, chrome;
 try {
   // Optional one-time visual comparison: simplified HTML with original full CSS.
@@ -42,9 +46,11 @@ try {
       const meta = await evaluate(`Object.fromEntries([...document.querySelectorAll('meta[name],meta[property]')].map(m=>[m.name||m.getAttribute('property'),m.content]))`);
       assert.equal(meta.description,meta['og:description']);
       assert(meta.description.includes('Over 25 years of professional development experience.'));
+      assert.equal(await evaluate('document.querySelector("link[rel=canonical]").href'),'https://piersblinco.com/');
+      assert.equal(meta['og:url'],'https://piersblinco.com/');
       assert(!/\b30\s*\+?\s*years/i.test(await evaluate('document.body.innerText')));
       const png = Buffer.from((await send('Page.captureScreenshot',{format:'png',captureBeyondViewport:true})).data,'base64');
-      shots.push(png);await writeFile(join(audit,`${name}-${width}.png`),png);
+      shots.push(png);await writeFile(join(audit,`${name==='static'?label:name}-${width}.png`),png);
       // The native directory works by keyboard and includes every organisation.
       await evaluate('document.querySelector(".brand-directory summary").focus()');
       await send('Input.dispatchKeyEvent',{type:'keyDown',key:'Enter',code:'Enter',windowsVirtualKeyCode:13,text:'\r'});
@@ -96,11 +102,13 @@ try {
     assert.equal((await fetch(local.origin+path)).status,404,path);
   }
   assert.deepEqual(chrome.exceptions,[]);
+  assert.deepEqual(chrome.consoleErrors,[]);
   assert.deepEqual(chrome.badResponses,[]);
   assert(chrome.requests.every(r=>r.url.startsWith(local.origin) || reference && r.url.startsWith(reference.origin)),'External request attempted');
   assert(chrome.requests.every(r=>['GET','HEAD'].includes(r.method)),'Write request attempted');
-  assert(local.requests.filter(r=>r.path.startsWith('/api/')).length===2,'Unexpected API traffic'); // Only explicit 404 checks above.
-  const report={checks:result,visualComparisonWithOriginalCss:Boolean(reference),all33ImagesDecoded:true,rotationPauseResume:true,viewAllKeyboard:true,noJavaScriptFallback:true,skipLinkKeyboard:true,noMissingAssets:true,noRuntimeApiCalls:true,noExternalRequests:true,exceptions:[]};
-  await writeFile(join(audit,'browser-results.json'),JSON.stringify(report,null,2)+'\n');
+  if(!remoteOrigin) assert(local.requests.filter(r=>r.path.startsWith('/api/')).length===2,'Unexpected API traffic');
+  assert(!chrome.requests.some(r=>new URL(r.url).pathname.startsWith('/api/')),'Page made a runtime API request'); // Only explicit 404 checks above.
+  const report={origin:local.origin,checks:result,visualComparisonWithOriginalCss:Boolean(reference),all33ImagesDecoded:true,rotationPauseResume:true,viewAllKeyboard:true,noJavaScriptFallback:true,skipLinkKeyboard:true,noMissingAssets:true,noRuntimeApiCalls:true,noExternalRequests:true,exceptions:[]};
+  await writeFile(join(audit,`${label}-browser-results.json`),JSON.stringify(report,null,2)+'\n');
   console.log('PASS: 1440/768/375px; retained design unchanged by CSS trimming; 25-year content/SEO; all 33 logos; rotation/pause/resume; keyboard view-all/skip link; no-JS fallback; no missing assets, external requests, CMS calls or JS errors.');
 } finally {chrome?.close();await local.close();await reference?.close();}
