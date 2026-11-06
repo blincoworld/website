@@ -1,0 +1,96 @@
+{
+  "schema": 1,
+  "id": "home",
+  "path": "/",
+  "seo": {
+    "title": "Piers Blinco — Independent Software Consultant · Piers Blinco",
+    "description": "Independent software consultancy, development, systems integration and technical delivery. Over {years} years of professional development experience.",
+    "socialTitle": "Piers Blinco — Independent Software Consultant",
+    "socialDescription": "",
+    "socialImage": {
+      "src": "/assets/images/social-preview-3deead63c6.png",
+      "width": 1200,
+      "height": 630
+    },
+    "socialImageAlt": "Piers Blinco — Independent Software Consultant. Portrait of Piers beside his name, with piersblinco.com."
+  },
+  "sections": [
+    {
+      "id": "hero",
+      "type": "hero",
+      "eyebrow": "Piers Blinco",
+      "eyebrowRole": "Independent Software Consultant",
+      "headline": "Senior technical expertise,",
+      "headlineBlue": "without the agency overhead.",
+      "intro": [
+        "I help businesses and agencies plan, build and deliver software projects with confidence. From initial technical decisions through to delivery, you work directly with someone who understands both the technology and the commercial realities."
+      ],
+      "portrait": {
+        "src": "/assets/images/piers-portrait-3b2768d94f.webp",
+        "alt": "Piers Blinco",
+        "width": 800,
+        "height": 800
+      },
+      "experienceLabel": "years of professional<br>development experience"
+    },
+    {
+      "id": "experience",
+      "type": "experience",
+      "eyebrow": "01 / Previous professional experience",
+      "heading": "I’ve spent over {years} years building software for businesses that depend on it.",
+      "description": "Experience gained across previous roles and delivery partnerships. These organisations have not necessarily commissioned my independent business or endorsed it.",
+      "caption": "Across retail, publishing, technology and beyond.",
+      "directoryLabel": "View all organisations"
+    },
+    {
+      "id": "what-i-do",
+      "type": "items",
+      "variant": "expertise",
+      "eyebrow": "02 / What I do",
+      "heading": "Good software starts with understanding the problem.",
+      "items": [
+        {
+          "title": "Software development",
+          "text": "Thoughtful web applications, websites and internal tools, built around the people who use them."
+        },
+        {
+          "title": "Technical consultancy",
+          "text": "An experienced perspective on architecture, technical choices and the practical next step."
+        },
+        {
+          "title": "Systems integration",
+          "text": "Connect applications, APIs and data so your systems work together."
+        },
+        {
+          "title": "Technical delivery partnerships",
+          "text": "Hands-on technical support for agencies, from shaping a brief through to delivery."
+        }
+      ]
+    },
+    {
+      "id": "how-i-work",
+      "type": "items",
+      "variant": "approach",
+      "eyebrow": "03 / How I work",
+      "heading": "Clear thinking. Direct communication. Accountable delivery.",
+      "items": [
+        {
+          "title": "Direct communication",
+          "text": "You speak directly with the person doing the technical work. Questions and decisions stay visible."
+        },
+        {
+          "title": "Clear scope",
+          "text": "Agree the problem, priorities and boundaries before getting into the build."
+        },
+        {
+          "title": "Realistic commitments",
+          "text": "Discuss constraints and trade-offs early, with milestones grounded in the work."
+        },
+        {
+          "title": "Accountable delivery",
+          "text": "Review progress together, surface risks and take responsibility for the agreed work."
+        }
+      ]
+    }
+  ]
+}

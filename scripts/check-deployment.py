@@ -61,6 +61,6 @@ with concurrent.futures.ThreadPoolExecutor(max_workers=6) as pool:
     results = list(pool.map(check,[name for name in files if name != '_headers']))
 for index,path in enumerate(['/missing','/agency-partners/','/api/pages/home','/api/enquiries/agency','/property-films/','/offer.html','/_headers']):
     assert get(path,'missing-'+str(index))[0] == 404, f'Unknown route did not return 404: {path}'
-report = {'origin':origin,'files':results,'all33LogoAssets':sum(r['file'].startswith('assets/brands/') for r in results)==33,'unknownRoutes404':True,'securityAndCacheHeaders':True}
+report = {'origin':origin,'files':results,'logoAssets':sum(r['file'].startswith('assets/brands/') for r in results),'unknownRoutes404':True,'securityAndCacheHeaders':True}
 (out/'results.json').write_text(json.dumps(report,indent=2)+'\n')
-print(f'PASS: {origin}; {len(results)} production assets HTTP 200, byte/content checks, all 33 logos, favicon/robots/sitemap, cache/security headers, removed/API paths HTTP 404.')
+print(f'PASS: {origin}; {len(results)} production assets HTTP 200, byte/content checks, every logo, favicon/robots/sitemap, cache/security headers, removed/API paths HTTP 404.')
