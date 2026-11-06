@@ -110,10 +110,14 @@ try {
   for (const path of ['/agency-partners/','/api/pages/home','/api/enquiries/agency','/missing']) {
     assert.equal((await fetch(local.origin+path)).status,404,path);
   }
+  // On production, Cloudflare's Web Analytics may inject its beacon script into some responses (it did for GitHub's
+  // runners on 6 Nov 2026). The site's CSP blocks it, so it never runs; that one blocked script is not a site fault
+  // (D-208). Only on remote checks, and only that exact host: any other error or external request still fails.
+  const injected = s => remoteOrigin && /^https:\/\/static\.cloudflareinsights\.com\//.test(String(s).match(/https:\/\/\S+/)?.[0] || '') && /Content Security Policy|cloudflareinsights/.test(String(s));
   assert.deepEqual(chrome.exceptions,[]);
-  assert.deepEqual(chrome.consoleErrors,[]);
+  assert.deepEqual(chrome.consoleErrors.filter(m=>!injected(m)),[]);
   assert.deepEqual(chrome.badResponses,[]);
-  assert(chrome.requests.every(r=>r.url.startsWith(local.origin) || reference && r.url.startsWith(reference.origin)),'External request attempted');
+  assert(chrome.requests.every(r=>r.url.startsWith(local.origin) || reference && r.url.startsWith(reference.origin) || injected(r.url)),'External request attempted');
   assert(chrome.requests.every(r=>['GET','HEAD'].includes(r.method)),'Write request attempted');
   if(!remoteOrigin) assert(local.requests.filter(r=>r.path.startsWith('/api/')).length===2,'Unexpected API traffic');
   assert(!chrome.requests.some(r=>new URL(r.url).pathname.startsWith('/api/')),'Page made a runtime API request'); // Only explicit 404 checks above.
