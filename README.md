@@ -71,6 +71,20 @@ use one-year immutable caching, and the root favicon uses one-day caching.
 Python's basic preview server does not interpret `_headers`; the automated local
 browser server applies the security policy.
 
+## Visit counting, the contact form and the privacy notice (D-209 to D-211)
+
+The site is still static, with one exception: `worker/index.js` runs for `/api/*` only (`assets.run_worker_first`) and
+forwards two requests to the Back Office (`website-refresh-outreach`) through the `BACK_OFFICE` service binding:
+
+- `POST /api/v`: one visit ping per page load from `site.js` (no cookies; `?notrack=1` / `?notrack=0` switch it off and
+  on in your own browser).
+- `POST /api/enquiry`: the contact form, a movable homepage section (`type: "contact"` in `content/home.json`). Its
+  Turnstile site key is `turnstileSiteKey` in `content/site.json`.
+
+If the Back Office is down, every page still loads, pings are dropped and the form asks people to email instead.
+`privacy.html` is rendered from `content/privacy.json` and linked from the footer. `npm run check` includes the Worker's
+tests (`scripts/test-worker.mjs`); deploy the Back Office first when its `SiteIngest` entrypoint changes.
+
 ## Production configuration and updates
 
 `wrangler.jsonc` names only the new static Worker and the apex custom domain.
