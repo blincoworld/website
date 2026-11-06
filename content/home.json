@@ -91,6 +91,15 @@
           "text": "Review progress together, surface risks and take responsibility for the agreed work."
         }
       ]
+    },
+    {
+      "id": "contact",
+      "type": "contact",
+      "eyebrow": "04 / Get in touch",
+      "heading": "Tell me what you need.",
+      "intro": [
+        "Whether it’s a new website, online booking or automating the jobs that eat your week, send me a few lines and I’ll reply within one working day."
+      ]
     }
   ]
 }
