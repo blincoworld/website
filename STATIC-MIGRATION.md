@@ -6,7 +6,7 @@
 | --- | --- |
 | Public domain | `https://piersblinco.com/` |
 | Worker | `piers-portfolio-static` |
-| Version | `434aeb2f-26aa-4d0e-9d7c-b3eeb5c993da`, 100% traffic |
+| Version | `cfb7b262-8e10-4a7d-97f2-b057e8ac7cc2`, 100% traffic (6 Nov 2026; previous `434aeb2f-26aa-4d0e-9d7c-b3eeb5c993da`) |
 | Public mirror | `https://piers-portfolio-static.pbwebonlinesales.workers.dev` |
 | Account | `c39888a9363fce8762763f0c60a9a388` |
 | Zone | `ceed470e2cef4ebefa4d4b941e909834` |
@@ -40,9 +40,13 @@ Unchanged assignments include:
 - `agency.piersblinco.com`: `agency-os`.
 - `outreach.piersblinco.com`: `outreach-os`.
 - `social.piersblinco.com`: `social-scheduler`.
-- `new.piersblinco.com`: still assigned to `website-cms`.
-- `www.piersblinco.com`: existing proxied CNAME to `blincoworld.github.io`, not a
-  Worker custom domain. Its pre-existing GitHub Pages 404 remains unchanged.
+- `new.piersblinco.com`: assigned to `website-cms` at cutover; removed with that
+  Worker on 6 November 2026.
+- `www.piersblinco.com`: a proxied CNAME to `blincoworld.github.io` (GitHub Pages
+  404) at cutover. On 6 November 2026 GitHub Pages was switched off and the CNAME
+  was replaced by a proxied placeholder (`AAAA 100::`) for a dashboard Redirect Rule:
+  www → `https://piersblinco.com`, 301, path and query kept. Previous record saved in
+  `.audit/www-redirect-2026-11-06/`.
 
 All other custom-domain objects and zone Worker route patterns match the backup.
 All 20 unrelated DNS records, including MX/SPF/email and www records, match the
@@ -54,37 +58,21 @@ The 12 D1 database resource identities/configuration metadata remain unchanged.
 No SQL or database writes, schema changes, SMTP/email changes, or edits to Testing,
 Partner Outreach or Family Hub were performed. No Pages projects were changed.
 
-## Former CMS and recoverable backups
+## Former CMS: retired 6 November 2026
 
-`website-cms` remains deployed at version
-`79fc8a1e-9f8f-4af9-b2de-a360b61496a3`, 100% traffic allocation within that Worker.
-Its deployed modules, settings, compatibility flags, D1/R2/SMTP/secret bindings,
-source repository, databases and prior backups are unchanged. It is retained
-for rollback, without the public apex assignment.
+`website-cms` was kept for rollback after the cutover and retired on 6 November 2026
+(owner's approval): the Worker (with its `new.piersblinco.com` custom domain), D1
+`website-cms-db` and R2 `website-cms-media` were deleted, and the GitHub repository
+`blincoworld/website-cms` was archived. Backups are in
+`~/website-backups/website-cms-retired-2026-11-06/`:
 
-Pre-cutover backups are stored locally under ignored `.audit/static-cutover/`:
+- `website-cms-db.sql`: a full remote export of the D1 database.
+- `r2/README.txt`: the bucket was empty (0 objects), so there was nothing to copy.
+- `secret-names.txt`: the Worker's secret names (values are never exported).
+- `website-cms/`: the local repository, including its ignored `.wrangler/backups/`.
 
-- `cms-settings-before.json`: complete API-visible configuration and binding
-  metadata; secret values are never exported by the API.
-- `cms-deployments-before.json` and `cms-version-before.json`: deployment/version
-  and compatibility data.
-- `cms-deployed-modules.multipart` and `cms-code-backup.json`: complete deployed
-  modules, content type and SHA-256 checksum.
-- `cms-source-wrangler-before.jsonc`: the original source configuration copy.
-- `domains-before.json`, `old-domain.json`, `routes-before.json` and
-  `rollback-domain-payload.json`: original exact domain assignment and routes.
-- `dns-zone-before.json`: all 21 zone DNS records; `dns-before.json`: exact apex
-  and www records. These are private local backup files, not deployed assets.
-- `workers-cutover-before.json` and `databases-cutover-before.json`: unaffected
-  Worker code/runtime and database resource inventory used for verification.
-
-Previously saved CMS content backups under
-`~/website-cms/.wrangler/backups/` remain intact. No secret rotation or CMS
-redeployment is needed to roll back: the old Worker/resources remain running.
-
-The old CMS source config still lists the apex and an obsolete admin hostname.
-Do not run a broad `wrangler deploy` or trigger deployment from that repository;
-it could attempt to reclaim domains. Use the apex-only helper below.
+The 4 November pre-cutover configuration and code snapshots remain under ignored
+`.audit/static-cutover/`.
 
 ## Cutover and exercised recovery
 
@@ -92,7 +80,7 @@ The direct attachment API initially returned ownership conflict 409/100116.
 The owner then explicitly approved detaching the existing apex assignment before
 attaching the new Worker. No ownership or DNS override flags were used.
 
-`scripts/domain-cutover.py` validates the exact hostname, zone, environment and
+`scripts/domain-cutover.py` (removed on 6 November 2026 with the CMS) validated the exact hostname, zone, environment and
 expected owner. It detaches only that domain object and immediately attaches the
 same hostname to the requested service. It refuses ambiguous/third-party owners,
 checks unrelated domain objects, and attempts CMS restoration on failure. Its
@@ -107,32 +95,21 @@ production check and remained on the static Worker.
 
 ## Rollback procedure
 
-1. Use the same account's private operator credentials, through the existing
-   protected token file or `CLOUDFLARE_API_TOKEN`. Never put token values in chat,
-   Git, command arguments or the publish directory.
-2. Inspect the read-only rollback plan:
+There is no CMS to roll back to. Rollback is **deploy the previous Worker version**:
+
+1. List the deployments and note the version that was live before the faulty release:
 
    ```sh
-   python3 scripts/domain-cutover.py rollback
+   npx wrangler deployments list --name piers-portfolio-static
    ```
 
-   It must show only the current apex domain object's DELETE followed by a PUT
-   attaching `piersblinco.com` to `website-cms`. If ownership is unexpected, stop.
-3. Restore the original assignment:
+2. Send 100% of traffic back to it:
 
    ```sh
-   python3 scripts/domain-cutover.py rollback --apply
+   npx wrangler versions deploy PREVIOUS_VERSION_ID@100 --name piers-portfolio-static
    ```
 
-   The helper also supports recovery if the apex is missing after a failed attach.
-   It does not alter the old Worker code, database, bindings or other hostnames.
-4. Immediately verify HTTPS and HTTP 200 at `https://piersblinco.com/`, the original
-   CMS homepage (its 30-year wording), its assets, and the previous CMS version.
-   Compare with the saved `home-before.bin` and backup settings/version. Confirm
-   unrelated domain/DNS assignments remain unchanged.
-5. Keep static source/configuration intact while investigating. Returning to the
-   static site later uses the same guarded `cutover` dry run and `--apply`, after
-   preview validation. Do not redeploy either Worker merely to move the domain.
+3. Run the deployed checks against `https://piersblinco.com` (see README.md).
 
 The `workers.dev` URL now mirrors production; it is not isolated staging for a
 future code deployment. Future code/assets releases should use version upload
@@ -162,10 +139,9 @@ and deliberate promotion, or a separately approved staging/version-preview setup
   bindings, and the old CMS code/config/version and unrelated infrastructure match
   the snapshots. Deployment reports/screenshots remain under ignored `.audit/`.
 
-## Potential later retirement — separate approval required
+## Later retirement — done 6 November 2026
 
-After a stable observation period and review of content/enquiry retention and
-recovery requirements, the old CMS Worker, its remaining `new` hostname, CMS D1/R2
-resources, unused SMTP/admin secrets and separate source repository can be reviewed
-for retirement. Existing Pages projects and the legacy www DNS arrangement can
-also be reviewed independently. None were deleted or changed by this migration.
+The old CMS Worker, its `new` hostname, CMS D1/R2 and secrets were deleted and its
+repository archived (see "Former CMS" above). The www CNAME to GitHub Pages was
+replaced by a placeholder for a www → apex redirect rule and GitHub Pages was switched off. The Pages
+projects were not changed.
