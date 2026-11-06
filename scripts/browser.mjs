@@ -6,18 +6,33 @@ import { readFile, mkdir } from 'node:fs/promises';
 import { join } from 'node:path';
 
 const types = {html:'text/html',css:'text/css',js:'text/javascript',json:'application/json',xml:'application/xml',txt:'text/plain',webp:'image/webp',png:'image/png',ico:'image/x-icon',woff2:'font/woff2'};
+// The same policies as _headers: Turnstile (the contact form's spam check) is allowed on the homepage only.
 const csp = "default-src 'none'; script-src 'self'; connect-src 'self'; style-src 'self'; font-src 'self'; img-src 'self'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'";
-export async function serve(directory, files, overrides = {}) {
+const homeCsp = csp.replace("script-src 'self';", "script-src 'self' https://challenges.cloudflare.com; frame-src https://challenges.cloudflare.com;");
+/**
+ * A local stand-in for the site: its files, plus the site Worker's two routes (D-209). POST /api/v answers 204 and
+ * records the ping; POST /api/enquiry answers with `api.enquiry` ({status, body}), recording what was sent.
+ */
+export async function serve(directory, files, overrides = {}, api = {}) {
   const requests = [];
   const server = createServer(async (req,res) => {
     const path = new URL(req.url,'http://localhost').pathname;
-    requests.push({path,method:req.method});
-    const name = path === '/' ? 'index.html' : path.slice(1);
+    let body = '';
+    if (req.method === 'POST') for await (const chunk of req) body += chunk;
+    requests.push({path,method:req.method,body});
+    if (req.method === 'POST' && path === '/api/v') {res.writeHead(204);res.end();return;}
+    if (req.method === 'POST' && path === '/api/enquiry') {
+      const answer = api.enquiry || {status:503,body:{ok:false,error:'unavailable'}};
+      res.writeHead(answer.status,{'Content-Type':'application/json'});res.end(JSON.stringify(answer.body));return;
+    }
+    let name = path === '/' ? 'index.html' : path.slice(1);
+    // Pages are served without ".html", as on Cloudflare (html_handling: auto-trailing-slash).
+    if (!files.has(name) && files.has(`${name}.html`)) name = `${name}.html`;
     if (!['GET','HEAD'].includes(req.method)) {res.writeHead(405);res.end();return;}
     if (!files.has(name) || name === '_headers') {res.writeHead(404);res.end('Not found');return;}
     try {
       const body = await readFile(overrides[path] || join(directory,name));
-      res.writeHead(200, {'Content-Type':types[name.split('.').pop()] || 'application/octet-stream','Content-Security-Policy':csp,'X-Content-Type-Options':'nosniff'});
+      res.writeHead(200, {'Content-Type':types[name.split('.').pop()] || 'application/octet-stream','Content-Security-Policy':name === 'index.html' ? homeCsp : csp,'X-Content-Type-Options':'nosniff'});
       res.end(req.method === 'HEAD' ? undefined : body);
     } catch {res.writeHead(500);res.end('Fixture failed');}
   });
@@ -36,7 +51,7 @@ export async function browser(directory) {
     });
     const pages=await fetch(origin+'/json/list').then(r=>r.json());
     socket=new WebSocket(pages.find(page=>page.type==='page').webSocketDebuggerUrl);await once(socket,'open');
-    let sequence=0;const pending=new Map(),exceptions=[],consoleErrors=[],badResponses=[],requests=[];
+    let sequence=0;const pending=new Map(),exceptions=[],consoleErrors=[],badResponses=[],requests=[],handlers=new Map();
     const send=(method,params={})=>new Promise((resolve,reject)=>{
       const id=++sequence;const timer=setTimeout(()=>{pending.delete(id);reject(Error('CDP timeout: '+method));},15000);
       pending.set(id,{resolve,reject,timer});socket.send(JSON.stringify({id,method,params}));
@@ -49,10 +64,11 @@ export async function browser(directory) {
       if(message.method==='Log.entryAdded' && message.params.entry.level==='error')consoleErrors.push(message.params.entry.text);
       if(message.method==='Network.responseReceived' && message.params.response.status>=400)badResponses.push(message.params.response.url);
       if(message.method==='Network.requestWillBeSent')requests.push({url:message.params.request.url,method:message.params.request.method});
+      if(message.method&&handlers.has(message.method))handlers.get(message.method)(message.params);
     });
     const evaluate=async expression=>{const result=await send('Runtime.evaluate',{expression,awaitPromise:true,returnByValue:true});if(result.exceptionDetails)throw Error(JSON.stringify(result.exceptionDetails));return result.result.value;};
     const waitFor=async expression=>{for(let i=0;i<250;i++){if(await evaluate(`Boolean(${expression})`))return;await new Promise(r=>setTimeout(r,40));}throw Error('Timed out: '+expression);};
     await send('Page.enable');await send('Runtime.enable');await send('Network.enable');await send('Log.enable');
-    return {send,evaluate,waitFor,exceptions,consoleErrors,badResponses,requests,close:()=>{socket.close();chrome.kill();}};
+    return {send,evaluate,waitFor,exceptions,consoleErrors,badResponses,requests,on:(method,fn)=>handlers.set(method,fn),close:()=>{socket.close();chrome.kill();}};
   } catch(error){socket?.close();chrome.kill();throw error;}
 }

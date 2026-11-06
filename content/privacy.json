@@ -1,0 +1,75 @@
+{
+  "schema": 1,
+  "id": "privacy",
+  "path": "/privacy",
+  "seoTitle": "Privacy notice · Piers Blinco",
+  "seoDescription": "How Piers Blinco uses what you send through the contact form, and how visits to piersblinco.com are counted without cookies.",
+  "title": "Privacy notice",
+  "updated": "6 November 2026",
+  "intro": [
+    "This notice explains how I, Piers Blinco, use personal information on piersblinco.com: what you send me through the contact form, and how I count visits to the site."
+  ],
+  "sections": [
+    {
+      "heading": "Who I am",
+      "paragraphs": [
+        "I’m Piers Blinco, a sole trader, of 4 Denstone Drive, Chester, CH4 7PR. I’m responsible for the information described here. You can contact me at <a href=\"mailto:piers@piersblinco.com\">piers@piersblinco.com</a>."
+      ]
+    },
+    {
+      "heading": "The contact form",
+      "paragraphs": [
+        "When you send the form, I receive your name, email address and message, what you need help with, and your phone number and business name if you give them.",
+        "I use them to reply to you and to talk about the work you’re asking about. Each message is emailed to me and saved in my own records, and you get an automatic email confirming I’ve received it. I don’t add you to a mailing list or send you marketing.",
+        "My lawful basis is legitimate interests: you’ve asked me to get in touch, and I use your details only for that. If we go on to work together, I use them to agree and deliver that work (a contract)."
+      ]
+    },
+    {
+      "heading": "Keeping the form free of spam",
+      "paragraphs": [
+        "The form uses Cloudflare Turnstile to check that a person, not an automated program, is sending it. Turnstile loads only when you start filling in the form. For that check, Cloudflare processes technical information about your browser and connection, such as your IP address, as described in <a href=\"https://www.cloudflare.com/turnstile-privacy-policy/\">Cloudflare’s Turnstile privacy addendum</a>.",
+        "I also limit how many messages can be sent from one connection. That uses a scrambled form of your IP address, which is deleted within a day."
+      ]
+    },
+    {
+      "heading": "Counting visits",
+      "paragraphs": [
+        "I count visits to this site, to see how many people find it, with my own simple counter. It uses no cookies, stores nothing on your device, and involves no advertising or analytics company.",
+        "When a page loads, your browser tells my server which page it was and, if you followed a link, the name of the website the link was on (never the full address of that page). To tell how many different people visited each day, your IP address and browser details are combined with a random value that changes every day and scrambled into a one-way code. I store only that code, never your IP address. The day’s random value is deleted when the day ends, so the code can’t be traced back to you or linked to your visits on other days.",
+        "My lawful basis is legitimate interests: understanding, in total, how the site is used. Visits from known automated programs aren’t counted."
+      ]
+    },
+    {
+      "heading": "Who I share it with",
+      "paragraphs": [
+        "No one, for their own purposes. I use service providers to run things: Cloudflare (hosting, storing the visit counts and enquiries, and the spam check) and Namecheap Private Email (email). Some of them may process data outside the UK, under appropriate safeguards."
+      ]
+    },
+    {
+      "heading": "How long I keep it",
+      "list": [
+        "<strong>Enquiries:</strong> up to 24 months after our last contact. If you become a client, I keep what I need for the work, and my business records for six years after the end of the tax year they relate to, as the law requires.",
+        "<strong>Visit records</strong> (the page, the referring website and the day’s code): 90 days. After that only daily totals are kept, and they contain nothing about anyone.",
+        "<strong>The form’s spam limits:</strong> no more than 24 hours."
+      ]
+    },
+    {
+      "heading": "Cookies",
+      "paragraphs": [
+        "This site sets no cookies. The visit counter stores nothing in your browser. (I can switch the counter off for my own browser, which saves one setting in that browser only.)"
+      ]
+    },
+    {
+      "heading": "Your rights",
+      "paragraphs": [
+        "You can ask to see the information I hold about you, have it corrected or deleted, or object to my using it. Email <a href=\"mailto:piers@piersblinco.com\">piers@piersblinco.com</a>. If you’re unhappy with how I’ve handled your information, you can complain to the Information Commissioner’s Office (<a href=\"https://ico.org.uk\">ico.org.uk</a>)."
+      ]
+    },
+    {
+      "heading": "Other notices",
+      "paragraphs": [
+        "If I’ve emailed your business, <a href=\"https://admin.piersblinco.com/privacy\">how I use business contact details</a> explains that. Accountancy firms: see the <a href=\"https://partners.piersblinco.com/privacy/partners\">referral partners’ notice</a>."
+      ]
+    }
+  ]
+}

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
-// Generates index.html and brands.json from content/*.json with renderer/site.mjs (D-208).
+// Generates index.html, brands.json and privacy.html from content/*.json with renderer/site.mjs (D-208, D-211).
 // Run by scripts/build.py. Fails, writing nothing, if the content doesn't validate.
-//   node scripts/render.mjs            write index.html and brands.json
+//   node scripts/render.mjs            write index.html, brands.json and privacy.html
 //   node scripts/render.mjs --check    exit 1 if the committed files differ from a fresh render (same year)
 import { readFileSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
@@ -9,7 +9,7 @@ import { renderSite, siteYear, validateContent } from '../renderer/site.mjs';
 
 const root = resolve(import.meta.dirname, '..');
 const read = name => JSON.parse(readFileSync(join(root, name), 'utf8'));
-const bundle = { site: read('content/site.json'), pages: { home: read('content/home.json') } };
+const bundle = { site: read('content/site.json'), pages: { home: read('content/home.json'), privacy: read('content/privacy.json') } };
 const result = validateContent(bundle);
 if (!result.ok) {
   for (const e of result.errors) console.error(`::error title=Content invalid::${e.path} ${e.message}`);
