@@ -118,5 +118,6 @@ wrangler = (root / 'wrangler.jsonc').read_text()
 assert '"run_worker_first": ["/api/*"]' in wrangler and '"entrypoint": "SiteIngest"' in wrangler and '"main": "worker/index.js"' in wrangler
 assert not (root / 'dist' / 'worker').exists() and 'worker/index.js' not in files
 headers = (root / '_headers').read_text()
-assert headers.count('https://challenges.cloudflare.com') == 4, 'Turnstile is allowed on the homepage only'
+assert headers.count('https://challenges.cloudflare.com') == 2 and '\n! ' not in headers, 'Turnstile is allowed on the homepage only, without detach rules'
+assert headers.count('Content-Security-Policy:') == 3, 'One policy per path: /:file, /assets/* and the homepage'
 print(f'PASS: static homepage and privacy notice rendered from content/; {years}-year counter and SEO; contact form {"present" if has_contact else "not on the page"}; site Worker /api/* only; local assets and {len(brands)} logo paths; homepage and privacy sitemap; {len(files)} production files')
