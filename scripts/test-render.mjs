@@ -97,10 +97,12 @@ test('the validator refuses broken content', () => {
   assert.deepEqual(validateContent(b), { ok: true, errors: [] });
 });
 
+/** The content without its contact form, so these tests add their own. */
+const withoutContact = () => { const b = bundle(); b.pages.home.sections = b.pages.home.sections.filter(s => s.type !== 'contact'); delete b.site.turnstileSiteKey; return b; };
 const contactSection = { id: 'contact', type: 'contact', eyebrow: 'Get in touch', heading: 'Tell me what you need', intro: ['I reply within <strong>one working day</strong>.'] };
 
 test('the contact form section renders its fixed fields, links the privacy notice and carries the Turnstile key', () => {
-  const b = bundle();
+  const b = withoutContact();
   b.site.turnstileSiteKey = '0x4AAAAAAAtestkey123';
   b.pages.home.sections.push(contactSection);
   assert.deepEqual(validateContent(b), { ok: true, errors: [] });
@@ -130,7 +132,7 @@ test('the contact form section is checked: once only, wording required, a valid 
     [b => { b.site.turnstileSiteKey = 'bad key!'; }, 'site.turnstileSiteKey']
   ];
   for (const [mutate, expected] of cases) {
-    const b = bundle(); mutate(b);
+    const b = withoutContact(); mutate(b);
     const r = validateContent(b);
     assert(r.errors.some(e => `${e.path} ${e.message}`.includes(expected)), `${expected}: ${JSON.stringify(r.errors)}`);
   }
