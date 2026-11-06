@@ -10,6 +10,10 @@ from xml.etree import ElementTree
 root = Path(__file__).resolve().parent.parent
 files = set(json.loads((root / 'production-files.json').read_text()))
 html = (root / 'index.html').read_text()
+# Expected values come from the content the page is rendered from (D-208), not from today's wording.
+site = json.loads((root / 'content/site.json').read_text())
+home = json.loads((root / 'content/home.json').read_text())
+years = site['experienceYears']
 
 class Page(HTMLParser):
     def __init__(self):
@@ -50,18 +54,18 @@ assert page.scripts == ['/site.js']
 assert page.canonical == 'https://piersblinco.com/'
 assert page.meta['og:url'] == page.canonical
 assert page.meta['description'] == page.meta['og:description']
-assert 'Over 25 years of professional development experience.' in page.meta['description']
-assert 'I’ve spent over 25 years building software for businesses that depend on it.' in html
-assert 'experience-number">25<span' in html
+assert home['seo']['description'].replace('{years}', str(years)) in page.meta['description'].replace('&amp;', '&')
+assert f'experience-number">{years}<span' in html
 assert not re.search(r'\b(?:20|30)\s*\+?\s*years', ' '.join(page.text), re.I)
-assert not re.search(r'agency-partners|enquiry|mailto:|contact-banner|hero-actions|Discuss your project|Explore my experience|Let’s talk', html, re.I)
+# Markup from the removed agency pages must not come back. (Copy-phrase bans were dropped in D-208: the editor may add links and copy.)
+assert not re.search(r'agency-partners|contact-banner|hero-actions', html, re.I)
 for ref in page.assets | set(page.links): check_ref(ref, '/')
 styles = (root / 'styles.css').read_text()
 for ref in re.findall(r'url\([\s\"\']*([^\)\"\'\s]+)', styles): check_ref(ref, '/styles.css')
 assert not re.search(r'agency-|enquiry|contact-banner|hero-actions|article-|#site-nav|#menu-toggle', styles)
 assert '.is-changing' in styles and ':focus-visible' in styles and 'prefers-reduced-motion' in styles
 brands = json.loads((root / 'brands.json').read_text())
-assert len(brands) == 33 and len({b['src'] for b in brands}) == 33
+assert brands == [{'name': l['name'], 'src': l['src']} for l in site['logos']] and len({b['src'] for b in brands}) == len(brands)
 for brand in brands: check_ref(brand['src'], '/brands.json')
 script = (root / 'site.js').read_text()
 assert re.findall(r"fetch\(['\"]([^'\"]+)", script) == ['/brands.json']
@@ -79,4 +83,4 @@ assert actual == files, 'Build includes extra/missing files'
 sitemap = ElementTree.fromstring((root / 'sitemap.xml').read_text())
 assert [e.text for e in sitemap.iter('{http://www.sitemaps.org/schemas/sitemap/0.9}loc')] == ['https://piersblinco.com/']
 assert 'Sitemap: https://piersblinco.com/sitemap.xml' in (root / 'robots.txt').read_text()
-print(f'PASS: one static homepage; 25-year copy and SEO; no sales links/forms/APIs; local assets and 33 logo paths; homepage-only sitemap; {len(files)} production files')
+print(f'PASS: one static homepage rendered from content/; {years}-year counter and SEO; no forms/APIs; local assets and {len(brands)} logo paths; homepage-only sitemap; {len(files)} production files')

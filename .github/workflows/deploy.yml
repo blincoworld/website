@@ -1,0 +1,116 @@
+# Build, check and deploy piersblinco.com (D-208 in the admin app's DECISIONS.md).
+#
+# Runs on every push to main: a Publish from the admin app's Website › Homepage editor is one commit here. Nothing
+# deploys unless the render, the content validation, check.py, the renderer tests and the Chrome checks all pass.
+# After deploying it checks production; if that fails it puts the previous version back.
+# The admin app reads this run's result (building / live / failed) through the GitHub API.
+name: Build, check and deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+  schedule:
+    # 1 January, just after midnight UTC: rebuild so the automatic copyright year moves on.
+    - cron: '7 0 1 1 *'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: production-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      CLOUDFLARE_ACCOUNT_ID: c39888a9363fce8762763f0c60a9a388
+      WORKER: piers-portfolio-static
+      CHROME_BIN: /usr/bin/google-chrome
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install pinned tools
+        run: npm ci
+
+      - name: Build (render content/, copy the allow-list)
+        run: python3 scripts/build.py 2>&1 | tee -a "$RUNNER_TEMP/step.log"; exit ${PIPESTATUS[0]}
+
+      - name: Check (render, content, files, renderer tests)
+        run: npm run check 2>&1 | tee "$RUNNER_TEMP/step.log"; exit ${PIPESTATUS[0]}
+
+      - name: Browser check (Chrome at 1440, 768 and 375px)
+        run: npm test 2>&1 | tee "$RUNNER_TEMP/step.log"; exit ${PIPESTATUS[0]}
+
+      - name: Record the live version (the rollback target)
+        id: before
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          set -o pipefail
+          if [ -z "$CLOUDFLARE_API_TOKEN" ]; then echo "The CLOUDFLARE_API_TOKEN secret is not set, so nothing was deployed." > "$RUNNER_TEMP/step.log"; exit 1; fi
+          npx wrangler deployments list --name "$WORKER" --json > "$RUNNER_TEMP/deployments.json" 2> "$RUNNER_TEMP/step.log"
+          version=$(node -e "const d=require(process.argv[1]); const v=d[d.length-1].versions.find(x=>x.percentage===100); if(!v) process.exit(1); console.log(v.version_id)" "$RUNNER_TEMP/deployments.json")
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "Live before this deploy: $version"
+
+      - name: Upload the new version
+        id: upload
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          set -o pipefail
+          npx wrangler versions upload --name "$WORKER" --strict --message "${GITHUB_SHA::7} (${{ github.event_name }})" 2>&1 | tee "$RUNNER_TEMP/step.log"
+          version=$(grep -oE 'Version ID: *[0-9a-f-]{36}' "$RUNNER_TEMP/step.log" | grep -oE '[0-9a-f-]{36}' | tail -1)
+          test -n "$version"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+      - name: Deploy it to 100%
+        id: deploy
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: npx wrangler versions deploy "${{ steps.upload.outputs.version }}@100" --name "$WORKER" --yes --message "${GITHUB_SHA::7}" 2>&1 | tee "$RUNNER_TEMP/step.log"; exit ${PIPESTATUS[0]}
+
+      - name: Check production
+        run: |
+          set -o pipefail
+          for attempt in 1 2 3 4; do
+            if npm run check:deployment -- https://piersblinco.com --label production > "$RUNNER_TEMP/step.log" 2>&1; then break; fi
+            if [ "$attempt" = 4 ]; then cat "$RUNNER_TEMP/step.log"; exit 1; fi
+            sleep 15
+          done
+          tail -1 "$RUNNER_TEMP/step.log"
+          SITE_ORIGIN=https://piersblinco.com SITE_LABEL=production npm test 2>&1 | tee "$RUNNER_TEMP/step.log"
+
+      - name: Roll back (production check failed)
+        if: failure() && steps.deploy.outcome == 'success'
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          npx wrangler versions deploy "${{ steps.before.outputs.version }}@100" --name "$WORKER" --yes --message "Automatic rollback after a failed production check"
+          echo "::error title=Rolled back::Production checks failed after deploying ${{ steps.upload.outputs.version }}, so ${{ steps.before.outputs.version }} was put back."
+
+      - name: Report the failure
+        if: failure()
+        run: |
+          # The admin app shows this annotation as the publish error: the last lines of the failing step's output.
+          tail -n 12 "$RUNNER_TEMP/step.log" 2>/dev/null | sed -e 's/%/%25/g' -e 's/\r//g' | awk 'BEGIN{ORS="%0A"} {print}' > "$RUNNER_TEMP/err.txt" || true
+          echo "::error title=Publish failed::$(cat "$RUNNER_TEMP/err.txt")"
+
+      - name: Summary
+        if: success()
+        run: |
+          echo "::notice title=Live::Version ${{ steps.upload.outputs.version }} is live (previous ${{ steps.before.outputs.version }})."
+          {
+            echo "### Live on piersblinco.com"
+            echo "- New version: \`${{ steps.upload.outputs.version }}\`"
+            echo "- Previous version (rollback): \`${{ steps.before.outputs.version }}\`"
+            echo "- Rollback: \`npx wrangler versions deploy ${{ steps.before.outputs.version }}@100 --name piers-portfolio-static\`"
+          } >> "$GITHUB_STEP_SUMMARY"

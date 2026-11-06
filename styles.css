@@ -116,6 +116,18 @@ p { margin-bottom: 1.3rem; }
 .home-section .prose ul { grid-template-columns: 1fr; gap: 2rem; }
 .site-footer { grid-template-columns: 1fr; padding-top: 2rem; }
 }
+em { font-synthesis: style; }
+.content-section { grid-template-columns: minmax(0px, 1fr); gap: 2rem; }
+.content-section > * { max-width: 820px; }
+.content-section .section-heading h2 { margin-bottom: 0px; }
+.content-section .prose { font-size: 1.0625rem; }
+.content-section > .content-image { max-width: 1000px; }
+.content-image { margin: 0px; }
+.content-image img { width: 100%; height: auto; }
+.content-image figcaption { color: var(--muted); font-size: 0.9375rem; padding-top: 0.75rem; }
+@media (max-width: 850px) {
+.content-section { gap: 1.5rem; }
+}
 @media (prefers-reduced-motion: reduce) {
 *, ::before, ::after { scroll-behavior: auto !important; animation: none !important; transition: none !important; }
 }

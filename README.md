@@ -2,8 +2,15 @@
 
 https://piersblinco.com is served directly by **Cloudflare Workers Static Assets**
 from this repository. The Worker is **`piers-portfolio-static`**, with no CMS code,
-D1, R2, SMTP or backend API binding. `index.html` is the content source; the build
-copies only the production allowlist to `dist/`.
+D1, R2, SMTP or backend API binding.
+
+**Content lives in `content/site.json` and `content/home.json`.** `index.html` and
+`brands.json` are generated from them by `renderer/site.mjs` (`npm run render`, also
+run by `npm run build`). Edit the content, not the generated files. The admin app's
+Website › Homepage editor (admin.piersblinco.com) edits the same content, previews it
+with a byte-identical copy of the same renderer, and publishes by committing here;
+`.github/workflows/deploy.yml` then builds, checks and deploys (D-208 in the admin
+app's DECISIONS.md). The build copies only the production allowlist to `dist/`.
 
 Current production version: `cfb7b262-8e10-4a7d-97f2-b057e8ac7cc2`.
 The public inspection URL is
@@ -25,10 +32,21 @@ needed for the local build and tests.
 
 ```sh
 npm ci
-npm run build
-npm run check
-npm test
+npm run build      # render content/ into index.html + brands.json, then copy the allowlist to dist/
+npm run check      # generated files match content/, content validates, check.py, renderer tests
+npm test           # Chrome at 1440, 768 and 375px
 ```
+
+Changing `renderer/site.mjs` also needs the admin app's copy updated
+(`npm run sync-site-renderer` in the admin repo), or the admin app refuses to publish.
+
+## Automatic deploys
+
+Every push to `main` runs `.github/workflows/deploy.yml`: build, check, Chrome
+check, `wrangler versions upload`, `versions deploy @100`, then the deployed checks
+against production. If those fail, the previous version is put back automatically.
+It needs the `CLOUDFLARE_API_TOKEN` Actions secret (Workers Scripts: Edit on this
+account only). It also runs on 1 January so the copyright year moves on.
 
 Deployed checks issue only GET requests and do not send enquiries or emails:
 
@@ -101,14 +119,18 @@ Redirect Rules), because the API credentials on hand can't manage rules.
 ## Repository layout
 
 ```text
-index.html / styles.css / site.js / brands.json   Static homepage
+content/                                        Homepage content (the source of truth)
+renderer/site.mjs                               The shared renderer and content validator
+index.html / brands.json                        Generated from content/ (committed)
+styles.css / site.js                            Static homepage styles and logo rotation
 assets/brands/                                  33 logo WebPs
 assets/fonts/                                   Inter and OFL licence
 assets/images/                                  Portrait, social preview, icons
 favicon.ico / robots.txt / sitemap.xml           Discovery assets
 _headers / production-files.json                Headers and publish allowlist
 wrangler.jsonc / package.json / package-lock.json Hosting config and pinned tooling
-scripts/                                        Build, browser and deployed checks
+scripts/                                        Render, build, browser and deployed checks
+.github/workflows/deploy.yml                    Build, check and deploy on push to main
 STATIC-MIGRATION.md                              Deployment and recovery record
 ```
 

@@ -1,0 +1,141 @@
+{
+  "schema": 1,
+  "name": "Piers Blinco",
+  "origin": "https://piersblinco.com",
+  "experienceYears": 25,
+  "footerTagline": "Thoughtful software. Practical delivery.",
+  "logos": [
+    {
+      "name": "Wiley",
+      "src": "/assets/brands/wiley-8936104ad9.webp"
+    },
+    {
+      "name": "BT Fresca",
+      "src": "/assets/brands/bt-fresca-5241dae7b3.webp"
+    },
+    {
+      "name": "Great Little Trading Company",
+      "src": "/assets/brands/great-little-trading-company-a805e98627.webp"
+    },
+    {
+      "name": "Runners Need",
+      "src": "/assets/brands/runners-need-a872ddbaf8.webp"
+    },
+    {
+      "name": "Snow + Rock",
+      "src": "/assets/brands/snow-and-rock-9ea6984ddc.webp"
+    },
+    {
+      "name": "Farrow & Ball",
+      "src": "/assets/brands/farrow-and-ball-75d2f0b0e0.webp"
+    },
+    {
+      "name": "DW Sports Fitness",
+      "src": "/assets/brands/dw-sports-fitness-aff34148ff.webp"
+    },
+    {
+      "name": "JD Sports",
+      "src": "/assets/brands/jd-sports-5ee6cc3781.webp"
+    },
+    {
+      "name": "Thomas Pink",
+      "src": "/assets/brands/thomas-pink-363bf4d665.webp"
+    },
+    {
+      "name": "Liberty London",
+      "src": "/assets/brands/liberty-90e09aba04.webp"
+    },
+    {
+      "name": "Lyle & Scott",
+      "src": "/assets/brands/lyle-and-scott-7aa1ebf51a.webp"
+    },
+    {
+      "name": "Habitat",
+      "src": "/assets/brands/habitat-b2da217ff5.webp"
+    },
+    {
+      "name": "Matalan",
+      "src": "/assets/brands/matalan-b918178b6d.webp"
+    },
+    {
+      "name": "The Range",
+      "src": "/assets/brands/the-range-81d8dd58b8.webp"
+    },
+    {
+      "name": "Oxford Bus Company",
+      "src": "/assets/brands/oxford-bus-company-00b3e80d13.webp"
+    },
+    {
+      "name": "Journl",
+      "src": "/assets/brands/journl-b9848afe2d.webp"
+    },
+    {
+      "name": "Westfield",
+      "src": "/assets/brands/westfield-685f02ee8a.webp"
+    },
+    {
+      "name": "Ladbrokes",
+      "src": "/assets/brands/ladbrokes-371dd8785b.webp"
+    },
+    {
+      "name": "Tesco",
+      "src": "/assets/brands/tesco-d41542ec29.webp"
+    },
+    {
+      "name": "Matches Fashion",
+      "src": "/assets/brands/matches-fashion-2e5d45d342.webp"
+    },
+    {
+      "name": "Aon",
+      "src": "/assets/brands/aon-e4e22b0a6b.webp"
+    },
+    {
+      "name": "House of Fraser",
+      "src": "/assets/brands/house-of-fraser-1193920075.webp"
+    },
+    {
+      "name": "GAN",
+      "src": "/assets/brands/gan-ca80348de1.webp"
+    },
+    {
+      "name": "Betfair",
+      "src": "/assets/brands/betfair-6f2e374d15.webp"
+    },
+    {
+      "name": "Foxwoods Resort Casino",
+      "src": "/assets/brands/foxwoods-daa441e0dd.webp"
+    },
+    {
+      "name": "APS Group",
+      "src": "/assets/brands/aps-group-1065ce8cce.webp"
+    },
+    {
+      "name": "FEED/DEPT.",
+      "src": "/assets/brands/feed-dept-d21f3fd952.webp"
+    },
+    {
+      "name": "eBay",
+      "src": "/assets/brands/ebay-f3889dbff4.webp"
+    },
+    {
+      "name": "Gumtree",
+      "src": "/assets/brands/gumtree-3681f0fc75.webp"
+    },
+    {
+      "name": "Betsson Group",
+      "src": "/assets/brands/betsson-group-ff9ac04ba5.webp"
+    },
+    {
+      "name": "Autoweb Design",
+      "src": "/assets/brands/autoweb-design-a2b4c66113.webp"
+    },
+    {
+      "name": "RFA Creative Digital",
+      "src": "/assets/brands/rfa-0b97aac390.webp"
+    },
+    {
+      "name": "Mint Velvet",
+      "src": "/assets/brands/mint-velvet-f0fe04baee.webp"
+    }
+  ]
+}

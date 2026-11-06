@@ -1,11 +1,14 @@
 #!/usr/bin/env python3
-"""Build the standalone static homepage from an explicit production allowlist."""
+"""Build the standalone static homepage: render it from content/ (D-208), then copy the production allowlist."""
 import json
 import shutil
+import subprocess
 from pathlib import Path
 
 root = Path(__file__).resolve().parent.parent
 output = root / 'dist'
+# index.html and brands.json are generated from content/*.json by the shared renderer (renderer/site.mjs).
+subprocess.run(['node', str(root / 'scripts' / 'render.mjs')], check=True)
 files = json.loads((root / 'production-files.json').read_text())
 if output.exists(): shutil.rmtree(output)
 for name in files:
