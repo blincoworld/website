@@ -108,6 +108,7 @@ export function validateContent(bundle) {
   const err = (path, message) => errors.push({ path, message });
   const isObj = v => v !== null && typeof v === 'object' && !Array.isArray(v);
   const plain = (path, v, { required = true, max } = {}) => {
+    if (!required && v === undefined) return;
     const e = plainError(v, max);
     if (e) err(path, e);
     else if (required && !v.trim()) err(path, 'is required');

@@ -90,6 +90,11 @@ test('the validator refuses broken content', () => {
     assert(r.errors.some(e => `${e.path} ${e.message}`.includes(expected)), `${expected}: ${JSON.stringify(r.errors)}`);
   }
   assert.deepEqual(validateContent(bundle()), { ok: true, errors: [] });
+  // Optional fields may be left out altogether.
+  const b = bundle();
+  b.pages.home.sections.push({ id: 'opt', type: 'content', blocks: [{ id: 'h', type: 'heading', text: 'No eyebrow' }, { id: 'i', type: 'image', src: '/assets/images/a-0123456789.webp', alt: 'A', width: 10, height: 10 }] });
+  delete b.pages.home.seo.socialDescription;
+  assert.deepEqual(validateContent(b), { ok: true, errors: [] });
 });
 
 console.log(`${passed} renderer tests passed`);
