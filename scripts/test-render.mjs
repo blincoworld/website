@@ -4,7 +4,7 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
-import { renderSite, richTextError, stripPreviewMarkers, validateContent } from '../renderer/site.mjs';
+import { CONTACT_NEEDS, renderSite, richTextError, stripPreviewMarkers, validateContent } from '../renderer/site.mjs';
 
 const root = resolve(import.meta.dirname, '..');
 const read = name => readFileSync(join(root, name), 'utf8');
@@ -95,6 +95,69 @@ test('the validator refuses broken content', () => {
   b.pages.home.sections.push({ id: 'opt', type: 'content', blocks: [{ id: 'h', type: 'heading', text: 'No eyebrow' }, { id: 'i', type: 'image', src: '/assets/images/a-0123456789.webp', alt: 'A', width: 10, height: 10 }] });
   delete b.pages.home.seo.socialDescription;
   assert.deepEqual(validateContent(b), { ok: true, errors: [] });
+});
+
+const contactSection = { id: 'contact', type: 'contact', eyebrow: 'Get in touch', heading: 'Tell me what you need', intro: ['I reply within <strong>one working day</strong>.'] };
+
+test('the contact form section renders its fixed fields, links the privacy notice and carries the Turnstile key', () => {
+  const b = bundle();
+  b.site.turnstileSiteKey = '0x4AAAAAAAtestkey123';
+  b.pages.home.sections.push(contactSection);
+  assert.deepEqual(validateContent(b), { ok: true, errors: [] });
+  const out = renderSite(b, { year: 2026 })['index.html'];
+  assert.match(out, /<section class="contact-section wrap" id="contact" aria-labelledby="contact-heading">/);
+  assert.match(out, /<form class="contact-form" id="contact-form" novalidate data-sitekey="0x4AAAAAAAtestkey123">/);
+  for (const name of ['name', 'email', 'phone', 'business', 'need', 'message', 'website']) assert.match(out, new RegExp(`name="${name}"`), name);
+  assert.deepEqual([...out.matchAll(/<option value="([a-z_]+)">/g)].map(m => m[1]), CONTACT_NEEDS.map(n => n[0]));
+  assert.match(out, /See the <a href="\/privacy">privacy notice<\/a>/);
+  assert.match(out, /<noscript>.*piers@piersblinco\.com.*<\/noscript>/s);
+  // Stands alone, like the experience section: it ends the run of home sections before it.
+  assert.match(out, /<\/section><\/div>\n    <section class="contact-section wrap"/);
+  // Without a key the form renders with no data-sitekey (site.js then asks people to email).
+  delete b.site.turnstileSiteKey;
+  assert.doesNotMatch(renderSite(b, { year: 2026 })['index.html'], /data-sitekey/);
+  // Preview marks its wording as editable and is otherwise the production page.
+  const preview = renderSite(b, { year: 2026, preview: true, resolveAsset: p => `/api/site/asset${p}` })['index.html'];
+  assert.match(preview, /data-cms-section="contact"/);
+  assert.match(preview, /<cms-f data-cms="pages\.home\.sections\.4\.heading" data-kind="plain">Tell me what you need<\/cms-f>/);
+});
+
+test('the contact form section is checked: once only, wording required, a valid key', () => {
+  const cases = [
+    [b => { b.pages.home.sections.push(contactSection, { ...contactSection, id: 'contact-2' }); }, 'the contact form can appear once'],
+    [b => { b.pages.home.sections.push({ ...contactSection, heading: '' }); }, 'heading is required'],
+    [b => { b.pages.home.sections.push({ ...contactSection, intro: [] }); }, 'intro must have'],
+    [b => { b.site.turnstileSiteKey = 'bad key!'; }, 'site.turnstileSiteKey']
+  ];
+  for (const [mutate, expected] of cases) {
+    const b = bundle(); mutate(b);
+    const r = validateContent(b);
+    assert(r.errors.some(e => `${e.path} ${e.message}`.includes(expected)), `${expected}: ${JSON.stringify(r.errors)}`);
+  }
+});
+
+test('the privacy notice renders from content/privacy.json, with the footer link on both pages', () => {
+  const b = bundle();
+  b.pages.privacy = JSON.parse(read('content/privacy.json'));
+  assert.deepEqual(validateContent(b), { ok: true, errors: [] });
+  const out = renderSite(b, { year: Number(/© (\d{4})/.exec(read('index.html'))[1]) });
+  assert.equal(out['privacy.html'], read('privacy.html'));
+  assert.match(out['privacy.html'], /<link rel="canonical" href="https:\/\/piersblinco\.com\/privacy">/);
+  assert.match(out['privacy.html'], /<h1>Privacy notice<\/h1><p class="legal-updated">Last updated 6 November 2026<\/p>/);
+  for (const html of [out['index.html'], out['privacy.html']]) assert.match(html, /<p class="footer-links"><a href="\/privacy">Privacy notice<\/a><\/p>/);
+  // Not rendered in the editor preview, or without the page in the bundle.
+  assert.equal(renderSite(b, { year: 2026, preview: true })['privacy.html'], undefined);
+  assert.equal(renderSite(bundle(), { year: 2026 })['privacy.html'], undefined);
+  for (const [mutate, expected] of [
+    [p => { p.updated = 'yesterday'; }, 'pages.privacy.updated'],
+    [p => { p.sections[0].paragraphs = ['<script>x</script>']; }, 'pages.privacy.sections.0.paragraphs.0'],
+    [p => { p.sections.push({ heading: 'Empty' }); }, 'needs at least one paragraph'],
+    [p => { p.path = '/privacy-policy'; }, 'pages.privacy.path']
+  ]) {
+    const c = bundle(); c.pages.privacy = JSON.parse(read('content/privacy.json')); mutate(c.pages.privacy);
+    const r = validateContent(c);
+    assert(r.errors.some(e => `${e.path} ${e.message}`.includes(expected)), `${expected}: ${JSON.stringify(r.errors)}`);
+  }
 });
 
 console.log(`${passed} renderer tests passed`);

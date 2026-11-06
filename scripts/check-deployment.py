@@ -36,7 +36,7 @@ def get(path, name):
     return int(status), body.read_bytes(), values
 
 def check(name):
-    path = '/' if name == 'index.html' else '/' + name
+    path = '/' if name == 'index.html' else '/privacy' if name == 'privacy.html' else '/' + name
     status, body, headers = get(path,name)
     assert status == 200, (path,status)
     expected = (root / 'dist' / name).read_bytes()
@@ -49,18 +49,25 @@ def check(name):
     assert headers.get('referrer-policy') == 'no-referrer', path
     assert "default-src 'none'" in headers.get('content-security-policy',''), path
     cache = headers.get('cache-control','')
-    if name in ['index.html','styles.css','site.js','brands.json','robots.txt','sitemap.xml']: assert 'no-store' in cache, (path,cache)
+    if name in ['index.html','privacy.html','styles.css','site.js','brands.json','robots.txt','sitemap.xml']: assert 'no-store' in cache, (path,cache)
+    # Turnstile (the contact form's spam check, D-211) is allowed on the homepage only.
+    csp = headers.get('content-security-policy','')
+    assert ('https://challenges.cloudflare.com' in csp) == (name == 'index.html'), (path, csp)
+    assert csp.count('default-src') == 1, (path, 'one policy only')
     if name.startswith('assets/'): assert 'max-age=31536000' in cache and 'immutable' in cache, (path,cache)
     if name == 'favicon.ico': assert 'max-age=86400' in cache, (path,cache)
     if name == 'sitemap.xml':
         tree = ElementTree.fromstring(body)
-        assert [e.text for e in tree.iter('{http://www.sitemaps.org/schemas/sitemap/0.9}loc')] == ['https://piersblinco.com/']
+        assert [e.text for e in tree.iter('{http://www.sitemaps.org/schemas/sitemap/0.9}loc')] == ['https://piersblinco.com/', 'https://piersblinco.com/privacy']
     return {'file':name,'status':status,'sha256':hashlib.sha256(body).hexdigest(),'bytes':len(body),'cache_control':cache}
 
 with concurrent.futures.ThreadPoolExecutor(max_workers=6) as pool:
     results = list(pool.map(check,[name for name in files if name != '_headers']))
 for index,path in enumerate(['/missing','/agency-partners/','/api/pages/home','/api/enquiries/agency','/property-films/','/offer.html','/_headers']):
     assert get(path,'missing-'+str(index))[0] == 404, f'Unknown route did not return 404: {path}'
-report = {'origin':origin,'files':results,'logoAssets':sum(r['file'].startswith('assets/brands/') for r in results),'unknownRoutes404':True,'securityAndCacheHeaders':True}
+# The site Worker's two routes (D-209) take POST only; a GET is refused without reaching the Back Office.
+for index,path in enumerate(['/api/v','/api/enquiry']):
+    assert get(path,'api-get-'+str(index))[0] == 405, f'GET {path} was not refused'
+report = {'origin':origin,'files':results,'logoAssets':sum(r['file'].startswith('assets/brands/') for r in results),'unknownRoutes404':True,'apiRoutesPostOnly':True,'securityAndCacheHeaders':True}
 (out/'results.json').write_text(json.dumps(report,indent=2)+'\n')
-print(f'PASS: {origin}; {len(results)} production assets HTTP 200, byte/content checks, every logo, favicon/robots/sitemap, cache/security headers, removed/API paths HTTP 404.')
+print(f'PASS: {origin}; {len(results)} production assets HTTP 200, byte/content checks, every logo, favicon/robots/sitemap, cache/security headers, removed/API paths HTTP 404, /api/v and /api/enquiry POST only.')

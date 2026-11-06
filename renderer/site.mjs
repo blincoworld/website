@@ -23,6 +23,17 @@ const ID = /^[a-z0-9][a-z0-9-]{0,39}$/;
 const LOGO_SRC = /^\/assets\/brands\/[a-z0-9][a-z0-9-]{0,80}\.webp$/;
 const IMAGE_SRC = /^\/assets\/images\/[a-z0-9][a-z0-9-]{0,80}\.(webp|png)$/;
 const ORIGIN = /^https:\/\/[a-z0-9.-]+$/;
+const TURNSTILE_KEY = /^[0-9A-Za-z_-]{10,64}$/;
+const DAY_TEXT = /^\d{1,2} [A-Z][a-z]+ \d{4}$/;
+/** The address the contact form falls back to, and the privacy notice's contact (D-211). */
+export const CONTACT_EMAIL = 'piers@piersblinco.com';
+/** The contact form's "What do you need?" options; the Back Office accepts exactly these values (D-211). */
+export const CONTACT_NEEDS = [
+  ['new_website', 'New website'],
+  ['online_booking', 'Online booking'],
+  ['automations_ai', 'Automations / AI'],
+  ['something_else', 'Something else']
+];
 
 // ---------------------------------------------------------------------------------------------------------------
 // Escaping and rich text
@@ -144,6 +155,8 @@ export function validateContent(bundle) {
     if (typeof site.origin !== 'string' || !ORIGIN.test(site.origin)) err('site.origin', 'must be an https origin with no trailing slash');
     if (!Number.isInteger(site.experienceYears) || site.experienceYears < 1 || site.experienceYears > 80) err('site.experienceYears', 'must be a whole number of years (1–80)');
     plain('site.footerTagline', site.footerTagline, { max: 160 });
+    // The contact form's Cloudflare Turnstile site key (public). Optional: without it the form asks people to email.
+    if (site.turnstileSiteKey !== undefined && (typeof site.turnstileSiteKey !== 'string' || !TURNSTILE_KEY.test(site.turnstileSiteKey))) err('site.turnstileSiteKey', 'must be a Turnstile site key');
     if (!Array.isArray(site.logos) || site.logos.length < 1 || site.logos.length > LIMITS.logos) err('site.logos', `must list 1–${LIMITS.logos} logos`);
     else {
       const srcs = new Set();
@@ -181,7 +194,7 @@ export function validateContent(bundle) {
     if (!Array.isArray(sections) || sections.length < 1 || sections.length > LIMITS.sections) err(`${P}.sections`, `must have 1–${LIMITS.sections} sections`);
     else {
       const ids = new Set();
-      const counts = { hero: 0, experience: 0, expertise: 0, approach: 0 };
+      const counts = { hero: 0, experience: 0, expertise: 0, approach: 0, contact: 0 };
       sections.forEach((s, i) => {
         const p = `${P}.sections.${i}`;
         if (!isObj(s)) return err(p, 'must be a section');
@@ -219,6 +232,13 @@ export function validateContent(bundle) {
               rich(`${p}.items.${j}.text`, item.text);
             });
             break;
+          case 'contact':
+            counts.contact++;
+            plain(`${p}.eyebrow`, s.eyebrow, { max: 120 });
+            plain(`${p}.heading`, s.heading, { max: 200 });
+            if (!Array.isArray(s.intro) || s.intro.length < 1 || s.intro.length > LIMITS.paragraphs) err(`${p}.intro`, `must have 1–${LIMITS.paragraphs} paragraphs`);
+            else s.intro.forEach((para, j) => rich(`${p}.intro.${j}`, para));
+            break;
           case 'content':
             if (!Array.isArray(s.blocks) || s.blocks.length < 1 || s.blocks.length > LIMITS.blocks) err(`${p}.blocks`, `must have 1–${LIMITS.blocks} blocks`);
             else s.blocks.forEach((b, j) => {
@@ -244,6 +264,36 @@ export function validateContent(bundle) {
       if (counts.hero !== 1) err(`${P}.sections`, 'must have exactly one hero');
       if (counts.experience !== 1) err(`${P}.sections`, 'must have exactly one experience section');
       if (counts.expertise > 1 || counts.approach > 1) err(`${P}.sections`, '“What I do” and “How I work” can appear once each');
+      if (counts.contact > 1) err(`${P}.sections`, 'the contact form can appear once');
+    }
+  }
+  // The privacy notice (D-211): optional in the bundle (the homepage editor works without it), rendered to privacy.html.
+  const privacy = isObj(bundle.pages) ? bundle.pages.privacy : undefined;
+  if (privacy !== undefined) {
+    const P = 'pages.privacy';
+    if (!isObj(privacy)) err(P, 'must be a page');
+    else {
+      if (privacy.schema !== SCHEMA_VERSION) err(`${P}.schema`, `must be ${SCHEMA_VERSION}`);
+      if (privacy.id !== 'privacy') err(`${P}.id`, 'must be "privacy"');
+      if (privacy.path !== '/privacy') err(`${P}.path`, 'must be "/privacy"');
+      plain(`${P}.seoTitle`, privacy.seoTitle, { max: 120 });
+      plain(`${P}.seoDescription`, privacy.seoDescription, { max: 320 });
+      plain(`${P}.title`, privacy.title, { max: 120 });
+      if (typeof privacy.updated !== 'string' || !DAY_TEXT.test(privacy.updated)) err(`${P}.updated`, 'must be a date like “6 November 2026”');
+      if (!Array.isArray(privacy.intro) || privacy.intro.length > LIMITS.paragraphs) err(`${P}.intro`, `must have 0–${LIMITS.paragraphs} paragraphs`);
+      else privacy.intro.forEach((para, j) => rich(`${P}.intro.${j}`, para));
+      if (!Array.isArray(privacy.sections) || privacy.sections.length < 1 || privacy.sections.length > LIMITS.sections) err(`${P}.sections`, `must have 1–${LIMITS.sections} sections`);
+      else privacy.sections.forEach((sec, i) => {
+        const p = `${P}.sections.${i}`;
+        if (!isObj(sec)) return err(p, 'must be a section');
+        plain(`${p}.heading`, sec.heading, { max: 200 });
+        const paras = sec.paragraphs ?? [], list = sec.list ?? [];
+        if (!Array.isArray(paras) || paras.length > LIMITS.paragraphs) err(`${p}.paragraphs`, `must have 0–${LIMITS.paragraphs} paragraphs`);
+        else paras.forEach((para, j) => rich(`${p}.paragraphs.${j}`, para));
+        if (!Array.isArray(list) || list.length > LIMITS.paragraphs) err(`${p}.list`, `must have 0–${LIMITS.paragraphs} items`);
+        else list.forEach((item, j) => rich(`${p}.list.${j}`, item));
+        if (Array.isArray(paras) && Array.isArray(list) && !paras.length && !list.length) err(p, 'needs at least one paragraph or list item');
+      });
     }
   }
   return { ok: errors.length === 0, errors };
@@ -260,7 +310,8 @@ const ICONS = `    <link rel="icon" href="/assets/images/favicon-a14aef9084.ico"
 `;
 
 /**
- * Renders the site. Returns { 'index.html': string, 'brands.json': string }.
+ * Renders the site. Returns { 'index.html': string, 'brands.json': string }, plus 'privacy.html' when the bundle has
+ * pages.privacy (production only; the editor preview shows the homepage).
  * options.year: the copyright year (required, so the output never depends on a hidden clock).
  * options.preview: editor markers on; options.resolveAsset(path): maps site paths (preview only).
  */
@@ -355,15 +406,40 @@ ${preview ? ICONS.replace(/href="([^"]+)"/g, (_, h) => `href="${asset(h)}"`) : I
     return `<section class="home-section content-section"${attrs({ section: s.id })}>${blocks}</section>`;
   };
 
-  // Hero and experience stand alone; each run of "home sections" (items and content) shares one wrapper, so the
-  // site's ".home-section + .home-section" divider applies between them.
+  // The contact form (D-211). Its wording is editable; the fields are fixed (the Back Office accepts exactly these).
+  // It works only with JavaScript (site.js sends it, with a Cloudflare Turnstile check); without, it says to email.
+  const contact = (s, p) => {
+    const key = site.turnstileSiteKey ? ` data-sitekey="${escapeAttr(site.turnstileSiteKey)}"` : '';
+    const email = `<a href="mailto:${CONTACT_EMAIL}">${CONTACT_EMAIL}</a>`;
+    const field = (id, label, input, hint = '') => `<div class="field"><label for="cf-${id}">${label}${hint}</label>${input}<p class="field-error" id="cf-${id}-error" hidden></p></div>`;
+    const optional = ' <span class="optional">(optional)</span>';
+    const needs = CONTACT_NEEDS.map(([v, l]) => `<option value="${v}">${escapeText(l)}</option>`).join('');
+    return `<section class="contact-section wrap" id="contact" aria-labelledby="contact-heading"${attrs({ section: s.id })}><div class="contact-intro"><p class="eyebrow">${plainField(`${p}.eyebrow`, s.eyebrow)}</p><h2 id="contact-heading">${plainField(`${p}.heading`, s.heading)}</h2><div class="prose"${attrs({ paras: `${p}.intro` })}>${paragraphs(s.intro)}</div><p class="contact-direct">Or email me at ${email}.</p></div>
+      <form class="contact-form" id="contact-form" novalidate${key}>
+        ${field('name', 'Name', '<input id="cf-name" name="name" type="text" autocomplete="name" maxlength="100" required aria-describedby="cf-name-error">')}
+        ${field('email', 'Email', '<input id="cf-email" name="email" type="email" autocomplete="email" maxlength="254" required aria-describedby="cf-email-error">')}
+        <div class="field-pair">${field('phone', 'Phone', '<input id="cf-phone" name="phone" type="tel" autocomplete="tel" maxlength="40" aria-describedby="cf-phone-error">', optional)}${field('business', 'Business name', '<input id="cf-business" name="business" type="text" autocomplete="organization" maxlength="150" aria-describedby="cf-business-error">', optional)}</div>
+        ${field('need', 'What do you need?', `<select id="cf-need" name="need" required aria-describedby="cf-need-error"><option value="">Choose one</option>${needs}</select>`)}
+        ${field('message', 'Message', '<textarea id="cf-message" name="message" rows="6" maxlength="5000" required aria-describedby="cf-message-error"></textarea>')}
+        <div class="contact-hp" aria-hidden="true"><label for="cf-website">Leave this field empty</label><input id="cf-website" name="website" type="text" tabindex="-1" autocomplete="off"></div>
+        <div class="contact-turnstile" id="cf-turnstile"></div>
+        <p class="contact-privacy">I’ll only use your details to reply to you. See the <a href="/privacy">privacy notice</a>.</p>
+        <div class="contact-actions"><button type="submit" class="contact-submit">Send message</button></div>
+        <div class="contact-status" id="contact-status" role="status" aria-live="polite"></div>
+      </form>
+      <noscript><p class="contact-noscript">The form needs JavaScript. Please email me at ${email}.</p></noscript>
+    </section>`;
+  };
+
+  // Hero, experience and the contact form stand alone; each run of "home sections" (items and content) shares one
+  // wrapper, so the site's ".home-section + .home-section" divider applies between them.
   const parts = [];
   let run = null;
   page.sections.forEach((s, i) => {
     const p = `${P}.sections.${i}`;
-    if (s.type === 'hero' || s.type === 'experience') {
+    if (s.type === 'hero' || s.type === 'experience' || s.type === 'contact') {
       run = null;
-      parts.push(s.type === 'hero' ? hero(s, p) : experience(s, p));
+      parts.push(s.type === 'hero' ? hero(s, p) : s.type === 'experience' ? experience(s, p) : contact(s, p));
       return;
     }
     const html = s.type === 'items' ? items(s, p) : content(s, p);
@@ -372,18 +448,43 @@ ${preview ? ICONS.replace(/href="([^"]+)"/g, (_, h) => `href="${asset(h)}"`) : I
   });
   const main = parts.map(x => (Array.isArray(x) ? `<div class="wrap home-sections">${x.join('')}</div>` : x)).join('\n    ');
 
-  const foot = `
+  const footer = tagline => `
 </main>
-    <footer class="site-footer wrap"><div><a class="brand" href="/">${name}<span class="brand-dot" aria-hidden="true">.</span></a><p>${plainField('site.footerTagline', site.footerTagline)}</p></div>
+    <footer class="site-footer wrap"><div><a class="brand" href="/">${name}<span class="brand-dot" aria-hidden="true">.</span></a><p>${tagline}</p></div>
+      <p class="footer-links"><a href="/privacy">Privacy notice</a></p>
       <p class="copyright">© ${year} ${name}</p>
     </footer>
   </body></html>
 `;
 
-  return {
-    'index.html': head + main + foot,
+  const files = {
+    'index.html': head + main + footer(plainField('site.footerTagline', site.footerTagline)),
     'brands.json': JSON.stringify(site.logos.map(l => ({ name: l.name, src: l.src })))
   };
+  // The privacy notice (D-211), when the bundle has it: the same header, footer, styles and site.js as the homepage.
+  const privacy = bundle.pages.privacy;
+  if (privacy && !preview) {
+    const url = `${site.origin}${privacy.path}`;
+    const sections = privacy.sections.map(sec => `<section><h2>${plainText(sec.heading)}</h2>${paragraphs(sec.paragraphs ?? [])}${(sec.list ?? []).length ? `<ul>\n${sec.list.map(li => `<li>${richText(li)}</li>\n`).join('')}</ul>\n` : ''}</section>`).join('\n      ');
+    files['privacy.html'] = `<!doctype html><html lang="en-GB"><head>
+    <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>${escapeText(privacy.seoTitle)}</title>
+    <meta name="description" content="${plainAttr(privacy.seoDescription)}"><meta name="robots" content="index, follow">
+    <link rel="canonical" href="${url}">
+${ICONS}    <link rel="stylesheet" href="/styles.css"><script type="module" src="/site.js"></script>
+  </head><body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="site-header"><div class="wrap header-inner">
+      <a class="brand" href="/" aria-label="${escapeAttr(site.name)}, home">${name}<span class="brand-dot" aria-hidden="true">.</span></a>
+    </div></header>
+    <main id="main" tabindex="-1">
+    <article class="legal wrap"><h1>${plainText(privacy.title)}</h1><p class="legal-updated">Last updated ${escapeText(privacy.updated)}</p>
+      <div class="prose legal-body">${paragraphs(privacy.intro)}
+      ${sections}
+      </div>
+    </article>${footer(plainText(site.footerTagline))}`;
+  }
+  return files;
 }
 
 /**
