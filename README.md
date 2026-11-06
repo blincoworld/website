@@ -5,7 +5,7 @@ from this repository. The Worker is **`piers-portfolio-static`**, with no CMS co
 D1, R2, SMTP or backend API binding. `index.html` is the content source; the build
 copies only the production allowlist to `dist/`.
 
-Current production version: `434aeb2f-26aa-4d0e-9d7c-b3eeb5c993da`.
+Current production version: `cfb7b262-8e10-4a7d-97f2-b057e8ac7cc2`.
 The public inspection URL is
 https://piers-portfolio-static.pbwebonlinesales.workers.dev — it now mirrors the
 same production version and is not an isolated staging environment.
@@ -28,7 +28,6 @@ npm ci
 npm run build
 npm run check
 npm test
-npm run test:rollback
 ```
 
 Deployed checks issue only GET requests and do not send enquiries or emails:
@@ -78,27 +77,26 @@ npx wrangler versions deploy REVIEWED_VERSION_ID@100 --name piers-portfolio-stat
 Version-specific preview URLs are currently disabled. Use a separately approved
 staging/version-preview setup if a future candidate needs remote testing before
 promotion; the existing `workers.dev` mirror alone does not isolate a deployment.
-Do not redeploy the old CMS or apply its stale route configuration.
-
 ## Rollback
 
-The original `website-cms` Worker remains intact at version
-`79fc8a1e-9f8f-4af9-b2de-a360b61496a3`. Its database, media, SMTP settings, source
-repository and backups are preserved. Rollback changes only the apex assignment:
+Rollback is **deploy the previous Worker version**. List the versions, then send
+100% of traffic back to the one that was live before the faulty release:
 
 ```sh
-python3 scripts/domain-cutover.py rollback         # Read-only plan
-python3 scripts/domain-cutover.py rollback --apply # Detach static apex, attach CMS
+npx wrangler deployments list --name piers-portfolio-static
+npx wrangler versions deploy PREVIOUS_VERSION_ID@100 --name piers-portfolio-static
 ```
 
-The helper uses `CLOUDFLARE_API_TOKEN` when supplied, otherwise the existing private
-operator-token file. It validates the exact account/zone/hostname and owner,
-uses no ownership/DNS override flags, and attempts CMS recovery on failures.
-Verify HTTPS and the restored CMS homepage immediately. See
-[STATIC-MIGRATION.md](STATIC-MIGRATION.md) for backup locations and full recovery
-instructions. Testing, partners, Family Hub, email and unrelated DNS are outside
-this operation. `www.piersblinco.com` still has its pre-existing GitHub Pages CNAME
-and 404 response; it was not included in the authorised apex cutover.
+Then run the deployed checks above against `https://piersblinco.com`. The old
+`website-cms` Worker, its D1, R2 bucket and repository were retired on
+6 November 2026 (backups in `~/website-backups/website-cms-retired-2026-11-06/`),
+so there is no CMS to roll back to.
+
+`www.piersblinco.com` no longer points at GitHub Pages (switched off for this
+repository on 6 November 2026). Its DNS record is a proxied placeholder (`AAAA 100::`)
+for a Cloudflare Redirect Rule that sends www to `https://piersblinco.com` with a 301,
+keeping the path and query. The rule is added in the Cloudflare dashboard (Rules ›
+Redirect Rules), because the API credentials on hand can't manage rules.
 
 ## Repository layout
 
@@ -110,11 +108,11 @@ assets/images/                                  Portrait, social preview, icons
 favicon.ico / robots.txt / sitemap.xml           Discovery assets
 _headers / production-files.json                Headers and publish allowlist
 wrangler.jsonc / package.json / package-lock.json Hosting config and pinned tooling
-scripts/                                        Build, browser, deployed checks and guarded rollback
+scripts/                                        Build, browser and deployed checks
 STATIC-MIGRATION.md                              Deployment and recovery record
 ```
 
 `dist/`, `node_modules/`, `.wrangler/` and `.audit/` are gitignored. Verification
-reports/screenshots are under `.audit/`; private configuration/code backups are
-under `.audit/static-cutover/`. Historical CMS content backups remain untouched
-in the separate CMS repository's ignored backup directory.
+reports/screenshots are under `.audit/`; private configuration/code backups from
+the 4 November cutover are under `.audit/static-cutover/`. The retired CMS's
+database export and source are in `~/website-backups/website-cms-retired-2026-11-06/`.

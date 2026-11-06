@@ -6,8 +6,7 @@
     "build": "python3 scripts/build.py",
     "check": "python3 scripts/check.py && node --check site.js",
     "test": "node scripts/check-browser.mjs",
-    "check:deployment": "python3 scripts/check-deployment.py",
-    "test:rollback": "python3 scripts/test-domain-cutover.py"
+    "check:deployment": "python3 scripts/check-deployment.py"
   },
   "engines": {
     "node": ">=22"
