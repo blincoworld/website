@@ -9,6 +9,8 @@ root = Path(__file__).resolve().parent.parent
 output = root / 'dist'
 # index.html and brands.json are generated from content/*.json by the shared renderer (renderer/site.mjs).
 subprocess.run(['node', str(root / 'scripts' / 'render.mjs')], check=True)
+# The social preview image is generated from the same content in headless Chrome (D-213); it is gitignored.
+subprocess.run(['node', str(root / 'scripts' / 'social-card.mjs')], check=True)
 files = json.loads((root / 'production-files.json').read_text())
 if output.exists(): shutil.rmtree(output)
 for name in files:

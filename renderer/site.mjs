@@ -187,8 +187,9 @@ export function validateContent(bundle) {
       plain(`${P}.seo.description`, seo.description, { max: 320 });
       plain(`${P}.seo.socialTitle`, seo.socialTitle, { max: 120 });
       plain(`${P}.seo.socialDescription`, seo.socialDescription, { required: false, max: 320 });
-      plain(`${P}.seo.socialImageAlt`, seo.socialImageAlt, { max: 420 });
-      image(`${P}.seo.socialImage`, seo.socialImage, { altRequired: false });
+      plain(`${P}.seo.socialImageAlt`, seo.socialImageAlt, { required: false, max: 420 });
+      // seo.socialImage is a legacy field (before D-213): the social image is now generated from the hero (socialCard),
+      // so it is ignored. It is still accepted, so older versions in the history can be restored.
     }
     const sections = page.sections;
     if (!Array.isArray(sections) || sections.length < 1 || sections.length > LIMITS.sections) err(`${P}.sections`, `must have 1–${LIMITS.sections} sections`);
@@ -342,7 +343,8 @@ export function renderSite(bundle, options) {
   const description = plainAttr(seo.description);
   const socialDescription = seo.socialDescription ? plainAttr(seo.socialDescription) : description;
   const canonical = `${site.origin}${page.path}`;
-  const socialImage = `${site.origin}${seo.socialImage.src}`;
+  const card = socialCard(bundle);
+  const socialImage = `${site.origin}${card.src}`;
   const name = escapeText(site.name);
 
   const head = `<!doctype html><html lang="en-GB"><head>
@@ -354,10 +356,10 @@ export function renderSite(bundle, options) {
     <meta property="og:title" content="${plainAttr(seo.socialTitle)}"><meta property="og:description" content="${socialDescription}">
     <meta property="og:url" content="${canonical}"><meta property="og:type" content="website">
     <meta property="og:image" content="${socialImage}">
-    <meta property="og:image:width" content="${seo.socialImage.width}"><meta property="og:image:height" content="${seo.socialImage.height}">
-    <meta property="og:image:alt" content="${plainAttr(seo.socialImageAlt)}">
+    <meta property="og:image:width" content="${card.width}"><meta property="og:image:height" content="${card.height}">
+    <meta property="og:image:alt" content="${plainAttr(seo.socialImageAlt || card.alt)}">
     <meta name="twitter:card" content="summary_large_image"><meta name="twitter:image" content="${socialImage}">
-    <meta name="twitter:image:alt" content="${plainAttr(seo.socialImageAlt)}">
+    <meta name="twitter:image:alt" content="${plainAttr(seo.socialImageAlt || card.alt)}">
 ${preview ? ICONS.replace(/href="([^"]+)"/g, (_, h) => `href="${asset(h)}"`) : ICONS}    <link rel="stylesheet" href="${asset('/styles.css')}">${preview ? '' : '<script type="module" src="/site.js"></script>'}
   </head><body>
     <a class="skip-link" href="#main">Skip to content</a>
@@ -485,6 +487,129 @@ ${ICONS}    <link rel="stylesheet" href="/styles.css"><script type="module" src=
     </article>${footer(plainText(site.footerTagline))}`;
   }
   return files;
+}
+
+// ---------------------------------------------------------------------------------------------------------------
+// Social preview image (D-213)
+//
+// The Open Graph / Twitter image is made from the homepage itself on every build: renderSocialCard() gives a
+// 1200×630 HTML card (the site's font and colours, the site name, the hero's role and headline, the portrait and
+// the domain), and the website build screenshots it in headless Chrome (scripts/social-card.mjs). The file name is
+// a hash of the card's HTML, so it changes whenever anything on the card changes, and the build, the Back Office's
+// publish and its preview all know the og:image path without rendering an image.
+
+export const SOCIAL_CARD = { width: 1200, height: 630 };
+const SOCIAL_FONT = '/assets/fonts/inter-variable-693b77d4f3.woff2';
+
+/**
+ * The social card as a standalone HTML document. options.resolveAsset(path) maps the font and portrait URLs (the
+ * editor preview and the build's local server); without it they stay site paths, which is the form that is hashed.
+ */
+export function renderSocialCard(bundle, options) {
+  const asset = options && options.resolveAsset ? options.resolveAsset : p => p;
+  const { site } = bundle;
+  const hero = bundle.pages.home.sections.find(s => s.type === 'hero') || {};
+  const years = String(site.experienceYears);
+  const text = s => escapeText(s || '').split(YEARS_TOKEN).join(years);
+  const host = site.origin.replace(/^https:\/\//, '');
+  const role = hero.eyebrowRole ? `<p class="role">${text(hero.eyebrowRole)}</p>` : '';
+  const blue = hero.headlineBlue ? ` <span class="blue">${text(hero.headlineBlue)}</span>` : '';
+  const portrait = hero.portrait ? `<div class="frame"><img src="${escapeAttr(asset(hero.portrait.src))}" alt=""></div>` : '';
+  return `<!doctype html><html lang="en-GB"><head><meta charset="utf-8"><title>${escapeText(site.name)}</title><link rel="icon" href="data:,"><style>
+@font-face { font-family: Inter; font-style: normal; font-weight: 100 900; src: url("${escapeAttr(asset(SOCIAL_FONT))}") format("woff2"); }
+* { box-sizing: border-box; margin: 0; }
+html, body { width: ${SOCIAL_CARD.width}px; height: ${SOCIAL_CARD.height}px; overflow: hidden; background: #fff; }
+body { position: relative; font-family: Inter, sans-serif; color: #111827; font-synthesis: none; -webkit-font-smoothing: antialiased; }
+.card { position: absolute; inset: 0 0 88px 0; display: grid; grid-template-columns: minmax(0, 1fr) 400px; grid-template-rows: minmax(0, 1fr); gap: 56px; padding: 52px 64px 44px; }
+.copy { display: flex; flex-direction: column; min-width: 0; min-height: 0; }
+.brand { font-size: 34px; font-weight: 700; letter-spacing: -0.04em; line-height: 1; }
+.dot, .role, .blue { color: #2563eb; }
+.role { margin-top: 16px; font-size: 24px; font-weight: 550; line-height: 1.3; }
+.fit { flex: 1; min-height: 0; display: flex; align-items: flex-end; margin-top: 24px; overflow: hidden; }
+h1 { width: 100%; font-size: 68px; line-height: 1.04; font-weight: 800; letter-spacing: -0.05em; overflow-wrap: break-word; }
+h1 .blue { display: block; }
+.frame { align-self: center; width: 400px; height: 400px; background: #f1f5f9; border-bottom: 6px solid #2563eb; overflow: hidden; }
+.frame img { display: block; width: 100%; height: 100%; object-fit: contain; }
+.bar { position: absolute; left: 0; right: 0; bottom: 0; height: 88px; display: flex; align-items: center; padding: 0 64px; background: #111827; color: #fff; font-size: 26px; font-weight: 600; letter-spacing: -0.01em; }
+</style></head><body>
+<div class="card"><div class="copy"><p class="brand">${escapeText(site.name)}<span class="dot">.</span></p>${role}<div class="fit" data-fit="68"><h1>${text(hero.headline)}${blue}</h1></div></div>${portrait}</div>
+<div class="bar">${escapeText(host)}</div>
+</body></html>
+`;
+}
+
+/** The social card's site path, size and HTML. The path is content-hashed: it changes when the card's HTML changes. */
+export function socialCard(bundle) {
+  const html = renderSocialCard(bundle);
+  return { src: `/assets/images/social-card-${sha256Hex(html).slice(0, 10)}.png`, width: SOCIAL_CARD.width, height: SOCIAL_CARD.height, alt: socialCardAlt(bundle), html };
+}
+
+/** The card described in words, for og:image:alt when seo.socialImageAlt is empty (so it always matches the card). */
+export function socialCardAlt(bundle) {
+  const { site } = bundle;
+  const hero = bundle.pages.home.sections.find(s => s.type === 'hero') || {};
+  const years = String(site.experienceYears);
+  const t = s => String(s || '').split(YEARS_TOKEN).join(years).trim();
+  const headline = [t(hero.headline), t(hero.headlineBlue)].filter(Boolean).join(' ');
+  const who = hero.eyebrowRole ? `${t(site.name)}, ${t(hero.eyebrowRole)}` : t(site.name);
+  const end = /[.!?]$/.test(headline) ? '' : '.';
+  return `${who}. “${headline}${end}” ${hero.portrait ? `Portrait of ${t(site.name)}, with` : 'With'} ${site.origin.replace(/^https:\/\//, '')}.`;
+}
+
+/**
+ * Shrinks the card's headline until it fits its box (68px down to 32px, in 2px steps); returns the size used.
+ * Runs in a browser on the card's document: the editor preview calls it, and the build passes its source to Chrome,
+ * so it must stay self-contained (no references outside the function).
+ */
+export function fitSocialCard(doc) {
+  const box = doc.querySelector('[data-fit]');
+  const h = box && box.firstElementChild;
+  if (!h) return 0;
+  let size = Number(box.getAttribute('data-fit'));
+  const fits = () => h.offsetHeight <= box.clientHeight && h.scrollWidth <= h.clientWidth;
+  h.style.fontSize = `${size}px`;
+  while (size > 32 && !fits()) { size -= 2; h.style.fontSize = `${size}px`; }
+  return size;
+}
+
+/** SHA-256 of a string's UTF-8 bytes, as hex. Plain JavaScript, so the renderer stays synchronous everywhere. */
+export function sha256Hex(str) {
+  const bin = unescape(encodeURIComponent(str));
+  const bytes = new Uint8Array(((bin.length + 9 + 63) >> 6) << 6);
+  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+  bytes[bin.length] = 0x80;
+  const bits = bin.length * 8;
+  const view = new DataView(bytes.buffer);
+  view.setUint32(bytes.length - 8, Math.floor(bits / 0x100000000));
+  view.setUint32(bytes.length - 4, bits >>> 0);
+  const K = [];
+  const H = [];
+  for (let n = 2, found = 0; found < 64; n++) {
+    let prime = true;
+    for (let d = 2; d * d <= n; d++) if (n % d === 0) { prime = false; break; }
+    if (!prime) continue;
+    if (found < 8) H.push((Math.pow(n, 1 / 2) % 1) * 0x100000000 >>> 0);
+    K.push((Math.pow(n, 1 / 3) % 1) * 0x100000000 >>> 0);
+    found++;
+  }
+  const w = new Array(64);
+  const rotr = (x, n) => (x >>> n) | (x << (32 - n));
+  for (let off = 0; off < bytes.length; off += 64) {
+    for (let i = 0; i < 16; i++) w[i] = view.getUint32(off + i * 4);
+    for (let i = 16; i < 64; i++) {
+      const s0 = rotr(w[i - 15], 7) ^ rotr(w[i - 15], 18) ^ (w[i - 15] >>> 3);
+      const s1 = rotr(w[i - 2], 17) ^ rotr(w[i - 2], 19) ^ (w[i - 2] >>> 10);
+      w[i] = (w[i - 16] + s0 + w[i - 7] + s1) >>> 0;
+    }
+    let [a, b, c, d, e, f, g, h] = H;
+    for (let i = 0; i < 64; i++) {
+      const t1 = (h + (rotr(e, 6) ^ rotr(e, 11) ^ rotr(e, 25)) + ((e & f) ^ (~e & g)) + K[i] + w[i]) >>> 0;
+      const t2 = ((rotr(a, 2) ^ rotr(a, 13) ^ rotr(a, 22)) + ((a & b) ^ (a & c) ^ (b & c))) >>> 0;
+      h = g; g = f; f = e; e = (d + t1) >>> 0; d = c; c = b; b = a; a = (t1 + t2) >>> 0;
+    }
+    [a, b, c, d, e, f, g, h].forEach((v, i) => { H[i] = (H[i] + v) >>> 0; });
+  }
+  return H.map(v => v.toString(16).padStart(8, '0')).join('');
 }
 
 /**
