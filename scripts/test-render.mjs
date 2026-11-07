@@ -4,7 +4,8 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
-import { CONTACT_NEEDS, renderSite, richTextError, stripPreviewMarkers, validateContent } from '../renderer/site.mjs';
+import { createHash } from 'node:crypto';
+import { CONTACT_NEEDS, renderSite, renderSocialCard, richTextError, sha256Hex, socialCard, stripPreviewMarkers, validateContent } from '../renderer/site.mjs';
 
 const root = resolve(import.meta.dirname, '..');
 const read = name => readFileSync(join(root, name), 'utf8');
@@ -159,6 +160,77 @@ test('the privacy notice renders from content/privacy.json, with the footer link
     const c = bundle(); c.pages.privacy = JSON.parse(read('content/privacy.json')); mutate(c.pages.privacy);
     const r = validateContent(c);
     assert(r.errors.some(e => `${e.path} ${e.message}`.includes(expected)), `${expected}: ${JSON.stringify(r.errors)}`);
+  }
+});
+
+
+// ---- Social preview image (D-213) ----
+const hero = b => b.pages.home.sections.find(s => s.type === 'hero');
+const metaOf = (html, key) => (new RegExp(`(?:property|name)="${key}" content="([^"]*)"`).exec(html) || [])[1];
+
+test('og:image and twitter:image point at the generated card, with its size', () => {
+  const b = bundle();
+  const card = socialCard(b);
+  assert.match(card.src, /^\/assets\/images\/social-card-[0-9a-f]{10}\.png$/);
+  const html = renderSite(b, { year: 2026 })['index.html'];
+  assert.equal(metaOf(html, 'og:image'), `https://piersblinco.com${card.src}`);
+  assert.equal(metaOf(html, 'twitter:image'), `https://piersblinco.com${card.src}`);
+  assert.equal(metaOf(html, 'og:image:width'), '1200');
+  assert.equal(metaOf(html, 'og:image:height'), '630');
+  assert.doesNotMatch(html, /social-preview/);
+  assert.ok(JSON.parse(read('production-files.json')).includes(card.src.slice(1)), 'the allow-list carries the current card');
+});
+
+test('the card name changes when the headline, role, portrait or name changes, and only then', () => {
+  const base = socialCard(bundle()).src;
+  const changed = edit => { const b = bundle(); edit(b); return socialCard(b).src; };
+  assert.notEqual(changed(b => { hero(b).headline = 'Practical software,'; }), base);
+  assert.notEqual(changed(b => { hero(b).headlineBlue = 'delivered properly.'; }), base);
+  assert.notEqual(changed(b => { hero(b).eyebrowRole = 'Software Consultant'; }), base);
+  assert.notEqual(changed(b => { hero(b).portrait.src = '/assets/images/piers-portrait-0000000000.webp'; }), base);
+  assert.notEqual(changed(b => { b.site.name = 'P Blinco'; }), base);
+  // Nothing outside the card moves it, so a copy edit elsewhere doesn't invalidate shared previews.
+  assert.equal(changed(b => { b.site.footerTagline = 'Something else.'; }), base);
+  assert.equal(changed(b => { b.pages.home.seo.description = 'Other words.'; }), base);
+  assert.equal(changed(b => { hero(b).intro = ['A different intro.']; }), base);
+  assert.equal(socialCard(bundle()).src, base, 'the same content always gives the same name');
+});
+
+test('the card shows the name, role, headline (with {years}), portrait and domain, escaped', () => {
+  const b = bundle();
+  hero(b).headline = 'Over {years} years of <software>';
+  const html = renderSocialCard(b);
+  assert.match(html, /<p class="brand">Piers Blinco<span class="dot">\.<\/span><\/p>/);
+  assert.match(html, /<p class="role">Independent Software Consultant<\/p>/);
+  assert.match(html, /<h1>Over 25 years of &lt;software&gt; <span class="blue">without the agency overhead\.<\/span><\/h1>/);
+  assert.match(html, /<img src="\/assets\/images\/piers-portrait-3b2768d94f\.webp" alt="">/);
+  assert.match(html, /<div class="bar">piersblinco\.com<\/div>/);
+  assert.match(html, /src: url\("\/assets\/fonts\/inter-variable-693b77d4f3\.woff2"\)/);
+  const mapped = renderSocialCard(b, { resolveAsset: p => `/x${p}` });
+  assert.match(mapped, /src="\/x\/assets\/images\/piers-portrait/);
+  assert.match(mapped, /url\("\/x\/assets\/fonts\//);
+});
+
+test('the image description is automatic unless one is written', () => {
+  const b = bundle();
+  let html = renderSite(b, { year: 2026 })['index.html'];
+  assert.equal(metaOf(html, 'og:image:alt'), 'Piers Blinco, Independent Software Consultant. “Senior technical expertise, without the agency overhead.” Portrait of Piers Blinco, with piersblinco.com.');
+  assert.equal(metaOf(html, 'twitter:image:alt'), metaOf(html, 'og:image:alt'));
+  b.pages.home.seo.socialImageAlt = 'My own words';
+  html = renderSite(b, { year: 2026 })['index.html'];
+  assert.equal(metaOf(html, 'og:image:alt'), 'My own words');
+});
+
+test('the legacy seo.socialImage field is accepted and ignored', () => {
+  const b = bundle();
+  b.pages.home.seo.socialImage = { src: '/assets/images/social-preview-3deead63c6.png', width: 1200, height: 630 };
+  assert.ok(validateContent(b).ok);
+  assert.equal(metaOf(renderSite(b, { year: 2026 })['index.html'], 'og:image'), `https://piersblinco.com${socialCard(bundle()).src}`);
+});
+
+test('sha256Hex matches SHA-256', () => {
+  for (const s of ['', 'abc', 'Senior — expertise ’ é 😀', 'x'.repeat(55), 'x'.repeat(56), 'x'.repeat(64), renderSocialCard(bundle())]) {
+    assert.equal(sha256Hex(s), createHash('sha256').update(s, 'utf8').digest('hex'));
   }
 });
 

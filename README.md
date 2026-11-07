@@ -32,10 +32,20 @@ needed for the local build and tests.
 
 ```sh
 npm ci
-npm run build      # render content/ into index.html + brands.json, then copy the allowlist to dist/
+npm run build      # render content/, generate the social card, then copy the allowlist to dist/
 npm run check      # generated files match content/, content validates, check.py, renderer tests
-npm test           # Chrome at 1440, 768 and 375px
+npm test           # Chrome at 1440, 768 and 375px, and the social card tests
 ```
+
+**Social preview image (D-213).** The Open Graph / Twitter image is generated on every
+build from the hero (site name, role, headline, portrait) by `scripts/social-card.mjs`
+in headless Chrome: a 1200×630 PNG at `assets/images/social-card-<hash>.png`. The hash
+is of the card's HTML (`socialCard()` in the renderer), so the name changes whenever the
+card would look different, and `og:image`/`twitter:image` follow it. The PNG is
+gitignored; `npm run render` keeps its entry in `production-files.json` current and
+`npm run check` fails if it isn't. Leave `seo.socialImageAlt` empty for an automatic
+description. After a headline change, refresh LinkedIn's and Facebook's caches with
+their post inspector / sharing debugger.
 
 Changing `renderer/site.mjs` also needs the admin app's copy updated
 (`npm run sync-site-renderer` in the admin repo), or the admin app refuses to publish.
@@ -139,7 +149,7 @@ index.html / brands.json                        Generated from content/ (committ
 styles.css / site.js                            Static homepage styles and logo rotation
 assets/brands/                                  33 logo WebPs
 assets/fonts/                                   Inter and OFL licence
-assets/images/                                  Portrait, social preview, icons
+assets/images/                                  Portrait, icons (and the generated social card, gitignored)
 favicon.ico / robots.txt / sitemap.xml           Discovery assets
 _headers / production-files.json                Headers and publish allowlist
 wrangler.jsonc / package.json / package-lock.json Hosting config and pinned tooling
