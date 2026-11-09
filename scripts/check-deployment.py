@@ -68,6 +68,11 @@ for index,path in enumerate(['/missing','/agency-partners/','/api/pages/home','/
 # The site Worker's two routes (D-209) take POST only; a GET is refused without reaching the Back Office.
 for index,path in enumerate(['/api/v','/api/enquiry']):
     assert get(path,'api-get-'+str(index))[0] == 405, f'GET {path} was not refused'
+# The pre-call assessment (D-238): served by the Back Office through the binding, with its own nonce CSP; submissions POST only.
+status, body, values = get('/assessment?sector=garage','assessment')
+assert status == 200 and b'Tell Me About Your Business' in body and b'name="sector" value="garage"' in body, ('/assessment', status)
+assert "script-src 'nonce-" in values.get('content-security-policy',''), values.get('content-security-policy')
+assert get('/api/public/assessment','assessment-get')[0] == 405, 'GET /api/public/assessment was not refused'
 report = {'origin':origin,'files':results,'logoAssets':sum(r['file'].startswith('assets/brands/') for r in results),'unknownRoutes404':True,'apiRoutesPostOnly':True,'securityAndCacheHeaders':True}
 (out/'results.json').write_text(json.dumps(report,indent=2)+'\n')
-print(f'PASS: {origin}; {len(results)} production assets HTTP 200, byte/content checks, every logo, favicon/robots/sitemap, cache/security headers, removed/API paths HTTP 404, /api/v and /api/enquiry POST only.')
+print(f'PASS: {origin}; {len(results)} production assets HTTP 200, byte/content checks, every logo, favicon/robots/sitemap, cache/security headers, removed/API paths HTTP 404, /api/v and /api/enquiry POST only; /assessment served.')

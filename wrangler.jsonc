@@ -1,7 +1,8 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "piers-portfolio-static",
-  // Server code only for /api/* (D-209): worker/index.js forwards visit pings and the contact form to the Back Office.
+  // Server code only for /api/* (D-209) and /assessment (D-238): worker/index.js forwards visit pings, the contact form and
+  // the pre-call assessment to the Back Office.
   "main": "worker/index.js",
   "account_id": "c39888a9363fce8762763f0c60a9a388",
   "compatibility_date": "2026-11-04",
@@ -19,7 +20,7 @@
     "not_found_handling": "none",
     "binding": "ASSETS",
     // Everything else is served from the static files without running the Worker, so the site never depends on it.
-    "run_worker_first": ["/api/*"]
+    "run_worker_first": ["/api/*", "/assessment"]
   },
   // The Back Office Worker's SiteIngest entrypoint (no public URL). If it's down, pings are dropped and the form says
   // "please email me instead".

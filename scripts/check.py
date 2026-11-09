@@ -123,11 +123,11 @@ for ref in legal.assets: check_ref(ref, '/privacy')
 for ref in legal.links:
     if ref.startswith(('mailto:', 'https://')) and not ref.startswith('https://piersblinco.com'): continue
     check_ref(ref, '/privacy')
-# The site Worker (D-209) handles /api/* only and forwards to the Back Office's SiteIngest entrypoint.
+# The site Worker (D-209) handles /api/* and /assessment (D-238) only and forwards to the Back Office's SiteIngest entrypoint.
 wrangler = (root / 'wrangler.jsonc').read_text()
-assert '"run_worker_first": ["/api/*"]' in wrangler and '"entrypoint": "SiteIngest"' in wrangler and '"main": "worker/index.js"' in wrangler
+assert '"run_worker_first": ["/api/*", "/assessment"]' in wrangler and '"entrypoint": "SiteIngest"' in wrangler and '"main": "worker/index.js"' in wrangler
 assert not (root / 'dist' / 'worker').exists() and 'worker/index.js' not in files
 headers = (root / '_headers').read_text()
 assert headers.count('https://challenges.cloudflare.com') == 2 and '\n! ' not in headers, 'Turnstile is allowed on the homepage only, without detach rules'
 assert headers.count('Content-Security-Policy:') == 3, 'One policy per path: /:file, /assets/* and the homepage'
-print(f'PASS: static homepage and privacy notice rendered from content/; {years}-year counter and SEO; social card {cards[0].split("/")[-1]} (1200x630); contact form {"present" if has_contact else "not on the page"}; site Worker /api/* only; local assets and {len(brands)} logo paths; homepage and privacy sitemap; {len(files)} production files')
+print(f'PASS: static homepage and privacy notice rendered from content/; {years}-year counter and SEO; social card {cards[0].split("/")[-1]} (1200x630); contact form {"present" if has_contact else "not on the page"}; site Worker /api/* and /assessment only; local assets and {len(brands)} logo paths; homepage and privacy sitemap; {len(files)} production files')
