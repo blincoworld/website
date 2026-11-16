@@ -82,28 +82,31 @@ await test('only POSTs from the site’s own pages are forwarded; other paths ar
   assert.equal(bo.seen.length, 0);
 });
 
-// D-238: the pre-call assessment at piersblinco.com/assessment, served by the Back Office through the binding.
+// The pre-call assessment at piersblinco.com/assessment, served by Outreach through the OUTREACH binding (Outreach O-87;
+// the Back Office's D-238 before). The Back Office binding is given too, and must never see an assessment request.
 const ASSESSMENT_HTML = '<!doctype html><title>Tell Me About Your Business</title>';
 const ASSESSMENT_CSP = "default-src 'self'; script-src 'nonce-abc'";
+/** The Back Office binding in the assessment tests: it must never be called for the assessment. */
+const unused = { fetch: async () => { throw new Error('the Back Office was called for the assessment'); } };
 
-await test('GET /assessment is the Back Office’s form, with ?sector= and ?ref= passed on and its own security headers', async () => {
+await test('GET /assessment is Outreach’s form, with ?sector= and ?ref= passed on and its own security headers', async () => {
   const bo = backOffice(() => new Response(ASSESSMENT_HTML, { status: 200, headers: { 'Content-Type': 'text/html; charset=utf-8', 'Content-Security-Policy': ASSESSMENT_CSP, 'Cache-Control': 'no-store', 'X-Frame-Options': 'DENY', 'Set-Cookie': 'x=1' } }));
-  const res = await worker.fetch(new Request(`${SITE}/assessment?sector=garage&ref=p_1`, { headers: { 'CF-Connecting-IP': '203.0.113.9' } }), { ASSETS: assets, BACK_OFFICE: bo }, ctx);
+  const res = await worker.fetch(new Request(`${SITE}/assessment?sector=garage&ref=p_1`, { headers: { 'CF-Connecting-IP': '203.0.113.9' } }), { ASSETS: assets, OUTREACH: bo, BACK_OFFICE: unused }, ctx);
   assert.equal(res.status, 200);
   assert.equal(await res.text(), ASSESSMENT_HTML);
   assert.equal(res.headers.get('Content-Security-Policy'), ASSESSMENT_CSP);
   assert.equal(res.headers.get('X-Frame-Options'), 'DENY');
   assert.equal(res.headers.get('Set-Cookie'), null);
-  assert.equal(bo.seen[0].url, 'https://back-office.internal/assessment?sector=garage&ref=p_1');
+  assert.equal(bo.seen[0].url, 'https://outreach.internal/assessment?sector=garage&ref=p_1');
   assert.equal(bo.seen[0].headers['x-pb-client-ip'], '203.0.113.9');
-  const head = await worker.fetch(new Request(`${SITE}/assessment`, { method: 'HEAD' }), { ASSETS: assets, BACK_OFFICE: backOffice(() => new Response(ASSESSMENT_HTML, { status: 200, headers: { 'Content-Type': 'text/html' } })) }, ctx);
+  const head = await worker.fetch(new Request(`${SITE}/assessment`, { method: 'HEAD' }), { ASSETS: assets, OUTREACH: backOffice(() => new Response(ASSESSMENT_HTML, { status: 200, headers: { 'Content-Type': 'text/html' } })) }, ctx);
   assert.equal(head.status, 200);
-  assert.equal((await worker.fetch(new Request(`${SITE}/assessment`, { method: 'POST', body: 'x' }), { ASSETS: assets, BACK_OFFICE: bo }, ctx)).status, 405);
+  assert.equal((await worker.fetch(new Request(`${SITE}/assessment`, { method: 'POST', body: 'x' }), { ASSETS: assets, OUTREACH: bo, BACK_OFFICE: unused }, ctx)).status, 405);
 });
 
-await test('GET /assessment says "email me" when the Back Office is down or erroring', async () => {
+await test('GET /assessment says "email me" when Outreach is down or erroring', async () => {
   for (const bo of [{ fetch: async () => { throw new Error('down'); } }, backOffice(() => new Response('x', { status: 500 })), backOffice(() => new Response('x', { status: 404 })), undefined]) {
-    const res = await worker.fetch(new Request(`${SITE}/assessment`), { ASSETS: assets, BACK_OFFICE: bo }, ctx);
+    const res = await worker.fetch(new Request(`${SITE}/assessment`), { ASSETS: assets, OUTREACH: bo, BACK_OFFICE: unused }, ctx);
     assert.equal(res.status, 503);
     assert.match(await res.text(), /piers@piersblinco\.com/);
   }
@@ -112,10 +115,10 @@ await test('GET /assessment says "email me" when the Back Office is down or erro
 await test('POST /api/public/assessment is forwarded with the visitor’s IP (from Cloudflare, not the request) and the page’s origin', async () => {
   for (const [status, body] of [[200, { ok: true }], [400, { ok: false, error: 'invalid', fields: { email: 'x' } }], [429, { ok: false, error: 'rate_limited' }]]) {
     const bo = backOffice(() => Response.json(body, { status }));
-    const res = await worker.fetch(post('/api/public/assessment', { email: 'a@b.c' }, { 'x-pb-client-ip': '10.9.9.9' }), { ASSETS: assets, BACK_OFFICE: bo }, ctx);
+    const res = await worker.fetch(post('/api/public/assessment', { email: 'a@b.c' }, { 'x-pb-client-ip': '10.9.9.9' }), { ASSETS: assets, OUTREACH: bo, BACK_OFFICE: unused }, ctx);
     assert.equal(res.status, status);
     assert.deepEqual(await res.json(), body);
-    assert.equal(bo.seen[0].url, 'https://back-office.internal/assessment/submit');
+    assert.equal(bo.seen[0].url, 'https://outreach.internal/assessment/submit');
     assert.equal(bo.seen[0].headers['x-pb-client-ip'], '203.0.113.5');
     assert.equal(bo.seen[0].headers['x-pb-origin'], SITE);
     assert.equal(bo.seen[0].headers['content-type'], 'application/json');
@@ -123,27 +126,37 @@ await test('POST /api/public/assessment is forwarded with the visitor’s IP (fr
   }
   // The form posted normally (no script): a page comes back.
   const bo = backOffice(() => new Response('<p>Thanks!</p>', { status: 200, headers: { 'Content-Type': 'text/html; charset=utf-8' } }));
-  const res = await worker.fetch(post('/api/public/assessment', 'email=a%40b.c&services=website', { 'Content-Type': 'application/x-www-form-urlencoded' }), { ASSETS: assets, BACK_OFFICE: bo }, ctx);
+  const res = await worker.fetch(post('/api/public/assessment', 'email=a%40b.c&services=website', { 'Content-Type': 'application/x-www-form-urlencoded' }), { ASSETS: assets, OUTREACH: bo, BACK_OFFICE: unused }, ctx);
   assert.equal(res.status, 200);
   assert.equal(await res.text(), '<p>Thanks!</p>');
   assert.equal(bo.seen[0].headers['content-type'], 'application/x-www-form-urlencoded');
 });
 
-await test('POST /api/public/assessment: only from the site’s pages, size-limited, and "unavailable" when the Back Office fails', async () => {
+await test('POST /api/public/assessment: only from the site’s pages, size-limited, and "unavailable" when Outreach fails', async () => {
   const bo = backOffice(() => Response.json({ ok: true }));
-  const env = { ASSETS: assets, BACK_OFFICE: bo };
+  const env = { ASSETS: assets, OUTREACH: bo, BACK_OFFICE: unused };
   assert.equal((await worker.fetch(post('/api/public/assessment', {}, { Origin: 'https://evil.example' }), env, ctx)).status, 403);
   assert.equal((await worker.fetch(post('/api/public/assessment', 'x', { 'Content-Type': 'text/plain' }), env, ctx)).status, 415);
   assert.equal((await worker.fetch(post('/api/public/assessment', 'x'.repeat(65 * 1024)), env, ctx)).status, 413);
   assert.equal((await worker.fetch(new Request(`${SITE}/api/public/assessment`), env, ctx)).status, 405);
   assert.equal(bo.seen.length, 0);
   for (const failing of [{ fetch: async () => { throw new Error('down'); } }, backOffice(() => new Response('x', { status: 500 }))]) {
-    const res = await worker.fetch(post('/api/public/assessment', {}), { ASSETS: assets, BACK_OFFICE: failing }, ctx);
+    const res = await worker.fetch(post('/api/public/assessment', {}), { ASSETS: assets, OUTREACH: failing }, ctx);
     assert.equal(res.status, 503);
     assert.deepEqual(await res.json(), { ok: false, error: 'unavailable' });
   }
   // Nothing else changes: other paths are still the static files' answer.
   for (const path of ['/assessment/', '/assessment.html', '/api/public/other']) assert.equal((await worker.fetch(new Request(`${SITE}${path}`), env, ctx)).status, 404, path);
+});
+
+await test('visit pings and the contact form still go to the Back Office, never to Outreach', async () => {
+  const bo = backOffice(() => Response.json({ ok: true }));
+  const outreach = { fetch: async () => { throw new Error('Outreach was called for a Back Office path'); } };
+  const env = { ASSETS: assets, BACK_OFFICE: bo, OUTREACH: outreach };
+  assert.equal((await worker.fetch(post('/api/enquiry', { name: 'A' }), env, ctx)).status, 200);
+  assert.equal((await worker.fetch(post('/api/v', { p: '/' }), env, ctx)).status, 204);
+  await settle();
+  assert.deepEqual(bo.seen.map(r => r.url), ['https://back-office.internal/enquiry', 'https://back-office.internal/visit']);
 });
 
 console.log(`${passed} worker tests passed`);

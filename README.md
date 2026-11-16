@@ -95,6 +95,13 @@ If the Back Office is down, every page still loads, pings are dropped and the fo
 `privacy.html` is rendered from `content/privacy.json` and linked from the footer. `npm run check` includes the Worker's
 tests (`scripts/test-worker.mjs`); deploy the Back Office first when its `SiteIngest` entrypoint changes.
 
+## The pre-call assessment (Outreach O-87)
+
+`GET /assessment` and `POST /api/public/assessment` (`assets.run_worker_first`) are forwarded to Outreach (`outreach`)
+through the `OUTREACH` service binding to its `SiteIngest` entrypoint, with the visitor's IP from `CF-Connecting-IP`.
+Outreach serves the form and stores each submission as an enquiry (Outreach › Enquiries). If Outreach is down, the page
+asks people to email instead. Deploy Outreach first, so its `SiteIngest` entrypoint exists before this binding does.
+
 ## Production configuration and updates
 
 `wrangler.jsonc` names only the new static Worker and the apex custom domain.
